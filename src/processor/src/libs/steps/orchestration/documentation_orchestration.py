@@ -49,6 +49,12 @@ DOCUMENTATION_TERMINATION_PROMPT = """
 You are coordinating the {{step_name}} step of Azure Kubernetes migration.
 Objective: {{step_objective}}
 
+**🚨 CRITICAL AI LIMITATION REMINDER 🚨**:
+- **AI cannot certify production readiness** - Only human experts can make deployment decisions
+- **All outputs are recommendations only** - Require human validation before implementation
+- **Use advisory language** - "should", "recommended", "suggested" rather than "certified", "approved", "ready"
+- **Include disclaimers** - All reports must clearly state they are AI-generated recommendations
+
 **MANDATORY DUAL OUTPUT REQUIREMENTS**:
 1. **Create comprehensive `migration_report.md` file** in {{output_file_folder}} (for human consumption)
 2. **Return structured JSON data** (for completion tracking and automation)
@@ -79,7 +85,7 @@ The migration_report.md file must contain the following sections in markdown for
 
 ## Quality Validation Results
 - QA verification findings and validation status
-- Enterprise readiness assessment
+- Migration guidance assessment
 
 ## Next Steps and Recommendations
 - Post-migration activities and operational guidance
@@ -93,7 +99,7 @@ TERMINATION DECISION CRITERIA:
 The Technical Writer leads documentation with comprehensive expert collaboration. Analyze the conversation to determine if the documentation step should terminate.
 
 TERMINATE WITH SUCCESS when:
-- Chief Architect has reviewed and approved all documentation content in migration report
+- Chief Architect has reviewed and provided feedback on all documentation content in migration report
 - Chief Architect must confirm the file generated and saved in converted file folder
 - **DUAL OUTPUT COMPLETED**:
   - Comprehensive migration report (`migration_report.md`) generated and saved to output folder
@@ -103,11 +109,11 @@ TERMINATE WITH SUCCESS when:
 - Executive summary with quantified outcomes and success metrics is complete
 - Technical documentation covers all architectural decisions and implementation details
 - Deployment procedures and operational guidance are fully documented
-- Quality validation confirms enterprise-grade documentation standards
+- Quality validation provides recommendations for documentation standards
 - Technical Writer confirms documentation completion with expert consensus
 - All expert insights from domain specialists are captured and integrated
 - Migration report file is successfully saved and accessible
-- Documentation meets professional standards for enterprise migration projects
+- Documentation provides recommendations and guidance for migration projects
 - **🔴 MANDATORY FILE VERIFICATION**: `migration_report.md` generated and verified in {{output_file_folder}}
   - Use `list_blobs_in_container()` to confirm file exists in output folder
   - Use `read_blob_content()` to verify content is properly generated
@@ -124,7 +130,7 @@ TERMINATE WITH SUCCESS when:
      - platform_detected: actual platform (NOT NULL/empty)
      - conversion_accuracy: actual percentage (NOT NULL/placeholder)
      - documentation_completeness: actual assessment (NOT NULL/empty)
-     - enterprise_readiness: actual assessment (NOT NULL/empty)
+     - migration_guidance: actual assessment (NOT NULL/empty)
   ✅ generated_files: MUST have ALL fields with meaningful content:
      - documentation: array of actual files (NOT NULL/empty/template names)
      - total_files_generated: actual count (NOT NULL/zero)
@@ -185,7 +191,7 @@ Example SUCCESS response:
       "platform_detected": "[detected platform]",
       "conversion_accuracy": "[conversion accuracy]",
       "documentation_completeness": "[document completeness]",
-      "enterprise_readiness": "[production ready]"
+      "migration_guidance": "[recommendations provided]"
     },
     "generated_files": {
       "documentation": [all of generated report and yaml files that you have verified exist in blob storage],
@@ -201,7 +207,7 @@ Example SUCCESS response:
       "platform_detected": "[detected platform]",
       "conversion_accuracy": "[conversion accuracy]",
       "documentation_completeness": "[document completeness]",
-      "enterprise_readiness": "[production ready]"
+      "migration_guidance": "[recommendations provided]"
     }
   },
   "termination_type": "[soft_completion or other types]",
@@ -254,10 +260,10 @@ SELECTION PRIORITY:
 - Seek input from ALL relevant domain experts before finalizing documentation sections
 - Rotate between experts to ensure comprehensive coverage and true consensus
 - Ensure ONLY the appropriate platform expert participates actively
-- Build comprehensive enterprise documentation with focused platform expertise
+- Build comprehensive migration documentation with focused platform expertise
 
 Select the next participant to contribute their specialized expertise to documentation.
-Priority: Ensure ALL relevant experts contribute their domain-specific perspectives for comprehensive enterprise documentation.
+Priority: Ensure ALL relevant experts contribute their domain-specific perspectives for comprehensive migration documentation.
 
 **CRITICAL - RESPONSE FORMAT**:
 Respond with ONLY the participant name from this exact list:
@@ -376,7 +382,7 @@ Please summarize the documentation results and provide a structured report that 
         "platform_detected": "[EKS or GKE]",
         "conversion_accuracy": "[overall accuracy percentage]",
         "documentation_completeness": "[percentage complete]",
-        "enterprise_readiness": "[Yes or No]"
+        "migration_guidance": "[Yes or No]"
     }
 }
 
@@ -754,7 +760,7 @@ class DocumentationOrchestrator(StepGroupChatOrchestrator):
     - QA Engineer: Quality assurance, final validation, completeness checking
 
     KEY IMPROVEMENT: ALL domain experts now participate to provide their specialized perspectives,
-    ensuring comprehensive enterprise documentation with true collaborative consensus.
+    ensuring comprehensive migration documentation with true collaborative consensus.
     """
 
     async def create_documentation_orchestration_with_context(

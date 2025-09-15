@@ -9,7 +9,6 @@ Following SK Process Framework best practices:
 - Step-specific group chat orchestration
 """
 
-import time
 from typing import Any
 
 from jinja2 import Template
@@ -43,7 +42,6 @@ from libs.steps.orchestration.models.design_result import (
 from libs.steps.step_failure_collector import StepFailureCollector
 from plugins.mcp_server import MCPBlobIOPlugin, MCPDatetimePlugin, MCPMicrosoftDocs
 from utils.agent_telemetry import ProcessStatus, TelemetryManager
-from utils.error_classifier import ErrorClassification, classify_error
 from utils.logging_utils import create_migration_logger, safe_log
 from utils.mcp_context import PluginContext, with_name
 from utils.tool_tracking import ToolTrackingMixin
@@ -387,16 +385,23 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
         context_data = {
             "termination_type": design_output.termination_type,
             "termination_reason": design_output.reason,
-            "blocking_issues": list(design_output.blocking_issues) if design_output.blocking_issues else [],
+            "blocking_issues": list(design_output.blocking_issues)
+            if design_output.blocking_issues
+            else [],
         }
 
         # Add termination output details if available
         if design_output.termination_output:
-            context_data.update({
-                "azure_services": design_output.termination_output.azure_services or [],
-                "architecture_decisions": design_output.termination_output.architecture_decisions or [],
-                "expert_insights": design_output.termination_output.expert_insights or [],
-            })
+            context_data.update(
+                {
+                    "azure_services": design_output.termination_output.azure_services
+                    or [],
+                    "architecture_decisions": design_output.termination_output.architecture_decisions
+                    or [],
+                    "expert_insights": design_output.termination_output.expert_insights
+                    or [],
+                }
+            )
 
         return context_data
 
@@ -416,12 +421,14 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             process_id,
             "Conversation_Manager",
             "design_permanently_failed",
-            f"Design failed permanently due to {design_output.termination_type}: {design_output.reason}. Expert consensus: {design_output.blocking_issues}"
+            f"Design failed permanently due to {design_output.termination_type}: {design_output.reason}. Expert consensus: {design_output.blocking_issues}",
         )
 
         # Step 2: Create failure context using existing StepFailureCollector
         # Create "virtual exception" for termination scenario
-        termination_error = ValueError(f"Hard termination: {design_output.termination_type} - {design_output.reason}")
+        termination_error = ValueError(
+            f"Hard termination: {design_output.termination_type} - {design_output.reason}"
+        )
 
         # Use existing StepFailureCollector
         failure_collector = StepFailureCollector()
@@ -431,7 +438,7 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             process_id=process_id,
             context_data=self._create_termination_context_data(design_output),
             step_start_time=self.state.execution_start_time,
-            step_phase="hard_termination_design"
+            step_phase="hard_termination_design",
         )
 
         # Step 3: Set failure state (NOT retry state)
@@ -458,7 +465,7 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             reason=f"Design terminated: {design_output.termination_type} - {design_output.reason}",
             execution_time=self.state.total_execution_duration or 0.0,
             files_attempted=architecture_created,
-            system_failure_context=system_context
+            system_failure_context=system_context,
         )
 
         # CRITICAL: Do NOT set retry flags
@@ -471,14 +478,14 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             "termination_reason": design_output.reason,
             "blocking_issues": design_output.blocking_issues,
             "architecture_created": len(architecture_created),
-            "handled_as": "permanent_failure"
+            "handled_as": "permanent_failure",
         }
 
         await self.telemetry.update_agent_activity(
             process_id,
             "Design_Expert",
             "step_permanently_failed",
-            f"Design step terminated permanently: {failure_details}"
+            f"Design step terminated permanently: {failure_details}",
         )
 
     @kernel_function(description="Handle design event from analysis completion")
@@ -962,12 +969,28 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             - Storage Complexity: {{storage_complexity}}
             - Compute Complexity: {{compute_complexity}}
 
-            **[TOOLS] RESEARCH-DRIVEN DESIGN METHODOLOGY**:
-            You have access to comprehensive Microsoft Azure documentation tools. **ALWAYS use these research capabilities**:
-            - **Azure Architecture Center**: Query for reference architectures matching {{platform_detected}} to Azure migrations
-            - **Service Documentation**: Research AKS capabilities, Application Gateway, Storage solutions
-            - **Migration Best Practices**: Find official {{migration_type}} approaches
-            - **Security Standards**: Access Azure security baselines for {{overall_complexity}} complexity scenarios
+            **[TOOLS] STRATEGIC MICROSOFT DOCS RESEARCH METHODOLOGY**:
+            You have access to comprehensive Microsoft Azure documentation tools. **MANDATORY TWO-STEP RESEARCH PROCESS**:
+            
+            **🔍 STEP 1 - SEARCH FOR DISCOVERY**:
+            Use `microsoft_docs_search` to identify relevant documentation:
+            - **Azure Architecture Center**: Search "{{platform_detected}} to Azure migration reference architecture"
+            - **Service Documentation**: Search "AKS configuration", "Application Gateway setup", "Azure Storage options"
+            - **Migration Best Practices**: Search "{{migration_type}} migration best practices", "Azure migration guidelines"
+            - **Security Standards**: Search "Azure security baseline {{overall_complexity}} complexity"
+            
+            **📚 STEP 2 - FETCH FOR COMPREHENSIVE DETAILS**:
+            Use `microsoft_docs_fetch` on URLs from search results to get complete information:
+            - **Complete Configuration Guides**: Full YAML examples, parameter references, troubleshooting
+            - **Step-by-Step Procedures**: End-to-end migration workflows, implementation checklists
+            - **Architecture Patterns**: Complete reference architectures with detailed component specifications
+            - **Security Implementation**: Full security configuration guides, compliance requirements
+            
+            **🎯 STRATEGIC FETCH TRIGGERS**:
+            - When you need complete YAML/JSON configuration syntax
+            - When search results mention "detailed guide" or "complete tutorial"
+            - When implementing complex multi-service architectures
+            - When addressing security or compliance requirements
 
             **BEFORE STARTING DESIGN**:
             1. Verify analysis_result.md exists: check_blob_exists('analysis_result.md', container_name='{{container_name}}', folder_path='{{output_file_folder}}')
@@ -1008,6 +1031,13 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             3. **Content Requirements**: Include complete Azure architecture design, service mappings, migration strategy, and implementation roadmap
             4. **Verification**: After creation, verify with check_blob_exists('design_result.md', container_name='{{container_name}}', folder_path='{{output_file_folder}}')
             5. **NO TERMINATION**: Do not complete this step until the file is successfully created and verified
+
+            **REPORT MUST INCLUDE CONSISTENT FOOTER**:
+            ```
+            ---
+            *Generated by AI AKS migration agent team*
+            *Report generated on: [CURRENT_TIMESTAMP]*
+            ```
 
             **📋 REQUIRED RETURN STRUCTURE - EXACT FORMAT REQUIRED**:
 
@@ -1272,7 +1302,9 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
                     logger.info(
                         "[PERMANENT_FAILURE] Hard termination detected - processing as permanent failure"
                     )
-                    await self._process_hard_termination_as_failure(design_output, process_id)
+                    await self._process_hard_termination_as_failure(
+                        design_output, process_id
+                    )
                 else:
                     # Happy path: soft termination = successful completion
                     await self.telemetry.update_agent_activity(

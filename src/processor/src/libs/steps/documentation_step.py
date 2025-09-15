@@ -9,8 +9,6 @@ Following SK Process Framework best practices:
 - Step-specific group chat orchestration
 """
 
-import logging
-import time
 from typing import TYPE_CHECKING, Any
 
 from jinja2 import Template
@@ -412,16 +410,23 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
         context_data = {
             "termination_type": document_output.termination_type,
             "termination_reason": document_output.reason,
-            "blocking_issues": list(document_output.blocking_issues) if document_output.blocking_issues else [],
+            "blocking_issues": list(document_output.blocking_issues)
+            if document_output.blocking_issues
+            else [],
         }
 
         # Add termination output details if available
         if document_output.termination_output:
-            context_data.update({
-                "aggregated_results": document_output.termination_output.aggregated_results or {},
-                "expert_insights": document_output.termination_output.expert_insights or [],
-                "documentation_summary": document_output.termination_output.documentation_summary or {},
-            })
+            context_data.update(
+                {
+                    "aggregated_results": document_output.termination_output.aggregated_results
+                    or {},
+                    "expert_insights": document_output.termination_output.expert_insights
+                    or [],
+                    "documentation_summary": document_output.termination_output.documentation_summary
+                    or {},
+                }
+            )
 
         return context_data
 
@@ -432,7 +437,8 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
         # Extract reports safely
         reports = (
             document_output.termination_output.aggregated_results
-            if document_output.termination_output and hasattr(document_output.termination_output, 'aggregated_results')
+            if document_output.termination_output
+            and hasattr(document_output.termination_output, "aggregated_results")
             else {}
         )
 
@@ -441,12 +447,14 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
             process_id,
             "Conversation_Manager",
             "documentation_permanently_failed",
-            f"Documentation failed permanently due to {document_output.termination_type}: {document_output.reason}. Expert consensus: {document_output.blocking_issues}"
+            f"Documentation failed permanently due to {document_output.termination_type}: {document_output.reason}. Expert consensus: {document_output.blocking_issues}",
         )
 
         # Step 2: Create failure context using existing StepFailureCollector
         # Create "virtual exception" for termination scenario
-        termination_error = ValueError(f"Hard termination: {document_output.termination_type} - {document_output.reason}")
+        termination_error = ValueError(
+            f"Hard termination: {document_output.termination_type} - {document_output.reason}"
+        )
 
         # Use existing StepFailureCollector
         failure_collector = StepFailureCollector()
@@ -456,7 +464,7 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
             process_id=process_id,
             context_data=self._create_termination_context_data(document_output),
             step_start_time=self.state.execution_start_time,
-            step_phase="hard_termination_documentation"
+            step_phase="hard_termination_documentation",
         )
 
         # Step 3: Set failure state (NOT retry state)
@@ -479,7 +487,7 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
             reason=f"Documentation terminated: {document_output.termination_type} - {document_output.reason}",
             execution_time=self.state.total_execution_duration or 0.0,
             files_attempted=[],  # Documentation doesn't process files directly
-            system_failure_context=system_context
+            system_failure_context=system_context,
         )
 
         # CRITICAL: Do NOT set retry flags
@@ -492,14 +500,14 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
             "termination_reason": document_output.reason,
             "blocking_issues": document_output.blocking_issues,
             "reports_generated": len(reports) if isinstance(reports, dict) else 0,
-            "handled_as": "permanent_failure"
+            "handled_as": "permanent_failure",
         }
 
         await self.telemetry.update_agent_activity(
             process_id,
             "Documentation_Expert",
             "step_permanently_failed",
-            f"Documentation step terminated permanently: {failure_details}"
+            f"Documentation step terminated permanently: {failure_details}",
         )
 
     @kernel_function(description="Handle documentation event from YAML completion")
@@ -844,6 +852,13 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
         - Cited Configuration and Best Practice Guides
         ```
 
+        **REPORT MUST INCLUDE CONSISTENT FOOTER**:
+        ```
+        ---
+        *Generated by AI AKS migration agent team*
+        *Report generated on: [CURRENT_TIMESTAMP]*
+        ```
+
         **🎯 QUALITY STANDARDS**:
         - Use ALL available data from analysis, design, and conversion steps
         - Include specific metrics, percentages, and counts from actual results
@@ -1090,7 +1105,9 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
                     logger.info(
                         "[PERMANENT_FAILURE] Hard termination detected - processing as permanent failure"
                     )
-                    await self._process_hard_termination_as_failure(document_output, process_id)
+                    await self._process_hard_termination_as_failure(
+                        document_output, process_id
+                    )
                 else:
                     # Success case: soft termination = successful completion
                     # CRITICAL: Validate complete data population for success cases
@@ -1278,7 +1295,9 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
             )
 
             # Simplified error handling - treat all errors as critical
-            logger.error(f"[CRITICAL] Documentation step critical error: {error_message}")
+            logger.error(
+                f"[CRITICAL] Documentation step critical error: {error_message}"
+            )
 
             # Track critical error in telemetry
             await self.telemetry.update_agent_activity(
@@ -1291,13 +1310,11 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
             # Set state for migration service to read - PRIMARY failure indicator
             self.state.result = False
             self.state.reason = f"Critical error: {error_message}"
-            self.state.failure_context = (
-                await failure_collector.create_step_failure_state(
-                    reason=f"Documentation failed: {error_message}",
-                    execution_time=time_to_failure,
-                    files_attempted=[],  # Documentation doesn't process individual files
-                    system_failure_context=system_context,
-                )
+            self.state.failure_context = await failure_collector.create_step_failure_state(
+                reason=f"Documentation failed: {error_message}",
+                execution_time=time_to_failure,
+                files_attempted=[],  # Documentation doesn't process individual files
+                system_failure_context=system_context,
             )
 
             logger.error(

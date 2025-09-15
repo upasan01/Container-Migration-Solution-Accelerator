@@ -298,7 +298,10 @@ Please summarize the documentation results and provide a structured report that 
 - **ALWAYS use list_blobs_in_container()** to verify each file exists before including it in the report
 - **ALWAYS use read_blob_content()** to verify file content before describing it
 - **Use datetime MCP tool(datetime_service)** for ALL timestamp generation (avoid hardcoded dates)
-- **Use Microsoft Docs MCP tool(microsoft_docs_service)** to verify Azure service compatibility
+- **Microsoft Docs MCP Strategic Documentation Research**:
+  1. **SEARCH**: Use `microsoft_docs_search` for Azure migration guides, best practices, service documentation
+  2. **FETCH**: Use `microsoft_docs_fetch` on search URLs for complete migration procedures and reference links
+  3. **Documentation Purpose**: Comprehensive Azure service references, complete configuration guides, official Microsoft links
 
 **MANDATORY FILE VERIFICATION PROCESS**:
 1. **Before listing ANY file in GeneratedFilesCollection, you MUST**:
@@ -567,17 +570,32 @@ class DocumentationStepGroupChatManager(StepSpecificGroupChatManager):
 
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
-        
+
         # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = ["Success", "Complete", "Terminate", "Finished", "Done", "End", "Yes", "No", "True", "False"]
+        invalid_agent_names = [
+            "Success",
+            "Complete",
+            "Terminate",
+            "Finished",
+            "Done",
+            "End",
+            "Yes",
+            "No",
+            "True",
+            "False",
+        ]
         if selected_agent in invalid_agent_names:
-            logger.error(f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{self._safe_get_content(response)}'")
-            logger.error(f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback")
+            logger.error(
+                f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{self._safe_get_content(response)}'"
+            )
+            logger.error(
+                f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback"
+            )
             # Force fallback to Technical_Writer as a safe default for Documentation step
             selected_agent = "Technical_Writer"
             participant_name_with_reason = StringResult(
-                result="Technical_Writer", 
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'"
+                result="Technical_Writer",
+                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'",
             )
 
         # Remove common prefixes that might be added by the AI

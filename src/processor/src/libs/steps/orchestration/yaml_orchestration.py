@@ -5,10 +5,13 @@ This module demonstrates phase-specific agent selection for YAML
 You are coordinating the {{step_name}} step of Azure Kubernetes migration.
 Step objective: {{step_objective}}
 
-**IMPORTANT - USE MCP TOOLS FOR ACCURATE DATA**:
-- **Use datetime MCP tool** for ALL timestamp generation (avoid hardcoded dates)
-- **Use Microsoft Docs MCP tool** to lookup current AKS configuration syntax and Azure resource specifications
-- **Use blob storage MCP tools** to read source files and save converted YAML configurations
+**IMPORTANT - STRATEGIC MCP TOOLS USAGE**:
+- **datetime MCP tool**: For ALL timestamp generation (avoid hardcoded dates)
+- **Microsoft Docs MCP Strategic Workflow**:
+  1. **SEARCH**: Use `microsoft_docs_search` for AKS syntax, Azure resource types, configuration patterns
+  2. **FETCH**: Use `microsoft_docs_fetch` on result URLs for complete YAML examples and validation guides
+  3. **Critical for**: Current AKS API versions, Azure resource specifications, security configurations
+- **blob storage MCP tools**: Read source files and save converted YAML configurations
 
 You have concluded the YAML conversion discussion with technical consensus.
 Provide a structured report aligned with Yaml_ExtendedBooleanResult format:sion.
@@ -127,10 +130,13 @@ The file_converting_result.md file must contain the following sections in markdo
 **CRITICAL REQUIREMENT: COMPLETE DATA POPULATION MANDATORY**
 You MUST populate ALL fields in the Yaml_ExtendedBooleanResult structure. Incomplete responses will be rejected.
 
-**IMPORTANT - USE MCP TOOLS FOR ACCURATE DATA**:
+**IMPORTANT - STRATEGIC MCP TOOLS FOR ACCURATE DATA**:
 - **Use datetime MCP tool(datetime_service)** for ALL timestamp generation (avoid hardcoded dates)
 - **Use blob storage MCP tools (azure_blob_io_service)** to read actual file content for analysis
-- **Use Microsoft Docs MCP tool(microsoft_docs_service)** to verify Azure service compatibility
+- **Microsoft Docs MCP Strategic Usage (microsoft_docs_service)**:
+  1. **Search**: Query "AKS YAML configuration", "Azure resource syntax", "Kubernetes to AKS migration"
+  2. **Fetch**: Retrieve complete configuration guides from search URLs for accurate Azure service specs
+  3. **Essential for**: API version validation, Azure-specific configuration syntax, service compatibility
 
 **MANDATORY BLOB VERIFICATION BEFORE TERMINATION**:
 Before concluding files are missing, agents MUST:
@@ -630,17 +636,32 @@ class YamlStepGroupChatManager(StepSpecificGroupChatManager):
 
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
-        
+
         # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = ["Success", "Complete", "Terminate", "Finished", "Done", "End", "Yes", "No", "True", "False"]
+        invalid_agent_names = [
+            "Success",
+            "Complete",
+            "Terminate",
+            "Finished",
+            "Done",
+            "End",
+            "Yes",
+            "No",
+            "True",
+            "False",
+        ]
         if selected_agent in invalid_agent_names:
-            logger.error(f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{response.content}'")
-            logger.error(f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback")
+            logger.error(
+                f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{response.content}'"
+            )
+            logger.error(
+                f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback"
+            )
             # Force fallback to YAML_Expert as a safe default for YAML step
             selected_agent = "YAML_Expert"
             participant_name_with_reason = StringResult(
-                result="YAML_Expert", 
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'"
+                result="YAML_Expert",
+                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'",
             )
 
         # Remove invisible Unicode characters that can cause matching issues

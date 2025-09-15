@@ -16,5 +16,7 @@ wheels/
 *.env
 src/.env
 
+.vscode/
+
 # Virtual environments
 .venv

@@ -1,0 +1,10 @@
+azure-storage-blob>=12.19.0
+azure-storage-queue>=12.7.0
+azure-identity>=1.15.0
+pyyaml>=6.0.1
+python-dotenv>=1.0.0
+colorama>=0.4.6
+tabulate>=0.9.0
+rich>=13.7.0
+click>=8.1.7
+jinja2>=3.1.2

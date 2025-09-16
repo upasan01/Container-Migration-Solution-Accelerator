@@ -618,12 +618,6 @@ class YamlStepGroupChatManager(StepSpecificGroupChatManager):
 
         # Apply smart truncation before API call to preserve context
         self._smart_truncate_chat_history(chat_history)
-        # self._smart_truncate_chat_history_with_token_limit(
-        #     chat_history,
-        #     max_total_tokens=10000,  # Increased by 50%: 5000 * 1.5 = 7500
-        #     max_messages=5,  # Increased by 50%: 2 * 1.5 = 3
-        #     max_tokens_per_message=2000,  # Increased by 50%: 200 * 1.5 = 300
-        # )
 
         response = await get_chat_message_content_with_retry(
             self.service,
@@ -642,89 +636,23 @@ class YamlStepGroupChatManager(StepSpecificGroupChatManager):
             valid_agents=list(participant_descriptions.keys()),
         )
 
+        logger.info(f"[AGENT_SELECTION] Raw AI response: '{response.content}'")
+        logger.info(
+            f"[AGENT_SELECTION] Parsed agent: '{participant_name_with_reason.result}'"
+        )
+        logger.info(
+            f"[AGENT_SELECTION] Available participants: {list(participant_descriptions.keys())}"
+        )
+
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
 
-        # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = [
-            "Success",
-            "Complete",
-            "Terminate",
-            "Finished",
-            "Done",
-            "End",
-            "Yes",
-            "No",
-            "True",
-            "False",
-        ]
-        if selected_agent in invalid_agent_names:
-            logger.error(
-                f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{response.content}'"
-            )
-            logger.error(
-                f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback"
-            )
-            # Force fallback to YAML_Expert as a safe default for YAML step
-            selected_agent = "YAML_Expert"
-            participant_name_with_reason = StringResult(
-                result="YAML_Expert",
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'",
-            )
-
-        # Remove invisible Unicode characters that can cause matching issues
-        # Remove zero-width characters and normalize Unicode
-        selected_agent = unicodedata.normalize("NFKC", selected_agent)
-        selected_agent = re.sub(
-            r"[\u200B-\u200D\uFEFF\u2060]", "", selected_agent
-        )  # Remove invisible chars
-        selected_agent = re.sub(
-            r"[^\w_]", "", selected_agent
-        )  # Keep only word chars and underscore
-        selected_agent = selected_agent.strip()
-
-        # Remove common prefixes that might be added by the AI
-        prefixes_to_remove = [
-            "Select ",
-            "Selected ",  # Past tense
-            "I select ",  # First person
-            "I selected ",  # First person past tense
-            "Choose ",  # Alternative verb
-            "Chosen ",  # Alternative past tense
-            "Next participant selected: ",
-            "Next participant: ",
-            "Selected participant: ",
-            "Participant: ",
-            "The next participant is ",  # Declarative form
-            "Next: ",  # Short form
-        ]
-
-        for prefix in prefixes_to_remove:
-            if selected_agent.startswith(prefix):
-                selected_agent = selected_agent[len(prefix) :].strip()
-                break
-
-        # Additional pattern matching for complex selections like "Select EKS_Expert as the next..."
-
-        # Enhanced pattern to extract participant name from various response formats
-        selection_pattern = r"^(?:(?:I\s+)?(?:Select(?:ed)?|Choose|Chosen)\s+)?(\w+)(?:\s+(?:as\s+the\s+next\s+participant|to\s+perform|for).*)?$"
-        match = re.match(selection_pattern, selected_agent, re.IGNORECASE)
-        if match:
-            potential_participant = match.group(1)
-            # Only use this if it matches one of our known participants
-            if potential_participant in participant_descriptions:
-                selected_agent = potential_participant
-
-        for prefix in prefixes_to_remove:
-            if selected_agent.startswith(prefix):
-                selected_agent = selected_agent[len(prefix) :].strip()
-                break
-
         print("*********************")
-        print(f"Original response: '{participant_name_with_reason.result}'")
-        print(f"Cleaned participant: '{selected_agent}'")
+        print(f"Original response: '{response.content}'")
+        print(f"Parsed agent: '{participant_name_with_reason.result}'")
+        print(f"Final selected agent: '{selected_agent}'")
         print(f"Available participants: {list(participant_descriptions.keys())}")
-        print(f"Reason: {participant_name_with_reason.reason}.")
+        print(f"Reason: {participant_name_with_reason.reason}")
         print("*********************")
 
         # Track agent selection in telemetry

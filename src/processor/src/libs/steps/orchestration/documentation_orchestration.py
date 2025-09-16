@@ -574,79 +574,23 @@ class DocumentationStepGroupChatManager(StepSpecificGroupChatManager):
             valid_agents=list(participant_descriptions.keys()),
         )
 
+        logger.info(f"[AGENT_SELECTION] Raw AI response: '{self._safe_get_content(response)}'")
+        logger.info(
+            f"[AGENT_SELECTION] Parsed agent: '{participant_name_with_reason.result}'"
+        )
+        logger.info(
+            f"[AGENT_SELECTION] Available participants: {list(participant_descriptions.keys())}"
+        )
+
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
 
-        # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = [
-            "Success",
-            "Complete",
-            "Terminate",
-            "Finished",
-            "Done",
-            "End",
-            "Yes",
-            "No",
-            "True",
-            "False",
-        ]
-        if selected_agent in invalid_agent_names:
-            logger.error(
-                f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{self._safe_get_content(response)}'"
-            )
-            logger.error(
-                f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback"
-            )
-            # Force fallback to Technical_Writer as a safe default for Documentation step
-            selected_agent = "Technical_Writer"
-            participant_name_with_reason = StringResult(
-                result="Technical_Writer",
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'",
-            )
-
-        # Remove common prefixes that might be added by the AI
-        prefixes_to_remove = [
-            "Select ",
-            "Selected ",
-            "I select ",
-            "I choose ",
-            "Let me select ",
-            "I will select ",
-            "Next participant selected: ",
-            "Next participant: ",
-            "Selected participant: ",
-            "Participant: ",
-        ]
-
-        for prefix in prefixes_to_remove:
-            if selected_agent.startswith(prefix):
-                selected_agent = selected_agent[len(prefix) :].strip()
-                break
-
-        # Enhanced pattern to extract participant name from various response formats
-        import re
-
-        # Enhanced pattern to match various AI response formats
-        selection_patterns = [
-            r"^(?:Select\s+|Selected\s+|I\s+select\s+|I\s+choose\s+|Let\s+me\s+select\s+|I\s+will\s+select\s+)?(\w+)(?:\s+as\s+the\s+next\s+participant.*)?$",
-            r"(\w+)\s+(?:as\s+the\s+next\s+participant|should\s+be\s+next|for\s+the\s+next\s+step)",
-            r"Next:\s*(\w+)",
-            r"Agent:\s*(\w+)",
-        ]
-
-        for pattern in selection_patterns:
-            match = re.match(pattern, selected_agent, re.IGNORECASE)
-            if match:
-                potential_participant = match.group(1)
-                # Only use this if it matches one of our known participants
-                if potential_participant in participant_descriptions:
-                    selected_agent = potential_participant
-                    break
-
         print("*********************")
-        print("*********************")
-        print(f"Next participant: {selected_agent}")
-        print(f"Reason: {participant_name_with_reason.reason}.")
+        print(f"Original response: '{self._safe_get_content(response)}'")
+        print(f"Parsed agent: '{participant_name_with_reason.result}'")
+        print(f"Final selected agent: '{selected_agent}'")
+        print(f"Available participants: {list(participant_descriptions.keys())}")
+        print(f"Reason: {participant_name_with_reason.reason}")
         print("*********************")
 
         # Track agent selection in telemetry

@@ -8,12 +8,13 @@ This RAI (Responsible AI) testing framework validates that your multi-agent cont
 2. Creates test YAML files containing the harmful content
 3. Uploads files to Azure Blob Storage with unique GUID folders  
 4. Sends messages to Azure Storage Queue to trigger agent processing
-5. Monitors how agents respond to the harmful content
+5. Monitors agent telemetry in Cosmos DB for completion status
 6. Updates file with results and generates compliance reports
 
 ## Prerequisites
 
 ✅ **Azure Storage Account** with blob containers and queues configured  
+✅ **Azure Cosmos DB** with migration_db database and agent_telemetry container  
 ✅ **Python 3.8+** installed  
 ✅ **Azure authentication** configured (Azure CLI or managed identity)  
 ✅ **Main application** deployed and running  
@@ -37,11 +38,19 @@ export STORAGE_ACCOUNT_NAME="yourstorageaccount"
 # Option 2: Connection string (for development only)
 export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=youraccount;AccountKey=...;EndpointSuffix=core.windows.net"
 
+# Required: Cosmos DB for monitoring
+export COSMOS_DB_ENDPOINT="https://your-cosmos-account.documents.azure.com:443/"
+export COSMOS_DB_KEY="your-cosmos-db-key"
+
 # Optional: Customize test configuration
 export RAI_TEST_COUNT=25                    # Number of tests to run
 export RAI_TEST_TIMEOUT=60                  # Test timeout in minutes
 export RAI_BLOB_CONTAINER="processes"       # Blob container name
 export RAI_QUEUE_NAME="processes-queue"     # Queue name
+
+# Optional: Customize Cosmos DB configuration
+export COSMOS_DB_DATABASE_NAME="migration_db"    # Cosmos database name
+export COSMOS_DB_CONTAINER_NAME="agent_telemetry" # Cosmos container name
 ```
 
 ### 3. Authenticate with Azure
@@ -176,6 +185,13 @@ This ensures comprehensive testing of how agents handle harmful content in vario
 - Check Azure Storage account name/connection string
 - Verify Azure authentication (az login)
 - Ensure storage containers and queues exist
+- Validate Cosmos DB endpoint and key are correct
+
+**"Cosmos DB connection failed"**
+- Verify COSMOS_DB_ENDPOINT and COSMOS_DB_KEY environment variables
+- Check Cosmos DB account exists and is accessible
+- Ensure migration_db database and agent_telemetry container exist
+- Validate network connectivity to Cosmos DB endpoint
 
 **"Failed to load CSV file"**
 - Check CSV file path is correct
@@ -197,4 +213,5 @@ This ensures comprehensive testing of how agents handle harmful content in vario
 2. Run with `--debug` flag for detailed logging
 3. Verify main application is processing queues normally
 4. Check Azure Storage account permissions and connectivity
-5. Validate CSV file format with provided template
+5. Validate Cosmos DB connectivity and database/container setup
+6. Validate CSV file format with provided template

@@ -1,5 +1,6 @@
 azure-storage-blob>=12.19.0
 azure-storage-queue>=12.7.0
+azure-cosmos>=4.5.1
 azure-identity>=1.15.0
 pyyaml>=6.0.1
 python-dotenv>=1.0.0

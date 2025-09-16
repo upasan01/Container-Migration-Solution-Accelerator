@@ -1,10 +1,11 @@
 """
 Test monitoring and reporting for RAI testing framework.
-Monitors agent responses and generates compliance reports.
+Monitors agent responses via Cosmos DB queries and generates compliance reports.
 """
 
 import json
 import time
+import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
@@ -23,6 +24,7 @@ from enum import Enum
 from .test_manager import TestCase
 from .blob_helper import BlobStorageTestHelper
 from .queue_helper import QueueTestHelper
+from .cosmos_helper import CosmosDBHelper
 
 
 class TestStatus(Enum):
@@ -46,13 +48,14 @@ class TestExecution:
 
 
 class TestMonitor:
-    """Monitor test execution and generate reports"""
+    """Monitor test execution via Cosmos DB queries and generate reports"""
     
     def __init__(self, config: RAITestConfig = None):
         self.config = config or RAITestConfig()
         self.logger = logging.getLogger(__name__)
         self.blob_helper = BlobStorageTestHelper(config)
         self.queue_helper = QueueTestHelper(config)
+        self.cosmos_helper = CosmosDBHelper(config)
         self.active_tests: Dict[str, TestExecution] = {}
         self.completed_tests: List[TestExecution] = []
     
@@ -188,6 +191,111 @@ class TestMonitor:
             del self.active_tests[execution_id]
         
         return execution
+    
+    async def monitor_with_cosmos_db(
+        self,
+        process_id: str,
+        timeout_minutes: int = None,
+        polling_interval_seconds: int = None
+    ) -> Dict[str, Any]:
+        """
+        Monitor test execution using Cosmos DB queries for agent telemetry
+        
+        Args:
+            process_id: The process ID to monitor
+            timeout_minutes: Maximum time to wait for completion
+            polling_interval_seconds: How often to poll Cosmos DB
+        
+        Returns:
+            Dictionary with monitoring results including final_outcome from agent
+        """
+        timeout_minutes = timeout_minutes or self.config.TEST_TIMEOUT_MINUTES
+        polling_interval_seconds = polling_interval_seconds or self.config.COSMOS_POLLING_INTERVAL_SECONDS
+        
+        self.logger.info(f"Starting Cosmos DB monitoring for process_id: {process_id}")
+        
+        try:
+            # Use the Cosmos DB helper to wait for completion
+            result = await self.cosmos_helper.wait_for_completion(
+                process_id=process_id,
+                timeout_minutes=timeout_minutes,
+                polling_interval_seconds=polling_interval_seconds
+            )
+            
+            # Transform the result into the expected format
+            if result["monitoring_status"] == "completed" and result["success"]:
+                status = "passed"
+            elif result["monitoring_status"] == "completed" and not result["success"]:
+                status = "failed"
+            elif result["monitoring_status"] == "timeout":
+                status = "timeout"
+            else:
+                status = "error"
+            
+            return {
+                "process_id": process_id,
+                "result": status,
+                "success": result["success"],
+                "error_message": result["error_message"],
+                "final_outcome": result.get("final_outcome"),
+                "elapsed_time_seconds": result.get("elapsed_time_seconds"),
+                "monitoring_status": result["monitoring_status"]
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error monitoring process_id {process_id} with Cosmos DB: {e}")
+            return {
+                "process_id": process_id,
+                "result": "error",
+                "success": False,
+                "error_message": f"Monitoring error: {str(e)}",
+                "final_outcome": None,
+                "monitoring_status": "error"
+            }
+    
+    async def check_completion_status(self, process_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Check if a process has completed by querying Cosmos DB once
+        
+        Args:
+            process_id: The process ID to check
+        
+        Returns:
+            Dictionary with completion status or None if not complete
+        """
+        try:
+            final_outcome = await self.cosmos_helper.get_final_outcome(process_id)
+            
+            if final_outcome is None:
+                self.logger.debug(f"Process {process_id} not yet complete")
+                return None
+            
+            # Process is complete
+            status = "passed" if final_outcome["success"] else "failed"
+            
+            return {
+                "process_id": process_id,
+                "result": status,
+                "success": final_outcome["success"],
+                "error_message": final_outcome["error_message"],
+                "final_outcome": final_outcome,
+                "monitoring_status": "completed"
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error checking completion status for process_id {process_id}: {e}")
+            return {
+                "process_id": process_id,
+                "result": "error",
+                "success": False,
+                "error_message": f"Status check error: {str(e)}",
+                "monitoring_status": "error"
+            }
+    
+    async def close(self):
+        """Clean up resources"""
+        if hasattr(self, 'cosmos_helper'):
+            await self.cosmos_helper.close()
     
     def _analyze_output_files(self, execution: TestExecution, output_files: List[str]) -> None:
         """Analyze output files for agent responses and safety measures"""

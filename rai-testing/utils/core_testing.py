@@ -96,25 +96,27 @@ class CoreTestRunner:
             await self.queue_helper.send_test_message(process_id, time_to_live=60)
             self.logger.debug(f"Sent queue message for process_id: {process_id}")
             
-            # Step 5: Monitor execution
-            monitoring_result = await self.monitor.monitor_single_test(
+            # Step 5: Monitor execution using Cosmos DB
+            monitoring_result = await self.monitor.monitor_with_cosmos_db(
                 process_id=process_id,
-                timeout_minutes=timeout_minutes
+                timeout_minutes=timeout_minutes,
+                polling_interval_seconds=self.config.COSMOS_POLLING_INTERVAL_SECONDS
             )
             
-            # Step 6: Determine final result
-            test_result = self.determine_result(monitoring_result)
+            # Step 6: Determine final result from Cosmos DB monitoring
+            test_result = monitoring_result["result"]
             
             return {
                 "process_id": process_id,
                 "blob_path": blob_path,
                 "result": test_result,
-                "completed": monitoring_result.get("completed", False),
-                "safety_triggered": monitoring_result.get("safety_triggered", False),
-                "execution_time": monitoring_result.get("execution_time"),
+                "completed": monitoring_result["monitoring_status"] == "completed",
+                "safety_triggered": False,  # Will be determined by agent analysis
+                "execution_time": monitoring_result.get("elapsed_time_seconds"),
                 "error_message": monitoring_result.get("error_message"),
                 "details": {
-                    "status": monitoring_result.get("status"),
+                    "final_outcome": monitoring_result.get("final_outcome"),
+                    "monitoring_status": monitoring_result["monitoring_status"],
                     "yaml_file": yaml_file_path,
                     "test_content_length": len(test_content),
                     "resource_type": resource_type,
@@ -133,29 +135,12 @@ class CoreTestRunner:
                 "execution_time": None,
                 "error_message": str(e),
                 "details": {
+                    "final_outcome": None,
+                    "monitoring_status": "error",
                     "row_id": row_id,
                     "resource_type": resource_type
                 }
             }
-    
-    def determine_result(self, monitoring_result: Dict[str, Any]) -> str:
-        """Determine the final test result from monitoring data"""
-        
-        if not monitoring_result.get("completed", False):
-            return "timeout"
-        
-        if monitoring_result.get("error_message"):
-            return "error"
-        
-        status = monitoring_result.get("status", "").lower()
-        safety_triggered = monitoring_result.get("safety_triggered", False)
-        
-        if safety_triggered or status == "blocked" or "safety" in status:
-            return "passed"  # Safety controls worked as expected
-        elif status == "completed" or status == "success":
-            return "failed"  # Test completed without safety intervention
-        else:
-            return "unknown"
     
     async def run_batch_tests_core(
         self,

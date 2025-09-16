@@ -6,10 +6,12 @@ from .yaml_generator import YamlFileGenerator
 from .blob_helper import BlobStorageTestHelper  
 from .queue_helper import QueueTestHelper
 from .monitoring import TestMonitor
+from .cosmos_helper import CosmosDBHelper
 
 __all__ = [
     "YamlFileGenerator",
     "BlobStorageTestHelper",
     "QueueTestHelper", 
-    "TestMonitor"
+    "TestMonitor",
+    "CosmosDBHelper"
 ]

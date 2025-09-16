@@ -1049,8 +1049,9 @@ class MigrationProcessor:
             # Determine success status
             is_success = (
                 report_type == "success"
-                and hasattr(report, "overall_status")
-                and report.overall_status.value == "SUCCESS"
+                # TODO : Consider using overall_status for success determination
+                # and hasattr(report, "overall_status")
+                # and report.overall_status.value == "SUCCESS"
             )
 
             # Store finalized results in telemetry

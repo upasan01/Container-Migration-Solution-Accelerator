@@ -1,6 +1,6 @@
 """
 YAML file generator for RAI testing.
-Creates Kubernetes configuration files with embedded harmful content for testing.
+Creates Kubernetes configuration files with embedded test content for testing.
 """
 
 import os
@@ -12,11 +12,11 @@ import yaml
 import sys
 from pathlib import Path
 
-# Add the parent directory to sys.path to import test_cases
+# Add the parent directory to sys.path to import utils
 parent_dir = Path(__file__).parent.parent
 sys.path.append(str(parent_dir))
 
-from test_cases.harmful_content import HarmfulContentCase
+from utils.test_manager import TestCase
 
 
 class YamlFileGenerator:
@@ -177,11 +177,11 @@ spec:
     
     def generate_yaml_file(
         self, 
-        test_case: HarmfulContentCase,
+        test_case: TestCase,
         resource_type: str = "pod",
         output_dir: str = None
     ) -> str:
-        """Generate a YAML file with harmful content embedded"""
+        """Generate a YAML file with test content embedded"""
         
         if resource_type not in self.templates:
             raise ValueError(f"Unsupported resource type: {resource_type}")
@@ -190,15 +190,15 @@ spec:
         
         # Generate random names for resources
         unique_id = str(uuid.uuid4())[:8]
-        app_name = f"rai-test-{test_case.id.lower()}-{unique_id}"
+        app_name = f"rai-test-{test_case.row_id}-{unique_id}"
         
         # Prepare template variables
         template_vars = {
-            "test_case_id": test_case.id,
+            "test_case_id": f"row-{test_case.row_id}",
             "app_name": app_name,
-            "harmful_content": test_case.content,
-            "encoded_harmful_content": test_case.content.replace('"', '\\"'),
-            "description": test_case.description,
+            "harmful_content": test_case.test_content,
+            "encoded_harmful_content": test_case.test_content.replace('"', '\\"'),
+            "description": f"Test case from row {test_case.row_id}",
             "image": "busybox:latest",
             "unique_id": unique_id
         }
@@ -232,7 +232,7 @@ spec:
         yaml_content = template.render(**template_vars)
         
         # Create filename
-        filename = f"{test_case.id}-{resource_type}-{unique_id}.yaml"
+        filename = f"{test_case.row_id}-{resource_type}-{unique_id}.yaml"
         
         # Write to file if output directory specified
         if output_dir:
@@ -246,7 +246,7 @@ spec:
     
     def generate_multi_resource_file(
         self,
-        test_case: HarmfulContentCase, 
+        test_case: TestCase, 
         resource_types: List[str],
         output_dir: str = None
     ) -> str:
@@ -254,7 +254,7 @@ spec:
         
         yaml_documents = []
         unique_id = str(uuid.uuid4())[:8]
-        app_name = f"rai-test-{test_case.id.lower()}-{unique_id}"
+        app_name = f"rai-test-{test_case.row_id}-{unique_id}"
         
         for resource_type in resource_types:
             if resource_type not in self.templates:
@@ -263,11 +263,11 @@ spec:
             template = self.templates[resource_type]
             
             template_vars = {
-                "test_case_id": test_case.id,
+                "test_case_id": f"row-{test_case.row_id}",
                 "app_name": app_name,
-                "harmful_content": test_case.content,
-                "encoded_harmful_content": test_case.content.replace('"', '\\"'),
-                "description": test_case.description,
+                "harmful_content": test_case.test_content,
+                "encoded_harmful_content": test_case.test_content.replace('"', '\\"'),
+                "description": f"Test case from row {test_case.row_id}",
                 "image": "busybox:latest",
                 "unique_id": unique_id
             }
@@ -339,7 +339,7 @@ spec:
     
     def create_test_file_set(
         self,
-        test_cases: List[HarmfulContentCase],
+        test_cases: List[TestCase],
         output_dir: str,
         resource_types: Optional[List[str]] = None
     ) -> List[str]:
@@ -360,6 +360,6 @@ spec:
                     )
                     created_files.append(filepath)
                 except Exception as e:
-                    print(f"Error creating {resource_type} file for {test_case.id}: {e}")
+                    print(f"Error creating {resource_type} file for row {test_case.row_id}: {e}")
         
         return created_files

@@ -19,9 +19,30 @@ parent_dir = Path(__file__).parent.parent
 sys.path.append(str(parent_dir))
 
 from config import RAITestConfig
-from test_cases.test_scenarios import TestExecution, TestStatus
+from enum import Enum
+from .test_manager import TestCase
 from .blob_helper import BlobStorageTestHelper
 from .queue_helper import QueueTestHelper
+
+
+class TestStatus(Enum):
+    """Test execution status"""
+    PENDING = "pending"
+    RUNNING = "running" 
+    PASSED = "passed"
+    FAILED = "failed"
+    ERROR = "error"
+    TIMEOUT = "timeout"
+
+
+class TestExecution:
+    """Test execution tracking"""
+    def __init__(self, test_case: TestCase, status: TestStatus = TestStatus.PENDING):
+        self.test_case = test_case
+        self.status = status
+        self.start_time = None
+        self.end_time = None
+        self.error_message = None
 
 
 class TestMonitor:

@@ -74,6 +74,7 @@ class RAITestConfig:
                 "\nFor development/testing:\n"
                 "  export AZURE_STORAGE_CONNECTION_STRING='DefaultEndpointsProtocol=https;AccountName=...'"
             )
+        
         return True
     
     @classmethod
@@ -87,30 +88,10 @@ class RAITestConfig:
             raise ValueError("No valid storage configuration found")
 
 
-# Test Categories
-TEST_CATEGORIES = {
-    "content-safety": {
-        "description": "Tests for harmful, offensive, or inappropriate content",
-        "severity": "high"
-    },
-    "security": {
-        "description": "Tests for malicious code, injection attempts, and security threats", 
-        "severity": "critical"
-    },
-    "legal-compliance": {
-        "description": "Tests for copyright, privacy, and regulatory compliance",
-        "severity": "high"
-    },
-    "operational-safety": {
-        "description": "Tests for resource abuse and system disruption",
-        "severity": "medium"
-    }
-}
-
-# Test Severity Levels
-SEVERITY_LEVELS = {
-    "critical": 0,
-    "high": 1, 
-    "medium": 2,
-    "low": 3
-}
+# Create module-level constants for backward compatibility
+config = RAITestConfig()
+STORAGE_ACCOUNT_NAME = config.STORAGE_ACCOUNT_NAME
+BLOB_CONTAINER_NAME = config.BLOB_CONTAINER_NAME 
+QUEUE_NAME = config.QUEUE_NAME
+DEFAULT_TEST_COUNT = config.DEFAULT_TEST_COUNT
+TEST_TIMEOUT_MINUTES = config.TEST_TIMEOUT_MINUTES

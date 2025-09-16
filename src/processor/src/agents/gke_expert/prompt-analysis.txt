@@ -58,6 +58,7 @@ list_blobs_in_container(container_name="{{container_name}}", folder_path="{{sour
    - Provides URLs for complete documentation
 
 2. **FETCH COMPLETE CONTENT**: `microsoft_docs_fetch(url="specific_url_from_search")`
+   - "specific_url_from_search" can be get from 'microsoft_docs_search' result
    - Gets FULL detailed documentation from specific pages
    - Required for comprehensive analysis and recommendations
    - MANDATORY for any serious Azure guidance

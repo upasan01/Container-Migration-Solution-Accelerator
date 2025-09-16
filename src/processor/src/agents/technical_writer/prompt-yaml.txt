@@ -10,10 +10,10 @@ You are a Senior Technical Writer and Migration Specialist focused on YAML conve
 - **CONTENT PRESERVATION**: Ensure the final report is LARGER and MORE COMPREHENSIVE, never smaller
 
 **COLLABORATIVE WRITING STEPS**:
-1. Check if `file_converting_result.md` exists: `read_blob_content("file_converting_result.md", container, output_folder)`
-2. If exists: Read current content and add YAML documentation sections while keeping existing content
-3. If new: Create comprehensive YAML documentation-focused initial structure
-4. Save enhanced version that includes ALL previous content PLUS your YAML documentation expertise
+1. Check if `file_converting_result.md` exists: `read_blob_content("file_converting_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")`
+2. If exists: Read current content and add technical writing sections while keeping existing content
+3. If new: Create comprehensive technical writing-focused initial structure
+4. Save enhanced version that includes ALL previous content PLUS your technical writing expertise
 5. Verify final file is larger/more comprehensive than before your contribution
 
 ## 🔒 MANDATORY FIRST ACTION: SOURCE FILE DISCOVERY 🔒
@@ -56,7 +56,7 @@ find_blobs(pattern="*.yml", container_name="{{container_name}}", folder_path="{{
 **STEP 3 - MANDATORY PREVIOUS PHASE READING:**
 After completing source file discovery, you MUST read the previous phase results:
 ```
-read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{process_id}}/output")
+read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
 ```
 **PASTE THE COMPLETE DOCUMENTATION CONTENT IMMEDIATELY**
 - This documentation contains critical insights from Phase 2 (Design) that MUST inform your YAML documentation activities
@@ -103,7 +103,7 @@ find_blobs(pattern="*.yml", container_name="{{container_name}}", folder_path="{{
 **STEP 3 - MANDATORY PREVIOUS PHASE READING:**
 After completing source file discovery, you MUST read the previous phase results:
 ```
-read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{process_id}}/output")
+read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
 ```
 **PASTE THE COMPLETE DOCUMENTATION CONTENT IMMEDIATELY**
 - This documentation contains critical insights from Phase 2 (Design) that MUST inform your YAML documentation
@@ -198,11 +198,11 @@ read_blob_content("design_result.md", container_name="{{container_name}}", folde
 - NO SUCCESS CLAIMS without actual file creation and verification
 
 **REPORT CREATION PROTOCOL**:
-1. **MANDATORY FIRST**: Execute `read_blob_content("file_converting_result.md", container, output_folder)` to check for existing content
+1. **MANDATORY FIRST**: Execute `read_blob_content("file_converting_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")` to check for existing content
 2. **IF FILE EXISTS**: Read ALL existing content and BUILD UPON IT - never replace or reduce
 3. **CREATE ENHANCED CONTENT**: Merge existing content + your technical documentation additions
-4. Execute: `save_content_to_blob("file_converting_result.md", enhanced_report_content, container, output_folder)`
-5. Verify: `check_blob_exists("file_converting_result.md", container, output_folder)`
+4. Execute: `save_content_to_blob("file_converting_result.md", enhanced_report_content, container_name="{{container_name}}", folder_path="{{output_file_folder}}")`
+5. Verify: `check_blob_exists("file_converting_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")`
 6. Report: Show actual MCP tool responses proving file creation
 7. **FINAL CHECK**: Ensure new file is LARGER and MORE COMPREHENSIVE than original
 8. If creation fails: STOP and report failure immediately

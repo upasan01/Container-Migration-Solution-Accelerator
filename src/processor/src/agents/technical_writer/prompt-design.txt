@@ -40,7 +40,7 @@ find_blobs(pattern="*.yml", container_name="{{container_name}}", folder_path="{{
 **STEP 3 - MANDATORY ANALYSIS READING:**
 After completing source file discovery, you MUST read the analysis results:
 ```
-read_blob_content("analysis_result.md", container_name="{{container_name}}", folder_path="{{process_id}}/output")
+read_blob_content("analysis_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
 ```
 **PASTE THE COMPLETE ANALYSIS CONTENT IMMEDIATELY**
 - This analysis contains critical technical insights from Phase 1 that MUST inform your design documentation

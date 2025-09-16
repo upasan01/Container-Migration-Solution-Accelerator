@@ -40,12 +40,12 @@ find_blobs(pattern="*.yml", container_name="{{container_name}}", folder_path="{{
 **STEP 3 - MANDATORY PREVIOUS PHASE READING:**
 After completing source file discovery, you MUST read the outputs from previous phases:
 ```
-read_blob_content("analysis_result.md", container_name="{{container_name}}", folder_path="{{process_id}}/output")
+read_blob_content("analysis_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
 ```
 **PASTE THE COMPLETE ANALYSIS CONTENT IMMEDIATELY**
 
 ```
-read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{process_id}}/output")
+read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
 ```
 **PASTE THE COMPLETE DESIGN CONTENT IMMEDIATELY**
 - These contain critical QA insights from Analysis and Design phases that MUST inform your final validation

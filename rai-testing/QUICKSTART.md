@@ -25,17 +25,21 @@ cd rai-testing
 pip install -r requirements.txt
 ```
 
-### 2. Configure Azure Storage
+### 2. Set Environment Variables
 ```bash
-# Copy configuration template
-python setup.py
+# Required: Azure Storage Account (choose one option)
 
-# Edit config.py with your storage account details
-# Option 1: Set storage account name (uses Azure AD)
-STORAGE_ACCOUNT_NAME = "yourstorageaccount"
+# Option 1: Storage account name with Azure AD (RECOMMENDED)
+export STORAGE_ACCOUNT_NAME="yourstorageaccount"
 
-# Option 2: Set connection string (for development)
-STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=..."
+# Option 2: Connection string (for development only)
+export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=youraccount;AccountKey=...;EndpointSuffix=core.windows.net"
+
+# Optional: Customize test configuration
+export RAI_TEST_COUNT=25                    # Number of tests to run
+export RAI_TEST_TIMEOUT=60                  # Test timeout in minutes
+export RAI_BLOB_CONTAINER="processes"       # Blob container name
+export RAI_QUEUE_NAME="processes-queue"     # Queue name
 ```
 
 ### 3. Authenticate with Azure
@@ -49,7 +53,36 @@ export AZURE_CLIENT_SECRET="your-client-secret"
 export AZURE_TENANT_ID="your-tenant-id"
 ```
 
-## Running RAI Tests
+### 4. Validate Setup
+```bash
+# Run setup validation
+python setup.py
+```
+
+## Configuration Options
+
+All configuration is handled through environment variables for security and flexibility:
+
+### Required Variables
+```bash
+# Choose ONE of these options:
+export STORAGE_ACCOUNT_NAME="yourstorageaccount"           # Recommended: Uses Azure AD
+export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpoints..." # Development only
+```
+
+### Optional Customization
+```bash
+export RAI_TEST_COUNT=25                    # Max tests to run (default: 25)
+export RAI_TEST_TIMEOUT=60                  # Timeout in minutes (default: 60)
+export RAI_MAX_CONCURRENT=5                 # Concurrent tests (default: 5)
+export RAI_BLOB_CONTAINER="processes"       # Container name (default: processes)
+export RAI_QUEUE_NAME="processes-queue"     # Queue name (default: processes-queue)
+export RAI_SOURCE_FOLDER="source"           # Source folder (default: source)
+export RAI_WORKSPACE_FOLDER="workspace"     # Workspace folder (default: workspace)
+export RAI_OUTPUT_FOLDER="converted"        # Output folder (default: converted)
+export RAI_RESULTS_DIR="results"            # Results directory (default: results)
+export RAI_SAFETY_PATTERNS="content safety,harmful content,policy violation"  # Safety keywords
+```
 
 ### Basic Usage
 ```bash

@@ -28,15 +28,19 @@ def setup_environment():
     
     console.print(f"✅ Python version: {sys.version_info.major}.{sys.version_info.minor}")
     
-    # Check if config.py exists
-    config_file = Path("config.py")
-    config_example = Path("config.example.py")
+    # Check environment variables
+    storage_account = os.getenv("STORAGE_ACCOUNT_NAME")
+    connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
     
-    if not config_file.exists() and config_example.exists():
-        console.print("⚠️  config.py not found. Creating from example...")
-        shutil.copy(config_example, config_file)
-        console.print("✅ Created config.py from example")
-        console.print("[yellow]Please edit config.py with your Azure Storage details[/yellow]")
+    if not storage_account and not connection_string:
+        console.print("[yellow]⚠️  Azure Storage configuration not found[/yellow]")
+        console.print("Please set one of the following environment variables:")
+        console.print("  • STORAGE_ACCOUNT_NAME (recommended for production)")
+        console.print("  • AZURE_STORAGE_CONNECTION_STRING (for development)")
+    elif storage_account:
+        console.print(f"✅ Storage account configured: {storage_account}")
+    else:
+        console.print("✅ Connection string configured")
     
     # Check required directories
     directories = ["results", "temp_test_files"]
@@ -54,7 +58,10 @@ def setup_environment():
     
     console.print("\\n[bold green]Setup complete![/bold green]")
     console.print("\\nNext steps:")
-    console.print("1. Edit config.py with your Azure Storage account details")
+    console.print("1. Set Azure Storage environment variables:")
+    console.print("   export STORAGE_ACCOUNT_NAME=your_storage_account")
+    console.print("   # OR")
+    console.print("   export AZURE_STORAGE_CONNECTION_STRING='DefaultEndpoints...'")
     console.print("2. Ensure you're authenticated with Azure (az login)")
     console.print("3. Install dependencies: pip install -r requirements.txt")
     console.print("4. Run tests: python run_rai_tests.py")

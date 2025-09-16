@@ -72,9 +72,25 @@ rai-testing/
 
 ### Configuration
 
-1. Copy `config.example.py` to `config.py`
-2. Update Azure Storage connection details
-3. Configure test parameters and thresholds
+All configuration is managed through environment variables for security and portability:
+
+**Required Environment Variables:**
+```bash
+# Choose one authentication method:
+export STORAGE_ACCOUNT_NAME="your_storage_account"           # Recommended: Azure AD auth
+export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpoints..."  # Development only
+```
+
+**Optional Configuration:**
+```bash
+export RAI_TEST_COUNT=25                    # Maximum tests to run
+export RAI_TEST_TIMEOUT=60                  # Test timeout in minutes  
+export RAI_BLOB_CONTAINER="processes"       # Blob container name
+export RAI_QUEUE_NAME="processes-queue"     # Storage queue name
+export RAI_SAFETY_PATTERNS="content safety,harmful content"  # Expected safety keywords
+```
+
+See `QUICKSTART.md` for complete configuration reference.
 
 ### Running Tests
 

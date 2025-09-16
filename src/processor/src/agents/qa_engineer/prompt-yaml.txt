@@ -146,6 +146,15 @@ find_blobs(pattern="*.yaml", container_name="{{container_name}}", recursive=True
 find_blobs(pattern="*.yml", container_name="{{container_name}}", recursive=True)
 ```
 
+### **Step 1: Read Design Results**
+**MANDATORY**: Read the design output from the previous phase to understand what needs to be validated and converted:
+```
+design_content = read_blob_content("design_result.md", container, output_folder)
+```
+- **CRITICAL**: You MUST understand the design decisions before validating YAML conversion
+- **CONTEXT**: The design result contains the architectural decisions you need to validate
+- **VALIDATION**: Ensure the YAML conversion aligns with design specifications
+
 ### **Step 2: QA Gate Decision Making**
 Based on comprehensive verification results:
 - **Files Found**: Report exact locations and proceed with conversion validation

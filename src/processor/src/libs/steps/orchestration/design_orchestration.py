@@ -60,6 +60,16 @@ logger = logging.getLogger(__name__)
 DESIGN_TERMINATION_PROMPT = """
 Coordinate {{step_name}} step: {{step_objective}}
 
+🚨 **CRITICAL FILE VERIFICATION REQUIREMENT** 🚨
+**BEFORE ALLOWING ANY SUCCESS TERMINATION**, you MUST verify the design_result.md file exists by executing these MCP tools:
+```
+list_blobs_in_container(container_name="{{container_name}}", folder_path="{{output_file_folder}}", recursive=True)
+```
+```
+read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
+```
+**NO FILE VERIFICATION = NO SUCCESS TERMINATION ALLOWED**
+
 **MANDATORY DUAL OUTPUT REQUIREMENTS**:
 1. **Create comprehensive `design_result.md` file** in {{output_file_folder}} (for human consumption)
 2. **Return structured JSON data** (for next step processing)
@@ -111,13 +121,20 @@ TERMINATE SUCCESS when:
 - **ALL MANDATORY FIELDS are properly populated with meaningful content**
 - The JSON contains non-empty arrays for azure_services, architecture_decisions, and outputs
 - The result field is set to "Success"
+- **🔴 MANDATORY FILE VERIFICATION COMPLETED**: You must FIRST verify `design_result.md` exists before allowing termination:
+  ```
+  list_blobs_in_container(container_name="{{container_name}}", folder_path="{{output_file_folder}}", recursive=True)
+  ```
+  **PASTE THE COMPLETE OUTPUT IMMEDIATELY**
+  
+  ```
+  read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
+  ```
+  **PASTE THE COMPLETE CONTENT IMMEDIATELY**
 - **DUAL OUTPUT COMPLETED**:
-  - Markdown report (`design_result.md`) created and saved to output folder
+  - Markdown report (`design_result.md`) verified to exist and contain meaningful content in output folder
   - JSON response structure prepared for next step processing
-- **🔴 MANDATORY FILE VERIFICATION**: `design_result.md` generated and verified in {{output_file_folder}}
-  - Use `list_blobs_in_container()` to confirm file exists in output folder
-  - Use `read_blob_content()` to verify content is properly generated
-  - **NO FILES, NO PASS**: Step cannot complete without verified file generation
+- **NO FILES, NO PASS**: Step cannot complete without verified file generation - you MUST execute MCP tools to verify
 - **🤝 EXPERT COLLABORATION ACHIEVED**: Evidence of consensus-based design decisions
   - Technical Architect and Azure Expert collaboration documented
   - Conflicting recommendations resolved through consensus building
@@ -147,8 +164,12 @@ CONTINUE when:
 - Architecture design discussions are actively progressing
 - Agents are still working toward consensus
 - JSON response exists but contains empty arrays or placeholder content
+- **🔴 MANDATORY FILE VERIFICATION NOT COMPLETED**: You have not yet verified `design_result.md` file exists using MCP tools
+  - You must execute `list_blobs_in_container()` to check if design_result.md exists
+  - You must execute `read_blob_content()` to verify the content is meaningful
+  - **NO VERIFICATION = NO TERMINATION**: Always check for file existence before allowing success termination
 - **Dual output not completed**:
-  - Design document (`design_result.md`) has not been generated and saved to output folder
+  - Design document (`design_result.md`) has not been verified to exist in output folder
   - JSON response structure not ready for next step processing
 
 **CRITICAL: DO NOT TERMINATE WITH SUCCESS IF ANY REQUIRED FIELD IS INCOMPLETE OR CONTAINS PLACEHOLDER CONTENT**
@@ -461,17 +482,32 @@ class DesignStepGroupChatManager(StepSpecificGroupChatManager):
 
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
-        
+
         # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = ["Success", "Complete", "Terminate", "Finished", "Done", "End", "Yes", "No", "True", "False"]
+        invalid_agent_names = [
+            "Success",
+            "Complete",
+            "Terminate",
+            "Finished",
+            "Done",
+            "End",
+            "Yes",
+            "No",
+            "True",
+            "False",
+        ]
         if selected_agent in invalid_agent_names:
-            logger.error(f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{response.content}'")
-            logger.error(f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback")
+            logger.error(
+                f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{response.content}'"
+            )
+            logger.error(
+                f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback"
+            )
             # Force fallback to Chief_Architect as a safe default
             selected_agent = "Chief_Architect"
             participant_name_with_reason = StringResult(
-                result="Chief_Architect", 
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'"
+                result="Chief_Architect",
+                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'",
             )
 
         # Remove common prefixes that might be added by the AI
@@ -680,7 +716,9 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
         # Chief Architect - Architecture oversight and validation
         # In Design phase: Provides oversight and ensures architectural soundness
         agent_architect = await mcp_context.create_agent(
-            agent_config=architect_agent(phase="design").render(**self.process_context),
+            agent_config=architect_agent(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_architect)
@@ -688,7 +726,9 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
         # Azure Expert - PRIMARY LEAD for Design phase
         # In Design phase: Leads the architecture design, recommends Azure services
         agent_azure = await mcp_context.create_agent(
-            agent_config=azure_expert(phase="design").render(**self.process_context),
+            agent_config=azure_expert(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_azure)
@@ -699,13 +739,17 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
         # Note: In a real implementation, you might conditionally include these
         # based on detected source platform from Analysis phase
         agent_eks = await mcp_context.create_agent(
-            agent_config=eks_expert(phase="design").render(**self.process_context),
+            agent_config=eks_expert(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_eks)
 
         agent_gke = await mcp_context.create_agent(
-            agent_config=gke_expert(phase="design").render(**self.process_context),
+            agent_config=gke_expert(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_gke)

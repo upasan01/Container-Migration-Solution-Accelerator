@@ -814,42 +814,54 @@ class DocumentationOrchestrator(StepGroupChatOrchestrator):
         # Technical Writer - COORDINATION LEAD for Documentation phase
         # Coordinates documentation but relies on expert consensus and input
         agent_writer = await mcp_context.create_agent(
-            technical_writer(phase="documentation").render(**self.process_context)
+            technical_writer(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_writer)
 
         # Chief Architect - Strategic oversight and review
         # Provides high-level architecture guidance and validation
         agent_architect = await mcp_context.create_agent(
-            architect_agent(phase="documentation").render(**self.process_context)
+            architect_agent(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_architect)
 
         # Azure Expert - Azure-specific operational and best practices input
         # Provides Azure operational procedures, troubleshooting, deployment guidance
         agent_azure = await mcp_context.create_agent(
-            azure_expert(phase="documentation").render(**self.process_context)
+            azure_expert(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_azure)
 
         # EKS Expert - Source platform migration considerations
         # Provides source platform expertise, migration challenges, platform-specific procedures
         agent_eks = await mcp_context.create_agent(
-            eks_expert(phase="documentation").render(**self.process_context)
+            eks_expert(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_eks)
 
         # GKE Expert - Cross-platform insights and best practices
         # Provides additional platform perspective and cross-platform best practices
         agent_gke = await mcp_context.create_agent(
-            gke_expert(phase="documentation").render(**self.process_context)
+            gke_expert(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_gke)
 
         # QA Engineer - Final quality assurance and validation
         # Validates documentation quality, ensures all requirements are captured
         agent_qa = await mcp_context.create_agent(
-            qa_engineer(phase="documentation").render(**self.process_context)
+            qa_engineer(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_qa)
 

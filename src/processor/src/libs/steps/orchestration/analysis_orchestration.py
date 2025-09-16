@@ -134,7 +134,7 @@ Chief Architect has AUTHORITY to make immediate hard termination decisions for O
 
 TERMINATE SUCCESS when:
 - Platform identified (EKS/GKE) with high confidence
-- All YAML/JSON files discovered, catalogued, and analyzed
+- All YAML/YML files discovered, catalogued, and analyzed
 - Expert consensus on platform and complete file analysis
 - **🔴 MANDATORY FILE VERIFICATION**: `analysis_result.md` generated and verified in {{output_file_folder}}
   - Use `list_blobs_in_container()` to confirm file exists in output folder
@@ -272,61 +272,6 @@ Respond with the participant name only - no explanations, no prefixes, no additi
 ANALYSIS_RESULT_FILTER_PROMPT = """
 Summarize the key findings and insights from the analysis step.
 """
-
-# ANALYSIS_RESULT_FILTER_PROMPT = """
-# You are coordinating the {{step_name}} step of Azure Kubernetes migration.
-# Step objective: {{step_objective}}
-
-# **IMPORTANT - USE MCP TOOLS FOR ACCURATE DATA**:
-# - **Use datetime MCP tool** for ALL timestamp generation (avoid hardcoded dates)
-# - **Use blob storage MCP tools** to read actual file content for analysis
-# - **STRATEGIC Microsoft Docs MCP Usage**:
-#   1. Use `microsoft_docs_search` to find relevant Azure service documentation
-#   2. Use `microsoft_docs_fetch` on search result URLs for complete configuration guides
-#   3. Essential for verifying Azure service compatibility and getting accurate syntax
-
-# You have concluded the analysis discussion with expert consensus.
-# Provide a structured report aligned with Analysis_ExtendedBooleanResult format:
-
-# {
-#     "result": ["Success" or "Fail"],
-#     "reason": "[Explanation for the result - why analysis succeeded or failed]",
-#     "termination_output": {
-#         "platform_detected": "[EKS or GKE - definitive identification only]",
-#         "confidence_score": "[percentage like 95%]",
-#         "files_discovered": [
-#             {
-#                 "filename": "[discovered YAML file name]",
-#                 "type": "[Deployment, Service, ConfigMap, etc.]",
-#                 "complexity": "[Low, Medium, or High]",
-#                 "azure_mapping": "[corresponding Azure service/resource]"
-#             }
-#         ],
-#         "complexity_analysis": {
-#             "network_complexity": "[network complexity assessment with details]",
-#             "security_complexity": "[security complexity assessment with details]",
-#             "storage_complexity": "[storage complexity assessment with details]",
-#             "compute_complexity": "[compute complexity assessment with details]"
-#         },
-#         "migration_readiness": {
-#             "overall_score": "[overall migration readiness score]",
-#             "concerns": ["list of migration concerns"],
-#             "recommendations": ["list of migration recommendations"]
-#         },
-#         "summary": "[comprehensive summary of analysis completion]",
-#         "expert_insights": ["key contributions from all participating experts"],
-#         "analysis_file": "[path to generated analysis result file]"
-#     },
-#     "termination_type": "[soft_completion, hard_blocked, hard_error, or hard_timeout]",
-#     "blocking_issues": ["specific issues if hard terminated, empty array if successful"]
-# }
-
-# REQUIREMENTS:
-# - Platform must be definitively EKS or GKE (no mixed classifications)
-# - Include ALL discovered files with complete FileType details
-# - Capture insights from focused analysis team (Architect, EKS Expert, GKE Expert, Azure Expert, Writer)
-# - Align with Analysis_ExtendedBooleanResult model structure
-# """
 
 
 class AnalysisStepGroupChatManager(StepSpecificGroupChatManager):

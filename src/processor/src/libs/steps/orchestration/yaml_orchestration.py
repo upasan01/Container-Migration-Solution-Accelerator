@@ -207,6 +207,7 @@ TERMINATE WITH FAILURE when:
 
 **CONTINUE PROCESSING when**:
 - **QA verification not yet performed** - QA Engineer must check output folder and converted files
+- **Markdown format verification incomplete** - QA Engineer must verify file_converting_result.md is proper markdown format (NOT JSON blob)
 - **Files not yet saved** - Conversion work in progress but files not saved to blob storage
 - Agents report files are missing but have NOT used comprehensive blob tool verification
 - Initial blob searches failed but alternative paths haven't been tried
@@ -223,8 +224,11 @@ TERMINATE WITH FAILURE when:
 **MANDATORY: When terminating with SUCCESS, you MUST populate EVERY field in Yaml_ExtendedBooleanResult:**
 - You must get confirmation from QA Engineer about terminating with SUCCESS
 - QA Engineer must verify all converted files has been saved in the output folder
+- **QA Engineer must verify file_converting_result.md is proper markdown format** (NOT JSON blob wrapped in markdown)
+- QA Engineer must confirm file_converting_result.md contains readable tables, headers, and structured content
+- QA Engineer must validate file_converting_result.md follows proper markdown syntax without JSON blob content
 - result: true
-- reason: "Detailed completion reason including QA verification status"
+- reason: "Detailed completion reason including QA verification status AND markdown format confirmation"
 - termination_output: MUST contain complete YamlOutput structure with:
   - converted_files: Complete list with ALL conversion details (source_file, converted_file, conversion_status, accuracy_rating, concerns, azure_enhancements)
   - multi_dimensional_analysis: ALL four dimensions (network, security, storage, compute) with complete DimensionalAnalysis
@@ -259,6 +263,8 @@ CONTINUE CONVERSION when:
 - Files have not been verified as saved in output folder
 - **Dual output not completed**:
   - Conversion report (`file_converting_result.md`) has not been generated and saved to output folder
+  - **Markdown format validation incomplete** - file_converting_result.md must be proper markdown (NOT JSON blob format)
+  - **QA markdown format verification required** - QA Engineer must confirm readable markdown structure
   - JSON response structure not ready for next step processing
 - Technical Writer has not yet created the comprehensive conversion report
 
@@ -308,10 +314,10 @@ Example SUCCESS response:
 Example CONTINUE response:
 {
   "result": false,
-  "reason": "QA verification not yet performed. Conversion report (file_converting_result.md) not yet created. Field validation check: [LIST INCOMPLETE FIELDS FROM CHECKLIST ABOVE]",
+  "reason": "QA verification not yet performed. Markdown format validation required for file_converting_result.md (must be proper markdown, not JSON blob). Field validation check: [LIST INCOMPLETE FIELDS FROM CHECKLIST ABOVE]",
   "termination_output": null,
   "termination_type": "soft_completion",
-  "blocking_issues": ["incomplete_qa_verification", "missing_conversion_report", "incomplete_field_population"]
+  "blocking_issues": ["incomplete_qa_verification", "markdown_format_validation_required", "missing_conversion_report", "incomplete_field_population"]
 }
 
 Example FAILURE response:
@@ -328,6 +334,8 @@ Example FAILURE response:
 □ No hardcoded names like "deployment.yaml" or "service.yaml" used
 □ File names verified through actual blob storage operations
 □ QA Engineer confirmed file existence and content quality
+□ **QA Engineer verified file_converting_result.md is proper markdown format** (NOT JSON blob)
+□ **Markdown format validation completed** - readable tables, headers, structured content confirmed
 
 NEVER respond with plain text. JSON ONLY.
 
@@ -880,7 +888,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # YAML Expert - PRIMARY LEAD for YAML phase
         # Handles configuration conversion, YAML generation, best practices
         agent_yaml = await mcp_context.create_agent(
-            agent_config=yaml_expert(phase="yaml").render(**self.process_context),
+            agent_config=yaml_expert(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_yaml)
@@ -888,7 +898,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # Azure Expert - Azure-specific configuration guidance
         # Provides Azure YAML patterns, service configurations, best practices
         agent_azure = await mcp_context.create_agent(
-            agent_config=azure_expert(phase="yaml").render(**self.process_context),
+            agent_config=azure_expert(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_azure)
@@ -896,7 +908,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # QA Engineer - Validation and testing focus
         # Validates converted YAML files, ensures quality, tests configurations
         agent_qa = await mcp_context.create_agent(
-            agent_config=qa_engineer(phase="yaml").render(**self.process_context),
+            agent_config=qa_engineer(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_qa)
@@ -904,7 +918,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # Technical Writer - Report generation and documentation
         # Creates conversion reports, documents the migration process
         agent_writer = await mcp_context.create_agent(
-            agent_config=technical_writer(phase="yaml").render(**self.process_context),
+            agent_config=technical_writer(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_writer)

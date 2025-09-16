@@ -574,7 +574,9 @@ class DocumentationStepGroupChatManager(StepSpecificGroupChatManager):
             valid_agents=list(participant_descriptions.keys()),
         )
 
-        logger.info(f"[AGENT_SELECTION] Raw AI response: '{self._safe_get_content(response)}'")
+        logger.info(
+            f"[AGENT_SELECTION] Raw AI response: '{self._safe_get_content(response)}'"
+        )
         logger.info(
             f"[AGENT_SELECTION] Parsed agent: '{participant_name_with_reason.result}'"
         )

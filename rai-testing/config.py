@@ -120,12 +120,3 @@ class RAITestConfig:
             "database_name": cls.COSMOS_DB_NAME,
             "container_name": cls.COSMOS_DB_CONTAINER
         }
-
-
-# Create module-level constants for backward compatibility
-config = RAITestConfig()
-STORAGE_ACCOUNT_NAME = config.STORAGE_ACCOUNT_NAME
-BLOB_CONTAINER_NAME = config.BLOB_CONTAINER_NAME 
-QUEUE_NAME = config.QUEUE_NAME
-DEFAULT_TEST_COUNT = config.DEFAULT_TEST_COUNT
-TEST_TIMEOUT_MINUTES = config.TEST_TIMEOUT_MINUTES

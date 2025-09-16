@@ -132,7 +132,7 @@ class RAITestOrchestrator:
                 )
         
         # Save updated CSV
-        self.test_manager.save_test_cases()
+        self.test_manager.save_updated_csv()
         
     def _generate_summary(self, results: List[Dict[str, Any]], test_cases: List[TestCase]) -> Dict[str, Any]:
         """Generate test results summary"""

@@ -45,7 +45,6 @@ list_blobs_in_container(container_name="{{container_name}}", folder_path="{{sour
 
 ## IMPORTANT - LEVERAGE MCP TOOLS FOR ACCURATE ANALYSIS
 - **ALWAYS use datetime_service** for generating current timestamps in analysis reports
-- **ALWAYS use microsoft_docs_service** to lookup current Azure service capabilities and limitations
 - **Use azure_blob_io_service** to read source configurations and save analysis results
 - **Reference latest Azure documentation** using microsoft_docs_service for accurate service mappings
 
@@ -279,12 +278,58 @@ list_blobs_in_container(
 *Report generated on: [CURRENT_TIMESTAMP]*
 ```
 
+## 📝 CRITICAL: MARKDOWN REPORT FORMAT 📝
+**ALL GKE ANALYSIS REPORTS MUST BE WELL-FORMED MARKDOWN DOCUMENTS:**
+
+🚨 **MANDATORY MARKDOWN FORMATTING REQUIREMENTS:**
+1. **Well-formed Markdown**: Every generated report should be valid Markdown format document
+2. **Table Format Validation**: Tables should use proper Markdown syntax with | separators and alignment
+3. **No Raw JSON Output**: Don't show JSON strings directly in report content - convert to readable Markdown format
+
+**🚨 GKE TABLE FORMATTING RULES (MANDATORY):**
+- **GCP Clarity**: Maximum 100 characters per cell for GKE analysis readability
+- **Migration Focus**: Complex GCP configurations detailed in sections, summaries in tables
+- **Service Mapping**: GCP→Azure mappings in tables, implementation details in sections
+- **Technical Accuracy**: Tables for quick reference, detailed configs in dedicated sections
+
+**GKE ANALYSIS TABLE FORMAT EXAMPLES:**
+```markdown
+| GKE Component | Current Config | Azure Equivalent | Details |
+|---------------|----------------|------------------|---------|
+| Node Pools | n1-standard-4 | Standard_D4s_v3 | See [Compute](#compute-analysis) |
+| Storage | PD-SSD | Premium SSD | See [Storage](#storage-analysis) |
+| Ingress | GCE Ingress | App Gateway | See [Network](#network-analysis) |
+```
+
+**GKE TABLE VALIDATION CHECKLIST:**
+- [ ] GCP service names fit in cells (≤100 chars)?
+- [ ] Complex GKE configurations moved to detailed sections?
+- [ ] Azure mappings clearly readable in table format?
+- [ ] Migration teams can quickly scan service equivalents?
+
 **FOOTER IMPLEMENTATION RULES**:
 - **ALWAYS** add the footer at the end of ALL analysis reports you create
 - Use `datetime_service.get_current_datetime()` to generate actual timestamp
 - Replace `[CURRENT_TIMESTAMP]` with actual datetime from datetime_service
 - Footer must be separated by horizontal line (`---`) from main content
 - Footer format is MANDATORY - do not modify the text or structure
+
+**🔴 FILE VERIFICATION RESPONSIBILITY**:
+**YOU are responsible for verifying analysis_result.md file generation before step completion.**
+**When providing final analysis completion response, you MUST:**
+
+1. **Execute file verification using MCP tools:**
+```
+list_blobs_in_container(container_name="{{container_name}}", folder_path="{{output_file_folder}}", recursive=True)
+```
+
+2. **Confirm file existence and report status clearly:**
+- If file exists: "FILE VERIFICATION: analysis_result.md confirmed in {{output_file_folder}}"
+- If file missing: "FILE VERIFICATION: analysis_result.md NOT FOUND in {{output_file_folder}}"
+
+3. **Include verification status in your completion response** so Conversation Manager can make informed termination decisions
+
+**VERIFICATION TIMING**: Execute file verification AFTER contributing to analysis_result.md but BEFORE providing final completion response
 
 **EXAMPLE USAGE**:
 When saving analysis_result.md, ensure content ends with:

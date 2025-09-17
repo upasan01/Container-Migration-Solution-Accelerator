@@ -24,8 +24,6 @@ Classes:
 """
 
 import logging
-import re
-import unicodedata
 
 from semantic_kernel.agents import GroupChatOrchestration
 from semantic_kernel.agents.orchestration.group_chat import (
@@ -76,13 +74,33 @@ Output folder : {{output_file_folder}}
 **REQUIRED MARKDOWN REPORT STRUCTURE** (`file_converting_result.md`):
 The file_converting_result.md file must contain the following sections in markdown format:
 
+**🚨 MANDATORY MARKDOWN FORMATTING RULES:**
+- **Professional Table Format**: All tables must use proper markdown syntax with aligned columns
+- **Cell Content Limits**: Maximum 50 characters per table cell for readability
+- **Consistent Status Icons**: Use ✅ for Complete, ⚠️ for Partial, ❌ for Failed
+- **Proper Headers**: Use ## for main sections, ### for subsections
+- **Executive Quality**: Tables must render perfectly for stakeholder review
+- **NO JSON BLOBS**: Content must be proper markdown, not JSON wrapped in code blocks
+
 ## YAML Conversion Summary
 - Total files converted: [number]
 - Overall conversion accuracy: [percentage]
 - Conversion completion status: [Complete/Partial]
 
 ## File Conversion Details
-[Table format listing each source file, converted file, status, and accuracy]
+**MANDATORY TABLE FORMAT** - Use proper markdown table syntax with aligned columns:
+
+| Source File | Converted File | Status | Accuracy | Notes |
+|------------|----------------|---------|----------|-------|
+| file1.yaml | file1-aks.yaml | ✅ Complete | 95% | Successfully converted |
+| file2.yaml | file2-aks.yaml | ✅ Complete | 88% | Minor adjustments needed |
+
+**CRITICAL TABLE FORMATTING RULES:**
+- Maximum 50 characters per cell for readability
+- Use ✅ for Complete, ⚠️ for Partial, ❌ for Failed
+- Include percentage accuracy (e.g., "95%", "88%")
+- Keep notes concise and actionable
+- Ensure proper markdown table syntax with pipes and headers
 
 ## Multi-Dimensional Analysis
 ### Network Conversion
@@ -225,8 +243,10 @@ TERMINATE WITH FAILURE when:
 - You must get confirmation from QA Engineer about terminating with SUCCESS
 - QA Engineer must verify all converted files has been saved in the output folder
 - **QA Engineer must verify file_converting_result.md is proper markdown format** (NOT JSON blob wrapped in markdown)
-- QA Engineer must confirm file_converting_result.md contains readable tables, headers, and structured content
+- QA Engineer must confirm file_converting_result.md contains readable tables with proper markdown syntax
+- QA Engineer must validate table formatting: aligned columns, status icons, cell content under 50 characters
 - QA Engineer must validate file_converting_result.md follows proper markdown syntax without JSON blob content
+- QA Engineer must confirm all tables use proper markdown table syntax with pipes and aligned headers
 - result: true
 - reason: "Detailed completion reason including QA verification status AND markdown format confirmation"
 - termination_output: MUST contain complete YamlOutput structure with:
@@ -264,7 +284,8 @@ CONTINUE CONVERSION when:
 - **Dual output not completed**:
   - Conversion report (`file_converting_result.md`) has not been generated and saved to output folder
   - **Markdown format validation incomplete** - file_converting_result.md must be proper markdown (NOT JSON blob format)
-  - **QA markdown format verification required** - QA Engineer must confirm readable markdown structure
+  - **QA markdown format verification required** - QA Engineer must confirm readable markdown structure and table formatting
+  - **Table syntax validation required** - QA Engineer must verify proper markdown table syntax with aligned columns
   - JSON response structure not ready for next step processing
 - Technical Writer has not yet created the comprehensive conversion report
 
@@ -363,7 +384,7 @@ Rotate between technical specialists to achieve high-quality YAML conversion:
 
 - YAML_Expert: Leads technical conversion and format validation with deep YAML expertise - **MUST use comprehensive blob search before reporting files missing**
 - Azure_Expert: Ensures Azure compatibility and applies platform-specific best practices - **MUST verify storage access and permissions thoroughly**
-- QA_Engineer: Validates conversion accuracy, quality standards, and production readiness - **MUST perform final verification of all search attempts**
+- QA_Engineer: Validates conversion accuracy, quality standards, and Azure migration readiness - **MUST perform final verification of all search attempts**
 - Technical_Writer: Creates comprehensive conversion reports and documentation - **MUST save file_converting_result.md report after QA verification**
 
 SELECTION PRIORITY:
@@ -371,7 +392,7 @@ SELECTION PRIORITY:
 2. Ensure ALL conversion specialists contribute their technical expertise
 3. Achieve comprehensive Azure compatibility through focused technical work
 4. Build consensus on conversion accuracy and quality validation
-5. Create validated, production-ready Azure YAML configurations
+5. Create validated, Azure migration-ready YAML configurations
 
 **Agent Selection Rules**:
 - If files reported missing but comprehensive search not performed → Select agent to do thorough verification
@@ -382,22 +403,30 @@ SELECTION PRIORITY:
 Select the next participant who can provide the most valuable technical conversion contribution or perform necessary blob verification.
 
 **CRITICAL - RESPONSE FORMAT**:
-Respond with ONLY the participant name from this exact list:
-- YAML_Expert
-- Azure_Expert
-- QA_Engineer
-- Technical_Writer
+Respond with a JSON object containing the participant name in the 'result' field:
+
+**VALID PARTICIPANT NAMES ONLY**:
+- "YAML_Expert"
+- "Azure_Expert"
+- "QA_Engineer"
+- "Technical_Writer"
+
+**DO NOT USE THESE INVALID VALUES**:
+- "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ "QA_Engineer"
-✅ "Azure_Expert"
+✅ {"result": "YAML_Expert", "reason": "YAML conversion expertise needed for technical transformation"}
+✅ {"result": "Azure_Expert", "reason": "Azure compatibility validation required"}
+✅ {"result": "QA_Engineer", "reason": "Quality validation and accuracy testing needed"}
+✅ {"result": "Technical_Writer", "reason": "Documentation and report generation required"}
 
 INCORRECT Response Examples:
-❌ "Selected QA_Engineer as the next participant to..."
-❌ "I choose Azure_Expert because..."
-❌ "Next participant: QA_Engineer"
+❌ "YAML_Expert" (missing JSON format)
+❌ {"result": "Success", "reason": "..."} (Success is not a valid participant name)
+❌ {"result": "Select YAML_Expert", "reason": "..."} (extra text in result field)
+❌ {"result": "Complete", "reason": "..."} (Complete is not a valid participant name)
 
-Respond with the participant name only - no explanations, no prefixes, no additional text.
+think carefully. **Respond with valid JSON only in the format: {"result": "participant_name", "reason": "explanation"}**.
 """
 
 YAML_RESULT_FILTER_PROMPT = """

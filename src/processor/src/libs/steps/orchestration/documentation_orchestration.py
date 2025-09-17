@@ -62,16 +62,39 @@ Objective: {{step_objective}}
 **REQUIRED MARKDOWN REPORT STRUCTURE** (`migration_report.md`):
 The migration_report.md file must contain the following sections in markdown format:
 
+**🚨 MANDATORY MARKDOWN FORMATTING RULES:**
+- **Professional Table Format**: All tables must use proper markdown syntax with aligned columns
+- **Cell Content Limits**: Maximum 50 characters per table cell for readability
+- **Consistent Status Icons**: Use ✅ for success, ⚠️ for warnings, ❌ for failures
+- **Proper Headers**: Use ## for main sections, ### for subsections
+- **Code Blocks**: Use ```yaml or ```json for configuration examples
+- **Executive Readability**: Tables must be scannable for executive review
+
 ## Executive Summary
 - Migration overview and outcomes
 - Key success metrics and completion status
 - Overall recommendations
+- Don't add Table of contents
 
 ## Platform Analysis Summary
 - Source platform details and complexity assessment
 - Target Azure architecture decisions
 
 ## File Conversion Results
+**MANDATORY TABLE FORMAT** - Use proper markdown table syntax for readability:
+
+| Source File | Target File | Status | Accuracy | Issues |
+|------------|-------------|---------|----------|--------|
+| app.yaml | app-aks.yaml | ✅ Complete | 95% | None |
+| svc.yaml | svc-aks.yaml | ⚠️ Partial | 88% | Minor config adjustments needed |
+
+**CRITICAL TABLE FORMATTING REQUIREMENTS:**
+- Maximum 50 characters per cell for professional readability
+- Use status icons: ✅ Complete, ⚠️ Partial, ❌ Failed
+- Include accuracy percentages (e.g., "95%", "88%")
+- Keep issues column concise and actionable
+- Ensure proper markdown table syntax with aligned pipes
+
 - Detailed conversion statistics and quality metrics
 - Per-file conversion status and accuracy
 
@@ -266,31 +289,34 @@ Select the next participant to contribute their specialized expertise to documen
 Priority: Ensure ALL relevant experts contribute their domain-specific perspectives for comprehensive migration documentation.
 
 **CRITICAL - RESPONSE FORMAT**:
-Respond with ONLY the participant name from this exact list:
-- Technical_Writer
-- Azure_Expert
-- Chief_Architect
-- QA_Engineer
-- EKS_Expert
-- GKE_Expert
+Respond with a JSON object containing the participant name in the 'result' field:
+
+**VALID PARTICIPANT NAMES ONLY**:
+- "Technical_Writer"
+- "Azure_Expert"
+- "Chief_Architect"
+- "QA_Engineer"
+- "EKS_Expert"
+- "GKE_Expert"
+
+**DO NOT USE THESE INVALID VALUES**:
+- "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ "Technical_Writer"
-✅ "Azure_Expert"
-✅ "Chief_Architect"
-✅ "QA_Engineer"
-✅ "EKS_Expert"
-✅ "GKE_Expert"
+✅ {"result": "Technical_Writer", "reason": "Documentation coordination and writing expertise needed"}
+✅ {"result": "Azure_Expert", "reason": "Azure deployment and operations insights required"}
+✅ {"result": "Chief_Architect", "reason": "Strategic oversight for migration documentation needed"}
+✅ {"result": "QA_Engineer", "reason": "Quality validation and testing documentation required"}
+✅ {"result": "EKS_Expert", "reason": "EKS migration considerations and operational procedures needed"}
+✅ {"result": "GKE_Expert", "reason": "GKE cross-platform best practices and operational procedures required"}
 
 INCORRECT Response Examples:
-❌ "Select Technical_Writer as the next participant to..."
-❌ "I choose Azure_Expert because..."
-❌ "Next participant: QA_Engineer"
-❌ "Success"
-❌ "Complete"
-❌ "Terminate"
+❌ "Technical_Writer" (missing JSON format)
+❌ {"result": "Success", "reason": "..."} (Success is not a valid participant name)
+❌ {"result": "Select Technical_Writer", "reason": "..."} (extra text in result field)
+❌ {"result": "Complete", "reason": "..."} (Complete is not a valid participant name)
 
-Respond with the participant name only - no explanations, no prefixes, no additional text.
+think carefully. **Respond with valid JSON only in the format: {"result": "participant_name", "reason": "explanation"}**.
 """
 DOCUMENTATION_RESULT_FILTER_PROMPT = """
 You are coordinating the {{step_name}} step of Azure Kubernetes migration.

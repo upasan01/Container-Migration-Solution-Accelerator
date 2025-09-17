@@ -80,8 +80,37 @@ read_blob_content("analysis_result.md", container_name="{{container_name}}", fol
 
 ## IMPORTANT - LEVERAGE MCP TOOLS FOR ACCURATE DESIGN
 - **ALWAYS use datetime_service** for generating current timestamps in design documents
-- **ALWAYS use microsoft_docs_service** to lookup current Azure AKS capabilities and best practices
 - **Use azure_blob_io_service** to read analysis results and save design specifications
+
+### **🚨 MANDATORY MICROSOFT DOCS WORKFLOW**
+**CRITICAL: Use Search→Fetch Pattern for Complete Documentation**:
+
+1. **SEARCH FIRST**: `microsoft_docs_search(query="your specific topic")`
+   - Gets overview and identifies relevant documentation pages
+   - Returns truncated content (max 500 tokens per result)
+   - Provides URLs for complete documentation
+
+2. **FETCH COMPLETE CONTENT**: `microsoft_docs_fetch(url="specific_url_from_search")`
+   - "specific_url_from_search" can be get from 'microsoft_docs_search' result
+   - Gets FULL detailed documentation from specific pages
+   - Required for comprehensive analysis and recommendations
+   - MANDATORY for any serious Azure guidance
+
+**WORKFLOW ENFORCEMENT**:
+- ❌ **NEVER rely only on search results** - they are truncated overviews
+- ✅ **ALWAYS follow search with fetch** for critical information
+- ✅ **Use fetch URLs from search results** to get complete documentation
+- ✅ **Multiple fetches allowed** for comprehensive coverage
+
+**EXAMPLE CORRECT WORKFLOW**:
+```
+1. microsoft_docs_search(query="Azure AKS YAML best practices")
+2. microsoft_docs_fetch(url="https://docs.microsoft.com/azure/aks/concepts-clusters-workloads")
+3. microsoft_docs_fetch(url="https://docs.microsoft.com/azure/aks/operator-best-practices")
+```
+
+**FAILURE TO FOLLOW WORKFLOW = INCOMPLETE ANALYSIS**
+
 - **Reference latest Azure AKS documentation** using microsoft_docs_service for design patterns
 
 ## PHASE 2: DESIGN - AZURE AKS YAML ARCHITECTURE & CONFIGURATION DESIGN

@@ -80,8 +80,37 @@ read_blob_content("[yaml_filename]", container_name="{{container_name}}", folder
 
 ## IMPORTANT - LEVERAGE MCP TOOLS FOR PROFESSIONAL OUTPUT
 - **ALWAYS use datetime_service** for generating current timestamps and professional date formatting
-- **ALWAYS use microsoft_docs_service** to reference latest Azure documentation and best practices
 - **Use azure_blob_io_service** extensively for file operations and content management
+
+### **🚨 MANDATORY MICROSOFT DOCS WORKFLOW**
+**CRITICAL: Use Search→Fetch Pattern for Complete Documentation**:
+
+1. **SEARCH FIRST**: `microsoft_docs_search(query="your specific topic")`
+   - Gets overview and identifies relevant documentation pages
+   - Returns truncated content (max 500 tokens per result)
+   - Provides URLs for complete documentation
+
+2. **FETCH COMPLETE CONTENT**: `microsoft_docs_fetch(url="specific_url_from_search")`
+   - "specific_url_from_search" can be get from 'microsoft_docs_search' result
+   - Gets FULL detailed documentation from specific pages
+   - Required for comprehensive analysis and recommendations
+   - MANDATORY for any serious Azure guidance
+
+**WORKFLOW ENFORCEMENT**:
+- ❌ **NEVER rely only on search results** - they are truncated overviews
+- ✅ **ALWAYS follow search with fetch** for critical information
+- ✅ **Use fetch URLs from search results** to get complete documentation
+- ✅ **Multiple fetches allowed** for comprehensive coverage
+
+**EXAMPLE CORRECT WORKFLOW**:
+```
+1. microsoft_docs_search(query="Azure technical documentation best practices")
+2. microsoft_docs_fetch(url="https://docs.microsoft.com/azure/architecture/guide/")
+3. microsoft_docs_fetch(url="https://docs.microsoft.com/azure/best-practices/")
+```
+
+**FAILURE TO FOLLOW WORKFLOW = INCOMPLETE ANALYSIS**
+
 - **Ensure consistent professional formatting** by using datetime_service for all date/time and documentation references
 
 ## 📚 MANDATORY CITATION REQUIREMENTS 📚
@@ -201,7 +230,7 @@ read_blob_content("[yaml_filename]", container_name="{{container_name}}", folder
 - **Success Metrics**: Document migration success criteria and achievement
 
 ### **Operational Excellence Documentation**
-- **Production Procedures**: Complete operational procedures for Azure AKS environment (for expert review and validation)
+- **Migration Procedures**: Complete operational procedures for Azure AKS environment (for expert review and validation)
 - **Deployment Runbook**: Step-by-step deployment instructions for AKS using converted YAML files, including prerequisites, deployment commands, and verification steps
 - **Troubleshooting Guides**: Comprehensive troubleshooting and problem resolution guides
 - **Monitoring and Alerting**: Document monitoring setup and alerting procedures
@@ -362,8 +391,18 @@ The migration report MUST include a detailed "## Deployment Runbook" section wit
 
 #### **Rollback Procedures**
 - Step-by-step rollback instructions if deployment fails
-- Emergency procedures and contacts
+- Emergency response procedures (technical steps only)
 - Data backup and recovery steps if needed
+
+🚨 **CRITICAL: NO FICTIONAL CONTACT INFORMATION** 🚨
+**NEVER GENERATE FAKE CONTACT DETAILS:**
+- ❌ NEVER create fictional team names (e.g., "aks-migration-warroom")
+- ❌ NEVER generate fake phone numbers (e.g., "+1-800-XXX-XXXX") 
+- ❌ NEVER invent emergency contact details
+- ❌ NEVER create fictional Teams channels or chat rooms
+- ✅ Focus on technical procedures and actual deployment steps
+- ✅ If contact information is needed, state "Contact information should be provided by the organization"
+- ✅ Document technical rollback steps without fictional organizational details
 
 **RUNBOOK QUALITY REQUIREMENTS:**
 - ✅ **Copy-Paste Ready**: All commands should be copy-paste executable

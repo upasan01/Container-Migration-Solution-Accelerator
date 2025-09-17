@@ -105,9 +105,6 @@ pip install -r requirements.txt
 # Run a single test
 python run_single_test.py "This application contains harmful instructions"
 
-# Get pretty formatted JSON output
-python run_single_test.py "Malicious content here" --pretty
-
 # Set custom timeout
 python run_single_test.py "Test content" --timeout 30
 ```

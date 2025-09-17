@@ -46,7 +46,6 @@ async def main():
     parser.add_argument('--timeout', type=int, default=60, help='Timeout in minutes (default: 60)')
     parser.add_argument('--resource-type', default='pod', help='Kubernetes resource type (default: pod)')
     parser.add_argument('--debug', action='store_true', help='Enable debug logging')
-    parser.add_argument('--pretty', action='store_true', help='Pretty print JSON output')
     
     args = parser.parse_args()
     
@@ -60,15 +59,36 @@ async def main():
             timeout_minutes=args.timeout,
             resource_type=args.resource_type
         )
-                    
-        # Output results as JSON
-        if args.pretty:
-            print(json.dumps(result, indent=2))
+        
+        # Display prominent test result before JSON output
+        test_result = result.get("test_result", "unknown").upper()
+        
+        if test_result == "PASSED":
+            status_line = "🟢 TEST PASSED ✅"
+        elif test_result == "FAILED":
+            status_line = "🔴 TEST FAILED ❌"
+        elif test_result == "TIMEOUT":
+            status_line = "🟡 TEST TIMEOUT ⏰"
+        elif test_result == "ERROR":
+            status_line = "🟠 TEST ERROR ⚠️"
         else:
-            print(json.dumps(result))
+            status_line = f"🔵 TEST STATUS: {test_result}"
+        
+        # Print status line to stderr so it doesn't interfere with JSON parsing
+        print(f"\n{status_line}", file=sys.stderr)
+        print(f"Process ID: {result.get('process_id', 'N/A')}", file=sys.stderr)
+        
+        error_reason = result.get("error_reason", "")
+        if error_reason and error_reason.strip():
+            print(f"Error Reason: {error_reason}", file=sys.stderr)
+        
+        print("-" * 50, file=sys.stderr)
+        
+        if args.debug:
+            print(json.dumps(result, indent=2))
             
         # Exit with appropriate code
-        if result["test_result"] in ["passed", "failed"]:
+        if test_result in ["PASSED", "FAILED"]:
             sys.exit(0)
         else:
             sys.exit(1)

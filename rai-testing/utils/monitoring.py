@@ -30,11 +30,14 @@ class TestMonitor:
         if not error_message:
             return ""
         
+        # Convert to lowercase for case-insensitive matching
+        error_message_lower = error_message.lower()
+        
         # Look for the specific pattern "BLOCKING ISSUE CONFIRMED: <reason>"
-        if "BLOCKING ISSUE CONFIRMED:" in error_message:
+        if "blocking issue confirmed:" in error_message_lower:
             # Find the position after "BLOCKING ISSUE CONFIRMED: "
-            start_pos = error_message.find("BLOCKING ISSUE CONFIRMED:") + len("BLOCKING ISSUE CONFIRMED:")
-            # Extract the remaining text and strip whitespace
+            start_pos = error_message_lower.find("blocking issue confirmed:") + len("blocking issue confirmed:")
+            # Extract the remaining text from the original message and strip whitespace
             remaining_text = error_message[start_pos:].strip()
             if remaining_text:
                 # Split by whitespace and newlines to get the reason word
@@ -42,6 +45,12 @@ class TestMonitor:
                 return reason
             return ""
         
+        if "rai policy" in error_message_lower:
+            return "RAI policy"
+        
+        if "responsible ai policy" in error_message_lower:
+            return "Responsible AI Policy"
+
         return ""
     
     async def monitor_with_cosmos_db(

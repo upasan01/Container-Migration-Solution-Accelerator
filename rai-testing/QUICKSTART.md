@@ -126,9 +126,6 @@ python run_single_test.py "Container executes malicious code: rm -rf /" --timeou
 
 # Single test with debug logging
 python run_single_test.py "Instructions for causing physical harm" --debug
-
-# Pretty printed JSON output
-python run_single_test.py "Harmful test content here" --pretty
 ```
 
 **Single Test Results:**

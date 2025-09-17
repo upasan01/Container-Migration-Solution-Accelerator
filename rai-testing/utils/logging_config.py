@@ -21,6 +21,10 @@ def setup_logging(
         handlers=[logging.StreamHandler(sys.stdout)],
         force=True  # Override any existing configuration
     )
+
+    # Configure repository logging based on debug mode
+    repo_level = logging.INFO if debug else logging.WARNING
+    logging.getLogger('sas.cosmosdb.sql.repository').setLevel(repo_level)
     
     logging.getLogger('azure').setLevel(logging.ERROR)
     logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.ERROR)
@@ -28,7 +32,6 @@ def setup_logging(
     logging.getLogger('azure.cosmos').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.ERROR)
     logging.getLogger('requests').setLevel(logging.ERROR)
-    logging.getLogger('sas.cosmosdb.sql.repository').setLevel(logging.WARNING)
     logging.getLogger('rich').setLevel(logging.WARNING)
 
 

@@ -1,3 +1,4 @@
 /logs
 /results
 /temp_test_files
+*.drawio.*

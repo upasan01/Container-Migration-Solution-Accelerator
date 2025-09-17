@@ -1,0 +1,130 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2">
+  <diagram name="Page-1" id="IqjkWr6LBpPxCR0Guc8m">
+    <mxGraphModel dx="1425" dy="829" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sCcm-W3OHmVzhx6xfnmr-4" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="sCcm-W3OHmVzhx6xfnmr-2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="520" y="130" as="sourcePoint" />
+            <mxPoint x="200" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-5" value="provide&lt;div&gt;test text&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="sCcm-W3OHmVzhx6xfnmr-4">
+          <mxGeometry x="-0.2557" y="-1" relative="1" as="geometry">
+            <mxPoint x="4" y="-11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sCcm-W3OHmVzhx6xfnmr-2" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="20" y="227" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-1" value="YAML file" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.document;" vertex="1" parent="1">
+          <mxGeometry x="470" y="156.77" width="40" height="47" as="geometry" />
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-16" value="RAI Testing&lt;div&gt;Process&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="200" y="170" width="180" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-17" value="" style="endArrow=classic;html=1;rounded=0;exitX=1.006;exitY=0.07;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-16" target="xgBlmgpWRBWaihuSthFr-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="260" y="170" as="sourcePoint" />
+            <mxPoint x="310" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-18" value="create" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-17">
+          <mxGeometry x="-0.2097" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-21" value="" style="endArrow=classic;html=1;rounded=0;entryX=-0.03;entryY=0.514;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-1" target="xgBlmgpWRBWaihuSthFr-12">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="565.68" y="310" as="sourcePoint" />
+            <mxPoint x="625.68" y="194" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-22" value="upload" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-21">
+          <mxGeometry x="-0.2026" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-12" value="Blob Storage" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/storage/Storage_Accounts_Classic.svg;" vertex="1" parent="1">
+          <mxGeometry x="610" y="160" width="50.68" height="40.54" as="geometry" />
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-24" value="Queue" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/general/Storage_Queue.svg;" vertex="1" parent="1">
+          <mxGeometry x="610" y="239.41" width="50.68" height="41.18" as="geometry" />
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-25" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.993;exitY=0.46;exitDx=0;exitDy=0;entryX=-0.031;entryY=0.358;entryDx=0;entryDy=0;entryPerimeter=0;exitPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-16" target="xgBlmgpWRBWaihuSthFr-24">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="270" as="sourcePoint" />
+            <mxPoint x="570" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-26" value="create new&lt;div&gt;message&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-25">
+          <mxGeometry x="-0.2396" y="2" relative="1" as="geometry">
+            <mxPoint x="46" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-27" value="" style="endArrow=classic;html=1;rounded=0;exitX=1.011;exitY=0.89;exitDx=0;exitDy=0;exitPerimeter=0;entryX=-0.032;entryY=0.174;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-16" target="xgBlmgpWRBWaihuSthFr-8">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="340" as="sourcePoint" />
+            <mxPoint x="640" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-28" value="monitor&lt;div&gt;status&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-27">
+          <mxGeometry x="-0.1093" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-8" value="Cosmos DB" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/databases/Azure_Cosmos_DB.svg;" vertex="1" parent="1">
+          <mxGeometry x="611.34" y="320" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-13" value="Processor" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Worker_Container_App.svg;" vertex="1" parent="1">
+          <mxGeometry x="780" y="227" width="68" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-31" value="" style="endArrow=classic;html=1;rounded=0;entryX=1.024;entryY=0.612;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.001;exitY=0.029;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-13" target="xgBlmgpWRBWaihuSthFr-12">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="760" y="205.27" as="sourcePoint" />
+            <mxPoint x="810" y="155.27" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-32" value="read&lt;div&gt;file&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-31">
+          <mxGeometry x="0.2335" y="3" relative="1" as="geometry">
+            <mxPoint x="44" y="6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-35" value="" style="endArrow=classic;html=1;rounded=0;entryX=1.033;entryY=0.237;entryDx=0;entryDy=0;entryPerimeter=0;exitX=-0.087;exitY=0.322;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-13" target="xgBlmgpWRBWaihuSthFr-24">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="710" y="310" as="sourcePoint" />
+            <mxPoint x="760" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-36" value="read&lt;div&gt;queue to&amp;nbsp;&lt;/div&gt;&lt;div&gt;start&lt;/div&gt;&lt;div&gt;process&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-35">
+          <mxGeometry x="0.1933" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-37" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.977;entryY=0.287;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.041;exitY=0.984;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-13" target="xgBlmgpWRBWaihuSthFr-8">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="880" y="170" as="sourcePoint" />
+            <mxPoint x="930" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-38" value="update&lt;div&gt;process&lt;/div&gt;&lt;div&gt;status&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-37">
+          <mxGeometry x="0.0029" y="-4" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-39" value="" style="endArrow=classic;html=1;rounded=0;exitX=-0.024;exitY=0.644;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="xgBlmgpWRBWaihuSthFr-16" target="sCcm-W3OHmVzhx6xfnmr-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="120" y="337" as="sourcePoint" />
+            <mxPoint x="170" y="287" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xgBlmgpWRBWaihuSthFr-40" value="receive&lt;div&gt;test&lt;/div&gt;&lt;div&gt;result&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xgBlmgpWRBWaihuSthFr-39">
+          <mxGeometry x="-0.184" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

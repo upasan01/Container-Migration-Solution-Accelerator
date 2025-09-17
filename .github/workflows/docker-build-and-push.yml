@@ -78,7 +78,8 @@ jobs:
           file: ./src/backend-api/Dockerfile
           push: ${{ github.ref_name == 'main' || github.ref_name == 'dev' || github.ref_name == 'demo' || github.ref_name == 'hotfix' }}
           tags: |
-            ${{ steps.registry.outputs.ext_registry }}/cmpmapi:${{ env.BASE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/backend-api:${{ env.BASE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/backend-api:${{ env.DATE_TAG }}
 
       - name: Build and Push ContentProcessor Docker image
         uses: docker/build-push-action@v6
@@ -87,8 +88,8 @@ jobs:
           file: ./src/processor/Dockerfile
           push: ${{ github.ref_name == 'main' || github.ref_name == 'dev' || github.ref_name == 'demo' || github.ref_name == 'hotfix' }}
           tags: |
-            ${{ steps.registry.outputs.ext_registry }}/cmpmprocessor:${{ env.BASE_TAG }}
-            ${{ steps.registry.outputs.ext_registry }}/cmpmprocessor:${{ env.DATE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/processor:${{ env.BASE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/processor:${{ env.DATE_TAG }}
             
       - name: Build and Push ContentProcessorWeb Docker image
         uses: docker/build-push-action@v6
@@ -97,5 +98,5 @@ jobs:
           file: ./src/frontend/Dockerfile
           push: ${{ github.ref_name == 'main' || github.ref_name == 'dev' || github.ref_name == 'demo' || github.ref_name == 'hotfix' }}
           tags: |
-            ${{ steps.registry.outputs.ext_registry }}/cmpmweb:${{ env.BASE_TAG }}
-            ${{ steps.registry.outputs.ext_registry }}/cmpmweb:${{ env.DATE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/frontend:${{ env.BASE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/frontend:${{ env.DATE_TAG }}

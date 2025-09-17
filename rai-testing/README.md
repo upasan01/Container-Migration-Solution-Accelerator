@@ -121,9 +121,6 @@ Create a CSV file with your test content using the required format shown above. 
 # Run all tests from CSV file
 python run_batch_tests.py --csv-file my_test_cases.csv
 
-# Run limited number of tests
-python run_batch_tests.py --csv-file my_test_cases.csv --test-count 10
-
 # Enable debug logging  
 python run_batch_tests.py --csv-file my_test_cases.csv --debug
 ```

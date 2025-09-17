@@ -12,8 +12,7 @@ Required Environment Variables:
     COSMOS_DB_KEY: Azure Cosmos DB primary/secondary key
 
 Optional Environment Variables:
-    RAI_TEST_COUNT: Maximum number of tests to run (default: 25)
-    RAI_TEST_TIMEOUT: Test timeout in minutes (default: 10)
+    RAI_TEST_TIMEOUT: Test timeout in minutes (default: 20)
     RAI_BLOB_CONTAINER: Blob container name (default: processes)
     RAI_QUEUE_NAME: Main queue name (default: processes-queue)
     RAI_COSMOS_DB_NAME: Cosmos DB database name (default: migration_db)
@@ -55,7 +54,6 @@ class RAITestConfig:
     TEST_FILE_PREFIX: str = "rai-test"
     
     # Monitoring Configuration
-    POLLING_INTERVAL_SECONDS: int = int(os.getenv("RAI_POLLING_INTERVAL", "30"))
     MAX_WAIT_TIME_MINUTES: int = int(os.getenv("RAI_MAX_WAIT_TIME", "60"))
     COSMOS_POLLING_INTERVAL_SECONDS: int = int(os.getenv("RAI_COSMOS_POLLING_INTERVAL", "10"))
     

@@ -7,7 +7,6 @@ Provides rich console interface for progress tracking and result reporting.
 
 Usage:
     python run_batch_tests.py --csv-file test_cases.csv
-    python run_batch_tests.py --csv-file test_cases.csv --test-count 10
     python run_batch_tests.py --csv-file test_cases.csv --debug
 """
 
@@ -42,13 +41,12 @@ class RAITestOrchestrator:
         # Test manager will be initialized when CSV file is provided
         self.test_manager: Optional[TestManager] = None
 
-    async def run_tests(self, csv_file: str, test_count: Optional[int] = None, debug: bool = False) -> Dict[str, Any]:
+    async def run_tests(self, csv_file: str, debug: bool = False) -> Dict[str, Any]:
         """
         Run RAI tests from CSV file using core testing library
         
         Args:
             csv_file: Path to CSV file with test cases
-            test_count: Optional limit on number of tests to run
             debug: Enable debug logging
         
         Returns:
@@ -66,10 +64,6 @@ class RAITestOrchestrator:
             test_cases = self.test_manager.load_test_cases()
             
             self.console.print(f"✅ CSV file loaded: {len(test_cases)} test cases found")
-            
-            # Limit test count if specified
-            if test_count and test_count < len(test_cases):
-                test_cases = test_cases[:test_count]
                 
             # Display test configuration
             estimated_minutes = len(test_cases) * 1.2  # each test typically takes a minute or so, adding a slight buffer to the estimate
@@ -81,7 +75,7 @@ class RAITestOrchestrator:
             config_table.add_row("CSV File", str(csv_file))
             config_table.add_row("Test Count", str(len(test_cases)))
             config_table.add_row("Estimated Time to Complete", estimated_time)
-            config_table.add_row("Timeout per Test", self.config.TEST_TIMEOUT_MINUTES)
+            config_table.add_row("Timeout per Test", str(self.config.TEST_TIMEOUT_MINUTES))
             
             self.console.print(Panel(config_table, title="🧪 Test Configuration"))
             
@@ -196,17 +190,16 @@ class RAITestOrchestrator:
 
 @click.command()
 @click.option('--csv-file', required=True, help='Path to CSV file containing test cases')
-@click.option('--test-count', type=int, help='Maximum number of tests to run')
 @click.option('--debug', is_flag=True, help='Enable debug logging')
-def main(csv_file: str, test_count: Optional[int], debug: bool):
+def main(csv_file: str, debug: bool):
     """Run RAI tests from CSV file"""
-    asyncio.run(run_async_main(csv_file, test_count, debug))
+    asyncio.run(run_async_main(csv_file, debug))
 
 
-async def run_async_main(csv_file: str, test_count: Optional[int], debug: bool):
+async def run_async_main(csv_file: str, debug: bool):
     """Async main function for running RAI tests"""
     orchestrator = RAITestOrchestrator()
-    result = await orchestrator.run_tests(csv_file, test_count, debug)
+    result = await orchestrator.run_tests(csv_file, debug)
     
     # Exit with appropriate code
     if result.get("success", False):

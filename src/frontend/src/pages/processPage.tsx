@@ -110,7 +110,7 @@ const ProcessPage: React.FC = () => {
   const navigate = useNavigate();
   const { batchId } = useParams<{ batchId: string }>();
   const isPanelOpen = useSelector((state: RootState) => state.historyPanel.isOpen);
-  
+
   // New state for real-time API data
   const [currentPhase, setCurrentPhase] = useState<string>("");
   const [phaseSteps, setPhaseSteps] = useState<string[]>([]);
@@ -129,24 +129,24 @@ const ProcessPage: React.FC = () => {
   // Helper function to generate phase message from API data
   const getPhaseMessage = (apiResponse: any) => {
     if (!apiResponse) return "";
-    
+
     const { phase, active_agent_count, total_agents, health_status, agents } = apiResponse;
-    
+
     const phaseMessages = {
       'Analysis': 'Analyzing workloads and dependencies, existing container images and configurations',
       'Design': 'Designing target environment mappings to align with Azure AKS',
       'YAML': 'Converting container specifications and orchestration configs to Azure format',
       'Documentation': 'Generating migration report and deployment files'
     };
-    
+
     // Extract active agent information from agents array
-    const activeAgents = agents?.filter(agent => 
+    const activeAgents = agents?.filter(agent =>
       agent.includes('speaking') || agent.includes('thinking')
     ) || [];
-    
+
     const speakingAgent = activeAgents.find(agent => agent.includes('speaking'));
     const thinkingAgent = activeAgents.find(agent => agent.includes('thinking'));
-    
+
     let agentActivity = "";
     if (speakingAgent) {
       const agentName = speakingAgent.split(':')[0].replace(/[✓✗]/g, '').replace(/\[.*?\]/g, '').trim();
@@ -155,21 +155,21 @@ const ProcessPage: React.FC = () => {
       const agentName = thinkingAgent.split(':')[0].replace(/[✓✗]/g, '').replace(/\[.*?\]/g, '').trim();
       agentActivity = ` - ${agentName} is thinking`;
     }
-    
+
     const baseMessage = phaseMessages[phase] || `${phase} phase in progress`;
     const agentInfo = active_agent_count && total_agents ? ` (${active_agent_count}/${total_agents} agents active)` : '';
     const healthIcon = health_status?.includes('🟢') ? ' 🟢' : '';
-    
+
     return `${phase} phase: ${baseMessage}${agentActivity}${agentInfo}`;
   };
 
   // Polling function to check batch status
   const pollBatchStatus = async () => {
     if (!batchId) return;
-    
+
     try {
       const response = await apiService.get(`/process/status/${batchId}/render/`);
-      
+
       if (!response) {
         console.error('No response received from status endpoint');
         return;
@@ -188,14 +188,14 @@ const ProcessPage: React.FC = () => {
       // Check if last_update_time has changed - only update if there's new activity
       if (response.last_update_time && response.last_update_time !== lastUpdateTime) {
         console.log('New activity detected! Last update time changed from', lastUpdateTime, 'to', response.last_update_time);
-        
+
         // Update the stored last update time
         setLastUpdateTime(response.last_update_time);
 
         // Update current phase and generate step message
         if (response.phase) {
           const newPhaseMessage = getPhaseMessage(response);
-          
+
           // Add the new message to steps ONLY if it's different from the last message
           setCurrentPhase(response.phase);
           setPhaseSteps(prev => {
@@ -316,10 +316,10 @@ const ProcessPage: React.FC = () => {
     }
 
     console.log('Starting batch status polling every 5 seconds...');
-    
+
     // Poll immediately on mount
     pollBatchStatus();
-    
+
     // Set up interval for every 5 seconds
     const pollInterval = setInterval(() => {
       console.log('Polling batch status...');
@@ -363,171 +363,138 @@ const ProcessPage: React.FC = () => {
     <>
       <style dangerouslySetInnerHTML={{ __html: scrollbarStyles }} />
       <div className="landing-page flex flex-col relative h-screen">
-      {/* Header - Same as Landing Page */}
-      <div onClick={handleLeave} style={{ cursor: "pointer"}}>
-        <Header subtitle="Container Migration">
-          <HeaderTools>
-          </HeaderTools>
-        </Header>
-      </div>
+        {/* Header - Same as Landing Page */}
+        <div onClick={handleLeave} style={{ cursor: "pointer" }}>
+          <Header subtitle="Container Migration">
+            <HeaderTools>
+            </HeaderTools>
+          </Header>
+        </div>
 
-      {/* Main Content */}
-      <main className={`main-content ${isPanelOpen ? "shifted" : ""} flex-1 flex overflow-auto bg-mode-neutral-background-1-rest relative`}>
-        <div className="min-h-full flex flex-col items-center bg-gray-50 p-4 sm:p-6 lg:p-8 w-full" style={{ marginTop: 'clamp(40px, 8vh, 120px)', paddingTop: '2rem' }}>
-          {/* Header - Centered */}
-          <div className="text-center mb-3 sm:mb-4" style={{textAlign: 'center' }}>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-2">Container Migration</h1>
-            <p className="text-gray-600 max-w-xl lg:max-w-2xl mx-auto text-sm sm:text-base">
-              Migrate your third party container workloads to{" "}
-              <a
-                href="https://azure.microsoft.com/en-us/products/kubernetes-service/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                Azure AKS
-              </a>{" "}
-            </p>
-          </div>
-
-          {/* Error MessageBar - Between title and Agent Activity */}
-          {migrationError && (
-            <div style={{ 
-              width: '100%',
-              maxWidth: '60vw',
-              margin: '0px auto',
-              marginBottom: '40px' // Increased gap from 24px to 40px
-            }}>
-              <MessageBar
-                messageBarType={MessageBarType.error}
-                isMultiline={false}
-                onDismiss={() => setMigrationError(false)}
-                dismissButtonAriaLabel="Close"
-                styles={{
-                  root: { 
-                    display: "flex", 
-                    alignItems: "center",
-                    backgroundColor: "#fef2f2",
-                    borderColor: "#fca5a5",
-                    color: "#991b1b"
-                  },
-                  text: {
-                    fontSize: "14px", // Increased from default (usually 14px)
-                  }
-                }}
-              >
-                The migration stopped before completion and no results were generated.
-              </MessageBar>
+        {/* Main Content */}
+        <main className={`main-content ${isPanelOpen ? "shifted" : ""} flex-1 flex overflow-auto bg-mode-neutral-background-1-rest relative`}>
+          <div className="min-h-full flex flex-col items-center bg-gray-50 p-4 sm:p-6 lg:p-8 w-full" style={{ marginTop: 'clamp(20px, 4vh, 60px)', paddingTop: '1rem' }}>
+            {/* Header - Centered */}
+            <div className="text-center mb-2" style={{ textAlign: 'center' }}>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-1">Container Migration</h1>
+              <p className="text-gray-600 max-w-xl lg:max-w-2xl mx-auto text-sm sm:text-base">
+                Migrate your third party container workloads to{" "}
+                <a
+                  href="https://azure.microsoft.com/en-us/products/kubernetes-service/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  Azure AKS
+                </a>{" "}
+              </p>
             </div>
-          )}
-       
-          {/* Card */}
-          <div className="bg-white border-2 border-gray-300 rounded-2xl shadow-lg p-6 sm:p-8" style={{
-            textAlign: 'center',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            border: '1px solid #d1d5db',
-            width: '100%',
-            maxWidth: '60vw',
-            margin: '0px auto',
-            borderRadius: '12px',
-            paddingBottom: '16px',
-            paddingTop: '16px',
-          }}>
-            {/* Lottie Animation - Centered above Agent Activity */}
-            {!migrationError && (
+
+            {/* Error MessageBar - Between title and Agent Activity */}
+            {migrationError && (
               <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
                 width: '100%',
-                marginBottom: '24px'
+                maxWidth: '60vw',
+                margin: '0px auto',
+                marginBottom: '20px' // Reduced gap from 40px to 20px
               }}>
-                <Lottie 
-                  animationData={documentLoader} 
-                  loop={true} 
-                  style={{ 
-                    width: '120px', 
-                    height: '120px',
-                    margin: '0 auto'
-                  }} 
-                />
+                <MessageBar
+                  messageBarType={MessageBarType.error}
+                  isMultiline={true}
+                  //onDismiss={() => setMigrationError(false)}
+                  dismissButtonAriaLabel="Close"
+                  styles={{
+                    root: {
+                      display: "flex",
+                      alignItems: "center",
+                      backgroundColor: "#fef2f2",
+                      borderColor: "#fca5a5",
+                      color: "#991b1b"
+                    },
+                    text: {
+                      fontSize: "14px", // Increased from default (usually 14px)
+                    }
+                  }}
+                >
+                  The migration stopped before completion and no results were generated.
+                  {/* <br />
+                  Please check the logs using Process ID: {batchId} for more details. */}
+                </MessageBar>
               </div>
             )}
 
-            {/* Title */}
-            <h2 className="text-lg font-semibold text-center mb-6" style={{textAlign: 'center' }}>Agent Activity</h2>
-
-            {/* Real-time phase steps from API */}
-            <div 
-              ref={stepsContainerRef}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                width: '100%',
-                maxWidth: '90%',
-                margin: '0 auto',
-                maxHeight: '240px', // Reduced from 320px to show exactly 4 steps
-                minHeight: '200px',
-                overflowY: 'auto',
-                paddingRight: '8px',
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#888 #f1f1f1'
-              }} 
-              className="custom-scrollbar"
-            >
-              {phaseSteps.length === 0 ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px 16px',
-                    backgroundColor: '#f9fafb',
-                    borderRadius: '8px',
-                    border: '1px solid #d1d5db',
-                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', width: '24px' }}>
-                    <CircleCheck
-                      strokeWidth="2.5px"
-                      color="#203474"
-                      size="16px"
-                    />
-                  </div>
-                  <div
+            {/* Card */}
+            <div className="bg-white border-2 border-gray-300 rounded-2xl shadow-lg p-6 sm:p-8" style={{
+              textAlign: 'center',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              border: '1px solid #d1d5db',
+              width: '100%',
+              maxWidth: '60vw',
+              margin: '10px auto', // Reduced from '0px auto' to bring it closer to header
+              borderRadius: '12px',
+              paddingBottom: '16px',
+              paddingTop: '16px',
+            }}>
+              {/* Lottie Animation - Centered above Agent Activity */}
+              {!migrationError && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  marginBottom: '24px'
+                }}>
+                  <Lottie
+                    animationData={documentLoader}
+                    loop={true}
                     style={{
-                      flex: 1,
-                      fontSize: "14px",
-                      color: "#666666",
-                      textAlign: "left",
-                      fontStyle: "italic"
+                      width: '120px',
+                      height: '120px',
+                      margin: '0 auto'
                     }}
-                  >
-                    Waiting for migration process to start...
-                  </div>
+                  />
                 </div>
-              ) : (
-                phaseSteps.map((step, index) => (
+              )}
+
+              {/* Title */}
+              <h2 className="text-lg font-semibold text-center mb-6" style={{ textAlign: 'center' }}>Agent Activity</h2>
+
+              {/* Real-time phase steps from API */}
+              <div
+                ref={stepsContainerRef}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  width: '100%',
+                  maxWidth: '90%',
+                  margin: '0 auto',
+                  maxHeight: '240px', // Reduced from 320px to show exactly 4 steps
+                  minHeight: '200px',
+                  overflowY: 'auto',
+                  paddingRight: '8px',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#888 #f1f1f1'
+                }}
+                className="custom-scrollbar"
+              >
+                {phaseSteps.length === 0 ? (
                   <div
-                    key={index}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: '12px',
                       padding: '12px 16px',
-                      backgroundColor: step.includes('✅') ? '#f0f9f0' : '#f9fafb',
+                      backgroundColor: '#f9fafb',
                       borderRadius: '8px',
-                      border: step.includes('✅') ? '1px solid #10b981' : '1px solid #d1d5db',
+                      border: '1px solid #d1d5db',
                       boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                      animation: 'fadeIn 0.5s ease-in-out',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', width: '24px' }}>
                       <CircleCheck
                         strokeWidth="2.5px"
-                        color={step.includes('✅') ? "#10b981" : "#203474"}
+                        color="#203474"
                         size="16px"
                       />
                     </div>
@@ -535,55 +502,90 @@ const ProcessPage: React.FC = () => {
                       style={{
                         flex: 1,
                         fontSize: "14px",
-                        color: "#000000",
+                        color: "#666666",
                         textAlign: "left",
+                        fontStyle: "italic"
                       }}
                     >
-                      {step}
+                      Waiting for migration process to start...
                     </div>
                   </div>
-                ))
-              )}
+                ) : (
+                  phaseSteps.map((step, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '12px 16px',
+                        backgroundColor: step.includes('✅') ? '#f0f9f0' : '#f9fafb',
+                        borderRadius: '8px',
+                        border: step.includes('✅') ? '1px solid #10b981' : '1px solid #d1d5db',
+                        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        animation: 'fadeIn 0.5s ease-in-out',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', width: '24px' }}>
+                        <CircleCheck
+                          strokeWidth="2.5px"
+                          color={step.includes('✅') ? "#10b981" : "#203474"}
+                          size="16px"
+                        />
+                      </div>
+                      <div
+                        style={{
+                          flex: 1,
+                          fontSize: "14px",
+                          color: "#000000",
+                          textAlign: "left",
+                        }}
+                      >
+                        {step}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      {/* Side Panel - Same as Landing Page */}
-      {isPanelOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: "60px",
-            right: 0,
-            height: "calc(100vh - 60px)",
-            width: "clamp(260px, 20vw, 320px)", // Responsive width
-            zIndex: 1050,
-            background: "white",
-            overflowY: "auto",
-          }}
-        >
-          <PanelRight panelWidth={300} panelResize={true} panelType={"first"} >
-            <PanelRightToolbar panelTitle="Batch history" panelIcon={<History />} handleDismiss={handleTogglePanel} />
-            <BatchHistoryPanel isOpen={isPanelOpen} onClose={() => dispatch(closePanel())} />
-          </PanelRight>
-        </div>
-      )}
+        {/* Side Panel - Same as Landing Page */}
+        {isPanelOpen && (
+          <div
+            style={{
+              position: "fixed",
+              top: "60px",
+              right: 0,
+              height: "calc(100vh - 60px)",
+              width: "clamp(260px, 20vw, 320px)", // Responsive width
+              zIndex: 1050,
+              background: "white",
+              overflowY: "auto",
+            }}
+          >
+            <PanelRight panelWidth={300} panelResize={true} panelType={"first"} >
+              <PanelRightToolbar panelTitle="Batch history" panelIcon={<History />} handleDismiss={handleTogglePanel} />
+              <BatchHistoryPanel isOpen={isPanelOpen} onClose={() => dispatch(closePanel())} />
+            </PanelRight>
+          </div>
+        )}
 
-      {/* Progress Modal */}
-      <ProgressModal
-        open={showProgressModal}
-        setOpen={setShowProgressModal}
-        title="Processing Container Migration"
-        currentPhase={currentPhase}
-        phaseSteps={phaseSteps}
-        apiData={apiData}
-        onCancel={handleCancelProcessing}
-        showCancelButton={true}
-        processingCompleted={processingCompleted}
-        migrationError={migrationError}
-        onNavigateHome={handleNavigateHome}
-      />
+        {/* Progress Modal */}
+        <ProgressModal
+          open={showProgressModal}
+          setOpen={setShowProgressModal}
+          title="Processing Container Migration"
+          currentPhase={currentPhase}
+          phaseSteps={phaseSteps}
+          apiData={apiData}
+          onCancel={handleCancelProcessing}
+          showCancelButton={true}
+          processingCompleted={processingCompleted}
+          migrationError={migrationError}
+          onNavigateHome={handleNavigateHome}
+        />
       </div>
     </>
   );

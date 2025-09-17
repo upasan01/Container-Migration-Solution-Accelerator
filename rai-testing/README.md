@@ -93,10 +93,9 @@ export RAI_QUEUE_NAME="processes-queue"     # Storage queue name
 export RAI_COSMOS_DB_NAME="migration_db"    # Cosmos DB database name
 export RAI_COSMOS_CONTAINER_NAME="agent_telemetry"  # Cosmos DB container name
 export RAI_COSMOS_POLLING_INTERVAL="10"     # Cosmos DB polling interval in seconds
-export RAI_SAFETY_PATTERNS="content safety,harmful content"  # Expected safety keywords
 ```
 
-See `QUICKSTART.md` for complete configuration reference.
+See [QUICKSTART.md](./QUICKSTART.md) for complete start-up configuration reference.
 
 ### 1. Single Test Mode
 
@@ -141,7 +140,7 @@ python run_batch_tests.py --csv-file my_test_cases.csv --debug
 4. **Storage Upload**: Uploads file to blob storage with unique GUID
 5. **Queue Triggering**: Sends process_id message to trigger processing
 6. **Cosmos DB Monitoring**: Queries agent_telemetry container for completion status
-7. **Result Output**: Returns JSON with process_id, blob_path, and result
+7. **Result Output**: Returns JSON with process_id, blob_path, result, and reason
 
 ### Batch CSV Mode
 

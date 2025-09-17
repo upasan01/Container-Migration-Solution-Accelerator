@@ -126,4 +126,3 @@ class Yaml_ExtendedBooleanResult(BooleanResult):
     blocking_issues: list[str] = Field(
         default_factory=list, description="Specific blocking issues if hard terminated"
     )
-

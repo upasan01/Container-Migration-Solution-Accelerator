@@ -77,6 +77,14 @@ read_blob_content("design_result.md", container_name="{{container_name}}", folde
 **REQUIRED MARKDOWN REPORT STRUCTURE** (`design_result.md`):
 The design_result.md file must contain the following sections in markdown format:
 
+**🚨 MANDATORY MARKDOWN FORMATTING RULES:**
+- **Professional Table Format**: All tables must use proper markdown syntax with aligned columns
+- **Cell Content Limits**: Maximum 50 characters per table cell for executive readability
+- **Consistent Status Icons**: Use ✅ for confirmed, ⚠️ for considerations, ❌ for issues
+- **Proper Headers**: Use ## for main sections, ### for subsections
+- **Code Blocks**: Use ```yaml or ```json for configuration examples
+- **Executive Presentation**: All content must be suitable for stakeholder review
+
 ## Azure Architecture Design Summary
 - Source platform: [detected platform]
 - Target Azure platform: [AKS/other services]
@@ -136,7 +144,7 @@ TERMINATE SUCCESS when:
   - JSON response structure prepared for next step processing
 - **NO FILES, NO PASS**: Step cannot complete without verified file generation - you MUST execute MCP tools to verify
 - **🤝 EXPERT COLLABORATION ACHIEVED**: Evidence of consensus-based design decisions
-  - Technical Architect and Azure Expert collaboration documented
+  - Chief Architect and Azure Expert collaboration documented
   - Conflicting recommendations resolved through consensus building
   - Design represents collective expert intelligence, not individual decisions
 
@@ -171,6 +179,59 @@ CONTINUE when:
 - **Dual output not completed**:
   - Design document (`design_result.md`) has not been verified to exist in output folder
   - JSON response structure not ready for next step processing
+
+**FIELD POPULATION GUIDANCE:**
+Extract the following fields from agent conversation messages:
+
+📋 **summary**: Look for comprehensive design summaries, architectural overviews, or migration strategy descriptions from agents
+📋 **azure_services**: Extract lists of Azure services mentioned (AKS, App Service, Storage, Key Vault, etc.)
+📋 **architecture_decisions**: Find design decisions with rationale (containerization approach, networking choices, security patterns)
+📋 **outputs**: Look for agents mentioning file generation, documentation creation, or deliverable completion
+
+**COMPLETE SUCCESS TEMPLATE EXAMPLE:**
+When agents provide complete design information, extract into this format:
+
+```json
+{
+  "result": true,
+  "reason": "Design step completed with comprehensive Azure architecture - verified by [agent_name]",
+  "termination_output": {
+    "result": "Success",
+    "summary": "Comprehensive Azure architecture design for containerized application migration from [source_platform] to Azure Kubernetes Service (AKS). Design includes multi-tier architecture with secure networking, managed services integration, and enterprise-grade security controls.",
+    "azure_services": [
+      "Azure Kubernetes Service (AKS)",
+      "Azure Container Registry (ACR)",
+      "Azure Key Vault",
+      "Azure Application Gateway",
+      "Azure Monitor",
+      "Azure Storage Account",
+      "Azure SQL Database"
+    ],
+    "architecture_decisions": [
+      {
+        "decision": "Azure Kubernetes Service (AKS) as container orchestration platform",
+        "rationale": "Provides managed Kubernetes with enterprise security, scaling, and Azure services integration"
+      },
+      {
+        "decision": "Application Gateway with WAF for ingress",
+        "rationale": "Enables SSL termination, path-based routing, and web application firewall protection"
+      },
+      {
+        "decision": "Azure Container Registry for image management",
+        "rationale": "Secure, private container registry with vulnerability scanning and geo-replication"
+      }
+    ],
+    "outputs": [
+      {
+        "file": "design_result.md",
+        "description": "Comprehensive Azure architecture design document with service selection, security considerations, and migration strategy"
+      }
+    ]
+  },
+  "termination_type": "soft_completion",
+  "blocking_issues": []
+}
+```
 
 **CRITICAL: DO NOT TERMINATE WITH SUCCESS IF ANY REQUIRED FIELD IS INCOMPLETE OR CONTAINS PLACEHOLDER CONTENT**
 
@@ -257,27 +318,30 @@ SELECTION PRIORITY:
 5. Create detailed design ready for technical implementation
 
 **CRITICAL - RESPONSE FORMAT**:
-Respond with ONLY the participant name from this exact list:
-- Chief_Architect
-- Azure_Expert
-- EKS_Expert
-- GKE_Expert
+Respond with a JSON object containing the participant name in the 'result' field:
+
+**VALID PARTICIPANT NAMES ONLY**:
+- "Chief_Architect"
+- "Azure_Expert"
+- "EKS_Expert"
+- "GKE_Expert"
+
+**DO NOT USE THESE INVALID VALUES**:
+- "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ "Chief_Architect"
-✅ "Azure_Expert"
-✅ "EKS_Expert"
-✅ "GKE_Expert"
+✅ {"result": "Chief_Architect", "reason": "Strategic oversight needed for architecture validation"}
+✅ {"result": "Azure_Expert", "reason": "Azure service selection and best practices required"}
+✅ {"result": "EKS_Expert", "reason": "Source platform context needed for EKS migration"}
+✅ {"result": "GKE_Expert", "reason": "Source platform insights required for GKE migration"}
 
 INCORRECT Response Examples:
-❌ "Select Chief_Architect as the next participant to..."
-❌ "I choose Azure_Expert because..."
-❌ "Next participant: EKS_Expert"
-❌ "Success"
-❌ "Complete"
-❌ "Terminate"
+❌ "Chief_Architect" (missing JSON format)
+❌ {"result": "Success", "reason": "..."} (Success is not a valid participant name)
+❌ {"result": "Select Chief_Architect", "reason": "..."} (extra text in result field)
+❌ {"result": "Complete", "reason": "..."} (Complete is not a valid participant name)
 
-Respond with the participant name only - no explanations, no prefixes, no additional text.
+think carefully. **Respond with valid JSON only in the format: {"result": "participant_name", "reason": "explanation"}**.
 """
 DESIGN_RESULT_FILTER_PROMPT = """
 Summarize the key findings and insights from the design step.

@@ -121,8 +121,36 @@ read_blob_content("[filename].yaml", container_name="{{container_name}}", folder
 
 ## IMPORTANT - LEVERAGE MCP TOOLS FOR ACCURATE ANALYSIS
 - **ALWAYS use datetime_service** for generating current timestamps in analysis reports
-- **ALWAYS use microsoft_docs_service** to lookup current Azure service capabilities and limitations
 - **Use azure_blob_io_service** to read source configurations and save analysis results
+
+### **🚨 MANDATORY MICROSOFT DOCS WORKFLOW**
+**CRITICAL: Use Search→Fetch Pattern for Complete Documentation**:
+
+1. **SEARCH FIRST**: `microsoft_docs_search(query="your specific topic")`
+   - Gets overview and identifies relevant documentation pages
+   - Returns truncated content (max 500 tokens per result)
+   - Provides URLs for complete documentation
+
+2. **FETCH COMPLETE CONTENT**: `microsoft_docs_fetch(url="specific_url_from_search")`
+   - "specific_url_from_search" can be get from 'microsoft_docs_search' result
+   - Gets FULL detailed documentation from specific pages
+   - Required for comprehensive analysis and recommendations
+   - MANDATORY for any serious Azure guidance
+
+**WORKFLOW ENFORCEMENT**:
+- ❌ **NEVER rely only on search results** - they are truncated overviews
+- ✅ **ALWAYS follow search with fetch** for critical information
+- ✅ **Use fetch URLs from search results** to get complete documentation
+- ✅ **Multiple fetches allowed** for comprehensive coverage
+
+**EXAMPLE CORRECT WORKFLOW**:
+```
+1. microsoft_docs_search(query="EKS to AKS migration documentation")
+2. microsoft_docs_fetch(url="https://docs.microsoft.com/azure/aks/migrate-from-eks")
+3. microsoft_docs_fetch(url="https://docs.microsoft.com/azure/architecture/aws-professional/")
+```
+
+**FAILURE TO FOLLOW WORKFLOW = INCOMPLETE ANALYSIS**
 
 ### **azure_blob_io_service Operations**
 - **RETRY POLICY**: If operations return empty results or fail, retry the operation to ensure reliability

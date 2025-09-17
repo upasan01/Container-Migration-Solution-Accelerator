@@ -140,6 +140,7 @@ TERMINATE SUCCESS when:
   - Use `list_blobs_in_container()` to confirm file exists in output folder
   - Use `read_blob_content()` to verify content is properly generated
   - **NO FILES, NO PASS**: Step cannot complete without verified file generation
+  - analysis_result.md have to describe all analyzed *.yaml or *.yml files
 
 TERMINATE FAILURE when:
 - Technical errors prevent access/operations
@@ -171,6 +172,51 @@ CONTINUE when:
 
 **CRITICAL: DO NOT TERMINATE WITH SUCCESS IF ANY REQUIRED FIELD IS INCOMPLETE**
 **CRITICAL: RESPOND WITH VALID JSON ONLY**
+
+**🔑 TERMINATION_OUTPUT FIELD POPULATION GUIDE**:
+
+**HOW TO EXTRACT DATA FOR SUCCESSFUL TERMINATION:**
+
+1. **platform_detected**: Extract from expert consensus in conversation
+   - Look for statements like "EKS detected" or "GKE platform confirmed"
+   - Must be exactly "EKS", "GKE", or "No Platform - No Files Found"
+
+2. **confidence_score**: Extract from expert analysis confidence statements
+   - Look for percentage statements like "95% confident" in expert messages
+   - Format as "95%" or "N/A - No Files" if no platform detected
+
+3. **files_discovered**: Extract from MCP tool outputs in conversation
+   - Use results from find_blobs('*.yaml') and find_blobs('*.yml') commands
+   - Each file needs: filename, type (from YAML content), complexity assessment, azure_mapping
+
+4. **complexity_analysis**: Extract from expert technical assessments
+   - Scan expert messages for network, security, storage, compute complexity mentions
+   - Synthesize into 4 required complexity dimensions with detailed descriptions
+
+5. **migration_readiness**: Extract from expert recommendations and concerns
+   - Look for readiness scores, concern lists, and recommendation lists in expert messages
+   - Compile into overall_score, concerns array, recommendations array
+
+6. **expert_insights**: Extract key quotes and insights from each expert's contributions
+   - Find meaningful analysis statements from each expert (EKS_Expert, GKE_Expert, Technical_Architect, etc.)
+   - Format as: "Expert_Name: Key insight or analysis finding"
+
+7. **analysis_file**: Must be exact path from MCP tool verification
+   - **MANDATORY**: Execute `list_blobs_in_container(container_name, output_folder)` to confirm file exists
+   - **MANDATORY**: Execute `read_blob_content("analysis_result.md", container_name, output_folder)` to verify content
+   - Only use confirmed path if file verification succeeds
+   - DO NOT terminate if file doesn't exist or is empty
+
+**DATA EXTRACTION CHECKLIST BEFORE TERMINATION:**
+□ Reviewed conversation for expert platform consensus
+□ Found confidence percentage from expert analysis
+□ Collected file discovery results from MCP tool outputs
+□ Gathered complexity assessments from technical experts
+□ Compiled readiness scores and recommendations
+□ Extracted meaningful insights from each expert participant
+□ **EXECUTED FILE VERIFICATION**: Used MCP tools to confirm analysis_result.md exists and contains content
+□ **DOCUMENTED VERIFICATION**: Included actual MCP tool outputs in termination reasoning
+
 **EVIDENCE-BASED HARD TERMINATION FORMAT** (when is_hard_terminated=true):
 {
   "result": true,
@@ -201,12 +247,48 @@ Example HARD TERMINATION response:
 Example SUCCESS response:
 {
   "result": true,
-  "reason": "Platform identified as EKS with 95% confidence. All files analyzed.",
+  "reason": "Analysis complete: EKS platform detected with 95% confidence from 12 YAML files. VERIFIED FILE GENERATION: Executed list_blobs_in_container() and confirmed analysis_result.md exists at converted/analysis_result.md. Executed read_blob_content() and verified 8 sections with 2,847 words of comprehensive analysis content including executive summary, file inventory, complexity assessment, and migration recommendations.",
   "termination_output": {
     "platform_detected": "EKS",
     "confidence_score": "95%",
-    "files_discovered": [...],
-    ...
+    "files_discovered": [
+      {
+        "filename": "deployment.yaml",
+        "type": "Deployment",
+        "complexity": "Medium",
+        "azure_mapping": "Azure Container Apps"
+      },
+      {
+        "filename": "service.yaml",
+        "type": "Service",
+        "complexity": "Low",
+        "azure_mapping": "Azure Load Balancer"
+      },
+      {
+        "filename": "configmap.yaml",
+        "type": "ConfigMap",
+        "complexity": "Low",
+        "azure_mapping": "Azure App Configuration"
+      }
+    ],
+    "complexity_analysis": {
+      "network_complexity": "Medium - Multiple services with ingress controllers and custom networking",
+      "security_complexity": "High - RBAC policies and service accounts with custom permissions configured",
+      "storage_complexity": "Low - Standard persistent volumes with basic storage classes only",
+      "compute_complexity": "Medium - Resource limits and requests defined with autoscaling enabled"
+    },
+    "migration_readiness": {
+      "overall_score": "85%",
+      "concerns": ["Complex networking setup requiring careful planning", "Custom RBAC policies need review"],
+      "recommendations": ["Review and adapt security policies for Azure", "Plan network migration strategy with AKS networking", "Test autoscaling behavior in Azure environment"]
+    },
+    "summary": "Comprehensive analysis completed successfully. EKS platform detected with high confidence based on AWS-specific patterns and configurations found across 12 YAML files.",
+    "expert_insights": [
+      "EKS Expert: AWS Load Balancer Controller patterns and EKS-specific annotations detected in service definitions",
+      "Technical Architect: Well-structured microservices architecture with proper separation of concerns",
+      "Chief Architect: Platform migration complexity is manageable with proper planning phase"
+    ],
+    "analysis_file": "converted/analysis_result.md"
   },
   "termination_type": "soft_completion",
   "blocking_issues": []
@@ -248,25 +330,28 @@ SELECTION PRIORITY:
 3. Complete file analysis with focused platform expertise
 
 **CRITICAL - RESPONSE FORMAT**:
-Respond with ONLY the participant name from this exact list:
-- Chief_Architect
-- EKS_Expert
-- GKE_Expert
+Respond with a JSON object containing the participant name in the 'result' field:
+
+**VALID PARTICIPANT NAMES ONLY**:
+- "Chief_Architect"
+- "EKS_Expert"
+- "GKE_Expert"
+
+**DO NOT USE THESE INVALID VALUES**:
+- "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ "Chief_Architect"
-✅ "EKS_Expert"
-✅ "GKE_Expert"
+✅ {"result": "Chief_Architect", "reason": "Strategic oversight needed for platform detection coordination"}
+✅ {"result": "EKS_Expert", "reason": "EKS configuration analysis required"}
+✅ {"result": "GKE_Expert", "reason": "GKE patterns analysis needed"}
 
 INCORRECT Response Examples:
-❌ "Select Chief_Architect as the next participant to..."
-❌ "I choose EKS_Expert because..."
-❌ "Next participant: GKE_Expert"
-❌ "Success"
-❌ "Complete"
-❌ "Terminate"
+❌ "Chief_Architect" (missing JSON format)
+❌ {"result": "Success", "reason": "..."} (Success is not a valid participant name)
+❌ {"result": "Select Chief_Architect", "reason": "..."} (extra text in result field)
+❌ {"result": "Complete", "reason": "..."} (Complete is not a valid participant name)
 
-Respond with the participant name only - no explanations, no prefixes, no additional text.
+think carefully. **Respond with valid JSON only in the format: {"result": "participant_name", "reason": "explanation"}**.
 """
 
 ANALYSIS_RESULT_FILTER_PROMPT = """

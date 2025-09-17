@@ -87,6 +87,7 @@ class CosmosDBHelper:
             "success": bool(success),
             "error_message": error_message or ""
         }
+    
     async def wait_for_completion(
         self,
         process_id: str,
@@ -137,22 +138,6 @@ class CosmosDBHelper:
             # Wait before next poll
             self.logger.debug(f"No final outcome yet for process_id: {process_id}, waiting {polling_interval_seconds}s...")
             await asyncio.sleep(polling_interval_seconds)
-
-
-# Convenience function for single queries
-async def query_agent_telemetry(process_id: str, config: RAITestConfig = None) -> Optional[Dict[str, Any]]:
-    """
-    Convenience function to query agent telemetry for a single process_id
-    
-    Args:
-        process_id: The process ID to look up
-        config: RAI test configuration
-    
-    Returns:
-        Final outcome dictionary or None
-    """
-    helper = CosmosDBHelper(config)
-    return await helper.get_final_outcome(process_id)
 
 
 # Additional convenience function for ProcessStatus

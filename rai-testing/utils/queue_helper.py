@@ -22,7 +22,6 @@ sys.path.append(str(parent_dir))
 
 from config import RAITestConfig
 
-
 class QueueTestHelper:
     """Helper class for managing test messages in Azure Storage Queue"""
     
@@ -120,34 +119,6 @@ class QueueTestHelper:
             self.logger.error(f"Failed to send test message for {process_id}: {e}")
             raise
     
-    def send_batch_test_messages(
-        self,
-        process_ids: List[str], 
-        user_id: str = "rai-test-user",
-        additional_data: Dict[str, Any] = None,
-        batch_size: int = 10
-    ) -> List[str]:
-        """Send multiple test messages in batches"""
-        
-        message_ids = []
-        
-        for i in range(0, len(process_ids), batch_size):
-            batch = process_ids[i:i + batch_size]
-            
-            for process_id in batch:
-                try:
-                    message_id = self.send_test_message(
-                        process_id=process_id,
-                        user_id=user_id,
-                        additional_data=additional_data
-                    )
-                    message_ids.append(message_id)
-                    
-                except Exception as e:
-                    self.logger.error(f"Failed to send message for {process_id}: {e}")
-        
-        return message_ids
-    
     def _create_default_migration_request(
         self,
         process_id: str,
@@ -169,46 +140,6 @@ class QueueTestHelper:
             "rai_test_case": True
         }
     
-    def peek_queue_messages(self, max_messages: int = 10) -> List[Dict[str, Any]]:
-        """Peek at messages in the queue without removing them"""
-        
-        try:
-            messages = []
-            peeked = self.queue_client.peek_messages(max_messages=max_messages)
-            
-            for message in peeked:
-                try:
-                    # Try to decode and parse message content
-                    content = message.content
-                    
-                    # Handle base64 encoded content
-                    if self._is_base64_encoded(content):
-                        content = base64.b64decode(content).decode('utf-8')
-                    
-                    parsed_content = json.loads(content)
-                    
-                    messages.append({
-                        "id": message.id,
-                        "inserted_on": message.inserted_on,
-                        "expires_on": message.expires_on,
-                        "dequeue_count": message.dequeue_count,
-                        "content": parsed_content
-                    })
-                    
-                except Exception as e:
-                    self.logger.warning(f"Failed to parse message {message.id}: {e}")
-                    messages.append({
-                        "id": message.id,
-                        "raw_content": message.content,
-                        "parse_error": str(e)
-                    })
-            
-            return messages
-            
-        except Exception as e:
-            self.logger.error(f"Failed to peek queue messages: {e}")
-            return []
-    
     def get_queue_properties(self) -> Dict[str, Any]:
         """Get queue properties including message count"""
         
@@ -224,119 +155,6 @@ class QueueTestHelper:
         except Exception as e:
             self.logger.error(f"Failed to get queue properties: {e}")
             return {"name": self.config.QUEUE_NAME, "error": str(e)}
-    
-    def get_dlq_properties(self) -> Dict[str, Any]:
-        """Get dead letter queue properties"""
-        
-        try:
-            properties = self.dlq_client.get_queue_properties()
-            
-            return {
-                "name": self.config.DEAD_LETTER_QUEUE_NAME,
-                "approximate_message_count": properties.approximate_message_count,
-                "metadata": properties.metadata or {}
-            }
-            
-        except Exception as e:
-            self.logger.error(f"Failed to get DLQ properties: {e}")
-            return {"name": self.config.DEAD_LETTER_QUEUE_NAME, "error": str(e)}
-    
-    def peek_dlq_messages(self, max_messages: int = 10) -> List[Dict[str, Any]]:
-        """Peek at messages in the dead letter queue"""
-        
-        try:
-            messages = []
-            peeked = self.dlq_client.peek_messages(max_messages=max_messages)
-            
-            for message in peeked:
-                try:
-                    # Try to decode and parse message content
-                    content = message.content
-                    
-                    # Handle base64 encoded content
-                    if self._is_base64_encoded(content):
-                        content = base64.b64decode(content).decode('utf-8')
-                    
-                    parsed_content = json.loads(content)
-                    
-                    messages.append({
-                        "id": message.id,
-                        "inserted_on": message.inserted_on,
-                        "expires_on": message.expires_on,
-                        "dequeue_count": message.dequeue_count,
-                        "content": parsed_content
-                    })
-                    
-                except Exception as e:
-                    self.logger.warning(f"Failed to parse DLQ message {message.id}: {e}")
-                    messages.append({
-                        "id": message.id,
-                        "raw_content": message.content,
-                        "parse_error": str(e)
-                    })
-            
-            return messages
-            
-        except Exception as e:
-            self.logger.error(f"Failed to peek DLQ messages: {e}")
-            return []
-    
-    def clear_test_messages(self, confirm: bool = False) -> Dict[str, int]:
-        """Clear all messages from both queues (use with caution!)"""
-        
-        if not confirm:
-            raise ValueError("Must set confirm=True to clear messages")
-        
-        cleared = {"main_queue": 0, "dlq": 0}
-        
-        try:
-            # Clear main queue
-            self.queue_client.clear_messages()
-            main_props = self.get_queue_properties()
-            cleared["main_queue"] = main_props.get("approximate_message_count", 0)
-            
-            self.logger.info(f"Cleared main queue: {self.config.QUEUE_NAME}")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to clear main queue: {e}")
-        
-        try:
-            # Clear dead letter queue
-            self.dlq_client.clear_messages()
-            dlq_props = self.get_dlq_properties()
-            cleared["dlq"] = dlq_props.get("approximate_message_count", 0)
-            
-            self.logger.info(f"Cleared DLQ: {self.config.DEAD_LETTER_QUEUE_NAME}")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to clear DLQ: {e}")
-        
-        return cleared
-    
-    def check_queues_exist(self) -> Dict[str, bool]:
-        """Check if both queues exist"""
-        
-        result = {}
-        
-        try:
-            self.queue_client.get_queue_properties()
-            result["main_queue"] = True
-        except ResourceNotFoundError:
-            result["main_queue"] = False
-        except Exception as e:
-            self.logger.error(f"Error checking main queue: {e}")
-            result["main_queue"] = False
-        
-        try:
-            self.dlq_client.get_queue_properties()
-            result["dlq"] = True
-        except ResourceNotFoundError:
-            result["dlq"] = False
-        except Exception as e:
-            self.logger.error(f"Error checking DLQ: {e}")
-            result["dlq"] = False
-        
-        return result
     
     def ensure_queues_exist(self) -> Dict[str, bool]:
         """Ensure both queues exist, create if needed"""

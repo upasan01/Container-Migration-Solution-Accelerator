@@ -49,10 +49,13 @@ async def main():
     
     args = parser.parse_args()
     
-    # Setup centralized logging
-    setup_logging(debug=args.debug, log_to_console=True, log_to_file=f"/logs/rai_single_tests.log")
+    today = datetime.now().strftime("%Y-%m-%d")
+    log_path = Path(__file__).parent / "logs" / f"rai_single_tests_{today}.log"
+    setup_logging(debug=args.debug, log_to_console=True, log_to_file=str(log_path))
     
     try:
+        logger = logging.getLogger("main")
+
         # Run the test using core testing library
         result = await run_single_test(
             test_content=args.test_content,
@@ -62,6 +65,8 @@ async def main():
         
         # Display prominent test result before JSON output
         test_result = result.get("test_result", "unknown").upper()
+        process_id = result.get("process_id", "N/A")
+        error_reason = result.get("error_reason", "")
         
         if test_result == "PASSED":
             status_line = "🟢 TEST PASSED ✅"
@@ -74,18 +79,21 @@ async def main():
         else:
             status_line = f"🔵 TEST STATUS: {test_result}"
         
-        # Print status line to stderr so it doesn't interfere with JSON parsing
+        # log off raw results
+        logger.info(f"Result: {test_result} | Reason: {error_reason} | Process ID: {process_id}")
+
+        # Print pretty results 
+        # Includes status line to stderr so it doesn't interfere with JSON parsing
         print(f"\n{status_line}", file=sys.stderr)
-        print(f"Process ID: {result.get('process_id', 'N/A')}", file=sys.stderr)
+        print(f"Process ID: {process_id}", file=sys.stderr)
         
-        error_reason = result.get("error_reason", "")
         if error_reason and error_reason.strip():
             print(f"Error Reason: {error_reason}", file=sys.stderr)
         
         print("-" * 50, file=sys.stderr)
         
         if args.debug:
-            print(json.dumps(result, indent=2))
+            logger.info(f"\n{json.dumps(result, indent=2)}")
             
         # Exit with appropriate code
         if test_result in ["PASSED", "FAILED"]:

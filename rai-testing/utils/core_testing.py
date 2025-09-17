@@ -62,6 +62,8 @@ class CoreTestRunner:
         process_id = process_id or str(uuid.uuid4())
         
         try:
+            start_time = asyncio.get_event_loop().time()
+
             # Step 1: Create test case object
             test_case = TestCase(
                 row_id=row_id,
@@ -104,6 +106,8 @@ class CoreTestRunner:
             
             # Step 6: Determine final result from Cosmos DB monitoring
             test_result = monitoring_result["test_result"]
+
+            elapsed_time = asyncio.get_event_loop().time() - start_time
             
             return {
                 "process_id": process_id,
@@ -111,7 +115,8 @@ class CoreTestRunner:
                 "process_success": monitoring_result.get("process_success", False),
                 "blob_path": blob_path,
                 "monitoring_status": monitoring_result["monitoring_status"],
-                "execution_time": monitoring_result.get("elapsed_time_seconds"),
+                "monitoring_time": monitoring_result.get("elapsed_time_seconds"),
+                "execution_time": elapsed_time,
                 "error_message": monitoring_result.get("error_message", ""),
                 "error_reason": monitoring_result.get("error_reason", ""),
                 "yaml_file": yaml_file_path,
@@ -182,6 +187,7 @@ class CoreTestRunner:
                     "blob_path": "",
                     "test_result": "error",
                     "error_message": str(e),
+                    "execution_time": None,
                     "row_id": test_case.row_id
                 })
                 

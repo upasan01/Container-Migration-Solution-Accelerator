@@ -54,10 +54,13 @@ class RAITestOrchestrator:
         Returns:
             Dictionary containing test results and summary
         """
-        log_path = Path(__file__).parent / "logs" / f"rai_csv_test_{str(uuid.uuid4())[:8]}.log"
+        today = datetime.now().strftime("%Y-%m-%d")
+        log_path = Path(__file__).parent / "logs" / f"rai_csv_test_{today}_{str(uuid.uuid4())[:8]}.log"
         setup_logging(debug=debug, log_to_console=False, log_to_file=str(log_path))
             
         try:
+            start_time = asyncio.get_event_loop().time()
+
             # Load test cases from CSV
             self.test_manager = TestManager(csv_file)
             test_cases = self.test_manager.load_test_cases()
@@ -69,24 +72,27 @@ class RAITestOrchestrator:
                 test_cases = test_cases[:test_count]
                 
             # Display test configuration
+            estimated_minutes = len(test_cases) * 1.2  # each test typically takes a minute or so, adding a slight buffer to the estimate
+            estimated_time = f"{int(estimated_minutes // 60)}h {int(estimated_minutes % 60)}m" if estimated_minutes >= 60 else f"{int(estimated_minutes)}m"
+            
             config_table = Table()
             config_table.add_column("Setting", style="cyan")
             config_table.add_column("Value", style="white")
             config_table.add_row("CSV File", str(csv_file))
             config_table.add_row("Test Count", str(len(test_cases)))
-            config_table.add_row("Timeout", f"{self.config.TEST_TIMEOUT_MINUTES} minutes")
+            config_table.add_row("Estimated Time to Complete", estimated_time)
             
             self.console.print(Panel(config_table, title="🧪 Test Configuration"))
             
             # Run tests using core testing library
             with Progress(
                 SpinnerColumn(),
-                TextColumn("[progress.description]{task.description}"),
+                TextColumn("[progress.description]{task.description} ({task.completed}/{task.total}) ..."),
                 BarColumn(),
-                TaskProgressColumn(),
+                TaskProgressColumn(text_format="[progress.percentage]{task.percentage:>3.0f}%"),
                 console=self.console
             ) as progress:
-                task = progress.add_task("Running tests...", total=len(test_cases))
+                task = progress.add_task("Running tests", total=len(test_cases))
                 
                 # Use the core testing library to run all tests
                 results = await run_batch_tests(
@@ -98,8 +104,10 @@ class RAITestOrchestrator:
             # Update CSV with results
             await self._update_csv_with_results(results, file_path=csv_file)
             
+            elapsed_time = asyncio.get_event_loop().time() - start_time
+
             # Generate summary
-            summary = self._generate_summary(results, test_cases)
+            summary = self._generate_summary(results, test_cases, total_time=elapsed_time)
             
             # Display results
             self._display_results(summary)
@@ -132,11 +140,25 @@ class RAITestOrchestrator:
         # Save updated CSV
         self.test_manager.save_updated_csv(output_path=file_path)
         
-    def _generate_summary(self, results: List[Dict[str, Any]], test_cases: List[TestCase]) -> Dict[str, Any]:
+    def _generate_summary(self, results: List[Dict[str, Any]], test_cases: List[TestCase], total_time: float) -> Dict[str, Any]:
         """Generate test results summary"""
         passed = sum(1 for r in results if r.get("test_result") == "passed")
         failed = sum(1 for r in results if r.get("test_result") == "failed")
         errors = sum(1 for r in results if r.get("test_result") in ["error", "timeout"])
+        
+        # Calculate average execution time
+        execution_times = [r.get("execution_time", 0) for r in results if r.get("execution_time")]
+        avg_time = sum(execution_times) / len(execution_times) if execution_times else 0
+        avg_time_formatted = f"{avg_time:.1f}s" if avg_time > 0 else "N/A"
+        
+        # Format total time
+        total_minutes = int(total_time // 60)
+        if total_minutes >= 60:
+            hours = total_minutes // 60
+            minutes = total_minutes % 60
+            total_time_formatted = f"{hours}h {minutes}m" if minutes > 0 else f"{hours}h"
+        else:
+            total_time_formatted = f"{total_minutes}m"
         
         return {
             "success": True,
@@ -145,6 +167,8 @@ class RAITestOrchestrator:
             "failed": failed,
             "errors": errors,
             "pass_rate": f"{(passed / len(test_cases) * 100):.1f}%",
+            "avg_time_per_test": avg_time_formatted,
+            "total_execution_time": total_time_formatted,
             "results": results,
             "csv_file": str(self.test_manager.csv_file_path),
             "timestamp": datetime.now().isoformat()
@@ -161,6 +185,9 @@ class RAITestOrchestrator:
         results_table.add_row("Failed", f"[red]{summary['failed']}[/red]")
         results_table.add_row("Errors", f"[yellow]{summary['errors']}[/yellow]")
         results_table.add_row("Pass Rate", summary["pass_rate"])
+        results_table.add_row("Execution Time", summary["total_execution_time"])
+        results_table.add_row("Avg Time Per Test", summary["avg_time_per_test"])
+        
         
         self.console.print(Panel(results_table, title="📊 Test Results"))
         self.console.print(f"✅ Results saved to: {summary['csv_file']}")

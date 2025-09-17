@@ -9,9 +9,6 @@ Following SK Process Framework best practices:
 - Step-specific group chat orchestration
 """
 
-from datetime import time
-import logging
-import time
 from typing import TYPE_CHECKING, Any
 
 from jinja2 import Template
@@ -389,16 +386,23 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
         context_data = {
             "termination_type": yaml_output.termination_type,
             "termination_reason": yaml_output.reason,
-            "blocking_issues": list(yaml_output.blocking_issues) if yaml_output.blocking_issues else [],
+            "blocking_issues": list(yaml_output.blocking_issues)
+            if yaml_output.blocking_issues
+            else [],
         }
 
         # Add termination output details if available
         if yaml_output.termination_output:
-            context_data.update({
-                "converted_files": yaml_output.termination_output.converted_files or [],
-                "expert_insights": yaml_output.termination_output.expert_insights or [],
-                "conversion_summary": yaml_output.termination_output.conversion_summary or {},
-            })
+            context_data.update(
+                {
+                    "converted_files": yaml_output.termination_output.converted_files
+                    or [],
+                    "expert_insights": yaml_output.termination_output.expert_insights
+                    or [],
+                    "conversion_summary": yaml_output.termination_output.conversion_summary
+                    or {},
+                }
+            )
 
         return context_data
 
@@ -418,12 +422,14 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
             process_id,
             "Conversation_Manager",
             "yaml_permanently_failed",
-            f"YAML conversion failed permanently due to {yaml_output.termination_type}: {yaml_output.reason}. Expert consensus: {yaml_output.blocking_issues}"
+            f"YAML conversion failed permanently due to {yaml_output.termination_type}: {yaml_output.reason}. Expert consensus: {yaml_output.blocking_issues}",
         )
 
         # Step 2: Create failure context using existing StepFailureCollector
         # Create "virtual exception" for termination scenario
-        termination_error = ValueError(f"Hard termination: {yaml_output.termination_type} - {yaml_output.reason}")
+        termination_error = ValueError(
+            f"Hard termination: {yaml_output.termination_type} - {yaml_output.reason}"
+        )
 
         # Use existing StepFailureCollector
         failure_collector = StepFailureCollector()
@@ -433,7 +439,7 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
             process_id=process_id,
             context_data=self._create_termination_context_data(yaml_output),
             step_start_time=self.state.execution_start_time,
-            step_phase="hard_termination_yaml"
+            step_phase="hard_termination_yaml",
         )
 
         # Step 3: Set failure state (NOT retry state)
@@ -453,14 +459,16 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
             else []
         )
         self.state.final_result = yaml_output
-        self.state.reason = f"Hard termination: {yaml_output.termination_type} - {yaml_output.reason}"
+        self.state.reason = (
+            f"Hard termination: {yaml_output.termination_type} - {yaml_output.reason}"
+        )
 
         # Set failure context using existing infrastructure
         self.state.failure_context = await failure_collector.create_step_failure_state(
             reason=f"YAML conversion terminated: {yaml_output.termination_type} - {yaml_output.reason}",
             execution_time=self.state.total_execution_duration or 0.0,
             files_attempted=converted_files,
-            system_failure_context=system_context
+            system_failure_context=system_context,
         )
 
         # CRITICAL: Do NOT set retry flags
@@ -473,14 +481,14 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
             "termination_reason": yaml_output.reason,
             "blocking_issues": yaml_output.blocking_issues,
             "converted_files": len(converted_files),
-            "handled_as": "permanent_failure"
+            "handled_as": "permanent_failure",
         }
 
         await self.telemetry.update_agent_activity(
             process_id,
             "YAML_Expert",
             "step_permanently_failed",
-            f"YAML step terminated permanently: {failure_details}"
+            f"YAML step terminated permanently: {failure_details}",
         )
 
     @kernel_function(description="Handle YAML conversion event from design completion")
@@ -926,6 +934,13 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
             - **file_converting_result.md** in {{output_file_folder}}
             - **Converted YAML files** in {{output_file_folder}}
 
+            **REPORT MUST INCLUDE CONSISTENT FOOTER**:
+            ```
+            ---
+            *Generated by AI AKS migration agent team*
+            *Report generated on: [CURRENT_TIMESTAMP]*
+            ```
+
             **📋 REQUIRED RETURN STRUCTURE WITH ENHANCED DATA**:
 
             ⚠️ **CRITICAL REQUIREMENT**: You MUST use the actual discovered file names from the analysis step.
@@ -1154,7 +1169,9 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
                     logger.info(
                         "[PERMANENT_FAILURE] Hard termination detected - processing as permanent failure"
                     )
-                    await self._process_hard_termination_as_failure(yaml_output, process_id)
+                    await self._process_hard_termination_as_failure(
+                        yaml_output, process_id
+                    )
                 else:
                     # Success case: soft termination = successful completion
                     # CRITICAL: Validate complete data population for success cases

@@ -49,6 +49,12 @@ DOCUMENTATION_TERMINATION_PROMPT = """
 You are coordinating the {{step_name}} step of Azure Kubernetes migration.
 Objective: {{step_objective}}
 
+**🚨 CRITICAL AI LIMITATION REMINDER 🚨**:
+- **AI cannot certify production readiness** - Only human experts can make deployment decisions
+- **All outputs are recommendations only** - Require human validation before implementation
+- **Use advisory language** - "should", "recommended", "suggested" rather than "certified", "approved", "ready"
+- **Include disclaimers** - All reports must clearly state they are AI-generated recommendations
+
 **MANDATORY DUAL OUTPUT REQUIREMENTS**:
 1. **Create comprehensive `migration_report.md` file** in {{output_file_folder}} (for human consumption)
 2. **Return structured JSON data** (for completion tracking and automation)
@@ -56,16 +62,39 @@ Objective: {{step_objective}}
 **REQUIRED MARKDOWN REPORT STRUCTURE** (`migration_report.md`):
 The migration_report.md file must contain the following sections in markdown format:
 
+**🚨 MANDATORY MARKDOWN FORMATTING RULES:**
+- **Professional Table Format**: All tables must use proper markdown syntax with aligned columns
+- **Cell Content Limits**: Maximum 50 characters per table cell for readability
+- **Consistent Status Icons**: Use ✅ for success, ⚠️ for warnings, ❌ for failures
+- **Proper Headers**: Use ## for main sections, ### for subsections
+- **Code Blocks**: Use ```yaml or ```json for configuration examples
+- **Executive Readability**: Tables must be scannable for executive review
+
 ## Executive Summary
 - Migration overview and outcomes
 - Key success metrics and completion status
 - Overall recommendations
+- Don't add Table of contents
 
 ## Platform Analysis Summary
 - Source platform details and complexity assessment
 - Target Azure architecture decisions
 
 ## File Conversion Results
+**MANDATORY TABLE FORMAT** - Use proper markdown table syntax for readability:
+
+| Source File | Target File | Status | Accuracy | Issues |
+|------------|-------------|---------|----------|--------|
+| app.yaml | app-aks.yaml | ✅ Complete | 95% | None |
+| svc.yaml | svc-aks.yaml | ⚠️ Partial | 88% | Minor config adjustments needed |
+
+**CRITICAL TABLE FORMATTING REQUIREMENTS:**
+- Maximum 50 characters per cell for professional readability
+- Use status icons: ✅ Complete, ⚠️ Partial, ❌ Failed
+- Include accuracy percentages (e.g., "95%", "88%")
+- Keep issues column concise and actionable
+- Ensure proper markdown table syntax with aligned pipes
+
 - Detailed conversion statistics and quality metrics
 - Per-file conversion status and accuracy
 
@@ -79,7 +108,7 @@ The migration_report.md file must contain the following sections in markdown for
 
 ## Quality Validation Results
 - QA verification findings and validation status
-- Enterprise readiness assessment
+- Migration guidance assessment
 
 ## Next Steps and Recommendations
 - Post-migration activities and operational guidance
@@ -93,7 +122,7 @@ TERMINATION DECISION CRITERIA:
 The Technical Writer leads documentation with comprehensive expert collaboration. Analyze the conversation to determine if the documentation step should terminate.
 
 TERMINATE WITH SUCCESS when:
-- Chief Architect has reviewed and approved all documentation content in migration report
+- Chief Architect has reviewed and provided feedback on all documentation content in migration report
 - Chief Architect must confirm the file generated and saved in converted file folder
 - **DUAL OUTPUT COMPLETED**:
   - Comprehensive migration report (`migration_report.md`) generated and saved to output folder
@@ -103,11 +132,11 @@ TERMINATE WITH SUCCESS when:
 - Executive summary with quantified outcomes and success metrics is complete
 - Technical documentation covers all architectural decisions and implementation details
 - Deployment procedures and operational guidance are fully documented
-- Quality validation confirms enterprise-grade documentation standards
+- Quality validation provides recommendations for documentation standards
 - Technical Writer confirms documentation completion with expert consensus
 - All expert insights from domain specialists are captured and integrated
 - Migration report file is successfully saved and accessible
-- Documentation meets professional standards for enterprise migration projects
+- Documentation provides recommendations and guidance for migration projects
 - **🔴 MANDATORY FILE VERIFICATION**: `migration_report.md` generated and verified in {{output_file_folder}}
   - Use `list_blobs_in_container()` to confirm file exists in output folder
   - Use `read_blob_content()` to verify content is properly generated
@@ -124,7 +153,7 @@ TERMINATE WITH SUCCESS when:
      - platform_detected: actual platform (NOT NULL/empty)
      - conversion_accuracy: actual percentage (NOT NULL/placeholder)
      - documentation_completeness: actual assessment (NOT NULL/empty)
-     - enterprise_readiness: actual assessment (NOT NULL/empty)
+     - migration_guidance: actual assessment (NOT NULL/empty)
   ✅ generated_files: MUST have ALL fields with meaningful content:
      - documentation: array of actual files (NOT NULL/empty/template names)
      - total_files_generated: actual count (NOT NULL/zero)
@@ -185,7 +214,7 @@ Example SUCCESS response:
       "platform_detected": "[detected platform]",
       "conversion_accuracy": "[conversion accuracy]",
       "documentation_completeness": "[document completeness]",
-      "enterprise_readiness": "[production ready]"
+      "migration_guidance": "[recommendations provided]"
     },
     "generated_files": {
       "documentation": [all of generated report and yaml files that you have verified exist in blob storage],
@@ -201,7 +230,7 @@ Example SUCCESS response:
       "platform_detected": "[detected platform]",
       "conversion_accuracy": "[conversion accuracy]",
       "documentation_completeness": "[document completeness]",
-      "enterprise_readiness": "[production ready]"
+      "migration_guidance": "[recommendations provided]"
     }
   },
   "termination_type": "[soft_completion or other types]",
@@ -254,37 +283,40 @@ SELECTION PRIORITY:
 - Seek input from ALL relevant domain experts before finalizing documentation sections
 - Rotate between experts to ensure comprehensive coverage and true consensus
 - Ensure ONLY the appropriate platform expert participates actively
-- Build comprehensive enterprise documentation with focused platform expertise
+- Build comprehensive migration documentation with focused platform expertise
 
 Select the next participant to contribute their specialized expertise to documentation.
-Priority: Ensure ALL relevant experts contribute their domain-specific perspectives for comprehensive enterprise documentation.
+Priority: Ensure ALL relevant experts contribute their domain-specific perspectives for comprehensive migration documentation.
 
 **CRITICAL - RESPONSE FORMAT**:
-Respond with ONLY the participant name from this exact list:
-- Technical_Writer
-- Azure_Expert
-- Chief_Architect
-- QA_Engineer
-- EKS_Expert
-- GKE_Expert
+Respond with a JSON object containing the participant name in the 'result' field:
+
+**VALID PARTICIPANT NAMES ONLY**:
+- "Technical_Writer"
+- "Azure_Expert"
+- "Chief_Architect"
+- "QA_Engineer"
+- "EKS_Expert"
+- "GKE_Expert"
+
+**DO NOT USE THESE INVALID VALUES**:
+- "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ "Technical_Writer"
-✅ "Azure_Expert"
-✅ "Chief_Architect"
-✅ "QA_Engineer"
-✅ "EKS_Expert"
-✅ "GKE_Expert"
+✅ {"result": "Technical_Writer", "reason": "Documentation coordination and writing expertise needed"}
+✅ {"result": "Azure_Expert", "reason": "Azure deployment and operations insights required"}
+✅ {"result": "Chief_Architect", "reason": "Strategic oversight for migration documentation needed"}
+✅ {"result": "QA_Engineer", "reason": "Quality validation and testing documentation required"}
+✅ {"result": "EKS_Expert", "reason": "EKS migration considerations and operational procedures needed"}
+✅ {"result": "GKE_Expert", "reason": "GKE cross-platform best practices and operational procedures required"}
 
 INCORRECT Response Examples:
-❌ "Select Technical_Writer as the next participant to..."
-❌ "I choose Azure_Expert because..."
-❌ "Next participant: QA_Engineer"
-❌ "Success"
-❌ "Complete"
-❌ "Terminate"
+❌ "Technical_Writer" (missing JSON format)
+❌ {"result": "Success", "reason": "..."} (Success is not a valid participant name)
+❌ {"result": "Select Technical_Writer", "reason": "..."} (extra text in result field)
+❌ {"result": "Complete", "reason": "..."} (Complete is not a valid participant name)
 
-Respond with the participant name only - no explanations, no prefixes, no additional text.
+think carefully. **Respond with valid JSON only in the format: {"result": "participant_name", "reason": "explanation"}**.
 """
 DOCUMENTATION_RESULT_FILTER_PROMPT = """
 You are coordinating the {{step_name}} step of Azure Kubernetes migration.
@@ -298,7 +330,10 @@ Please summarize the documentation results and provide a structured report that 
 - **ALWAYS use list_blobs_in_container()** to verify each file exists before including it in the report
 - **ALWAYS use read_blob_content()** to verify file content before describing it
 - **Use datetime MCP tool(datetime_service)** for ALL timestamp generation (avoid hardcoded dates)
-- **Use Microsoft Docs MCP tool(microsoft_docs_service)** to verify Azure service compatibility
+- **Microsoft Docs MCP Strategic Documentation Research**:
+  1. **SEARCH**: Use `microsoft_docs_search` for Azure migration guides, best practices, service documentation
+  2. **FETCH**: Use `microsoft_docs_fetch` on search URLs for complete migration procedures and reference links
+  3. **Documentation Purpose**: Comprehensive Azure service references, complete configuration guides, official Microsoft links
 
 **MANDATORY FILE VERIFICATION PROCESS**:
 1. **Before listing ANY file in GeneratedFilesCollection, you MUST**:
@@ -373,7 +408,7 @@ Please summarize the documentation results and provide a structured report that 
         "platform_detected": "[EKS or GKE]",
         "conversion_accuracy": "[overall accuracy percentage]",
         "documentation_completeness": "[percentage complete]",
-        "enterprise_readiness": "[Yes or No]"
+        "migration_guidance": "[Yes or No]"
     }
 }
 
@@ -565,64 +600,25 @@ class DocumentationStepGroupChatManager(StepSpecificGroupChatManager):
             valid_agents=list(participant_descriptions.keys()),
         )
 
+        logger.info(
+            f"[AGENT_SELECTION] Raw AI response: '{self._safe_get_content(response)}'"
+        )
+        logger.info(
+            f"[AGENT_SELECTION] Parsed agent: '{participant_name_with_reason.result}'"
+        )
+        logger.info(
+            f"[AGENT_SELECTION] Available participants: {list(participant_descriptions.keys())}"
+        )
+
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
-        
-        # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = ["Success", "Complete", "Terminate", "Finished", "Done", "End", "Yes", "No", "True", "False"]
-        if selected_agent in invalid_agent_names:
-            logger.error(f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{self._safe_get_content(response)}'")
-            logger.error(f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback")
-            # Force fallback to Technical_Writer as a safe default for Documentation step
-            selected_agent = "Technical_Writer"
-            participant_name_with_reason = StringResult(
-                result="Technical_Writer", 
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'"
-            )
-
-        # Remove common prefixes that might be added by the AI
-        prefixes_to_remove = [
-            "Select ",
-            "Selected ",
-            "I select ",
-            "I choose ",
-            "Let me select ",
-            "I will select ",
-            "Next participant selected: ",
-            "Next participant: ",
-            "Selected participant: ",
-            "Participant: ",
-        ]
-
-        for prefix in prefixes_to_remove:
-            if selected_agent.startswith(prefix):
-                selected_agent = selected_agent[len(prefix) :].strip()
-                break
-
-        # Enhanced pattern to extract participant name from various response formats
-        import re
-
-        # Enhanced pattern to match various AI response formats
-        selection_patterns = [
-            r"^(?:Select\s+|Selected\s+|I\s+select\s+|I\s+choose\s+|Let\s+me\s+select\s+|I\s+will\s+select\s+)?(\w+)(?:\s+as\s+the\s+next\s+participant.*)?$",
-            r"(\w+)\s+(?:as\s+the\s+next\s+participant|should\s+be\s+next|for\s+the\s+next\s+step)",
-            r"Next:\s*(\w+)",
-            r"Agent:\s*(\w+)",
-        ]
-
-        for pattern in selection_patterns:
-            match = re.match(pattern, selected_agent, re.IGNORECASE)
-            if match:
-                potential_participant = match.group(1)
-                # Only use this if it matches one of our known participants
-                if potential_participant in participant_descriptions:
-                    selected_agent = potential_participant
-                    break
 
         print("*********************")
-        print("*********************")
-        print(f"Next participant: {selected_agent}")
-        print(f"Reason: {participant_name_with_reason.reason}.")
+        print(f"Original response: '{self._safe_get_content(response)}'")
+        print(f"Parsed agent: '{participant_name_with_reason.result}'")
+        print(f"Final selected agent: '{selected_agent}'")
+        print(f"Available participants: {list(participant_descriptions.keys())}")
+        print(f"Reason: {participant_name_with_reason.reason}")
         print("*********************")
 
         # Track agent selection in telemetry
@@ -736,7 +732,7 @@ class DocumentationOrchestrator(StepGroupChatOrchestrator):
     - QA Engineer: Quality assurance, final validation, completeness checking
 
     KEY IMPROVEMENT: ALL domain experts now participate to provide their specialized perspectives,
-    ensuring comprehensive enterprise documentation with true collaborative consensus.
+    ensuring comprehensive migration documentation with true collaborative consensus.
     """
 
     async def create_documentation_orchestration_with_context(
@@ -790,42 +786,54 @@ class DocumentationOrchestrator(StepGroupChatOrchestrator):
         # Technical Writer - COORDINATION LEAD for Documentation phase
         # Coordinates documentation but relies on expert consensus and input
         agent_writer = await mcp_context.create_agent(
-            technical_writer(phase="documentation").render(**self.process_context)
+            technical_writer(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_writer)
 
         # Chief Architect - Strategic oversight and review
         # Provides high-level architecture guidance and validation
         agent_architect = await mcp_context.create_agent(
-            architect_agent(phase="documentation").render(**self.process_context)
+            architect_agent(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_architect)
 
         # Azure Expert - Azure-specific operational and best practices input
         # Provides Azure operational procedures, troubleshooting, deployment guidance
         agent_azure = await mcp_context.create_agent(
-            azure_expert(phase="documentation").render(**self.process_context)
+            azure_expert(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_azure)
 
         # EKS Expert - Source platform migration considerations
         # Provides source platform expertise, migration challenges, platform-specific procedures
         agent_eks = await mcp_context.create_agent(
-            eks_expert(phase="documentation").render(**self.process_context)
+            eks_expert(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_eks)
 
         # GKE Expert - Cross-platform insights and best practices
         # Provides additional platform perspective and cross-platform best practices
         agent_gke = await mcp_context.create_agent(
-            gke_expert(phase="documentation").render(**self.process_context)
+            gke_expert(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_gke)
 
         # QA Engineer - Final quality assurance and validation
         # Validates documentation quality, ensures all requirements are captured
         agent_qa = await mcp_context.create_agent(
-            qa_engineer(phase="documentation").render(**self.process_context)
+            qa_engineer(phase="documentation").render(
+                **self.process_context["analysis_result"]
+            )
         )
         agents.append(agent_qa)
 

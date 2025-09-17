@@ -60,12 +60,30 @@ logger = logging.getLogger(__name__)
 DESIGN_TERMINATION_PROMPT = """
 Coordinate {{step_name}} step: {{step_objective}}
 
+🚨 **CRITICAL FILE VERIFICATION REQUIREMENT** 🚨
+**BEFORE ALLOWING ANY SUCCESS TERMINATION**, you MUST verify the design_result.md file exists by executing these MCP tools:
+```
+list_blobs_in_container(container_name="{{container_name}}", folder_path="{{output_file_folder}}", recursive=True)
+```
+```
+read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
+```
+**NO FILE VERIFICATION = NO SUCCESS TERMINATION ALLOWED**
+
 **MANDATORY DUAL OUTPUT REQUIREMENTS**:
 1. **Create comprehensive `design_result.md` file** in {{output_file_folder}} (for human consumption)
 2. **Return structured JSON data** (for next step processing)
 
 **REQUIRED MARKDOWN REPORT STRUCTURE** (`design_result.md`):
 The design_result.md file must contain the following sections in markdown format:
+
+**🚨 MANDATORY MARKDOWN FORMATTING RULES:**
+- **Professional Table Format**: All tables must use proper markdown syntax with aligned columns
+- **Cell Content Limits**: Maximum 50 characters per table cell for executive readability
+- **Consistent Status Icons**: Use ✅ for confirmed, ⚠️ for considerations, ❌ for issues
+- **Proper Headers**: Use ## for main sections, ### for subsections
+- **Code Blocks**: Use ```yaml or ```json for configuration examples
+- **Executive Presentation**: All content must be suitable for stakeholder review
 
 ## Azure Architecture Design Summary
 - Source platform: [detected platform]
@@ -111,15 +129,22 @@ TERMINATE SUCCESS when:
 - **ALL MANDATORY FIELDS are properly populated with meaningful content**
 - The JSON contains non-empty arrays for azure_services, architecture_decisions, and outputs
 - The result field is set to "Success"
+- **🔴 MANDATORY FILE VERIFICATION COMPLETED**: You must FIRST verify `design_result.md` exists before allowing termination:
+  ```
+  list_blobs_in_container(container_name="{{container_name}}", folder_path="{{output_file_folder}}", recursive=True)
+  ```
+  **PASTE THE COMPLETE OUTPUT IMMEDIATELY**
+
+  ```
+  read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
+  ```
+  **PASTE THE COMPLETE CONTENT IMMEDIATELY**
 - **DUAL OUTPUT COMPLETED**:
-  - Markdown report (`design_result.md`) created and saved to output folder
+  - Markdown report (`design_result.md`) verified to exist and contain meaningful content in output folder
   - JSON response structure prepared for next step processing
-- **🔴 MANDATORY FILE VERIFICATION**: `design_result.md` generated and verified in {{output_file_folder}}
-  - Use `list_blobs_in_container()` to confirm file exists in output folder
-  - Use `read_blob_content()` to verify content is properly generated
-  - **NO FILES, NO PASS**: Step cannot complete without verified file generation
+- **NO FILES, NO PASS**: Step cannot complete without verified file generation - you MUST execute MCP tools to verify
 - **🤝 EXPERT COLLABORATION ACHIEVED**: Evidence of consensus-based design decisions
-  - Technical Architect and Azure Expert collaboration documented
+  - Chief Architect and Azure Expert collaboration documented
   - Conflicting recommendations resolved through consensus building
   - Design represents collective expert intelligence, not individual decisions
 
@@ -147,9 +172,66 @@ CONTINUE when:
 - Architecture design discussions are actively progressing
 - Agents are still working toward consensus
 - JSON response exists but contains empty arrays or placeholder content
+- **🔴 MANDATORY FILE VERIFICATION NOT COMPLETED**: You have not yet verified `design_result.md` file exists using MCP tools
+  - You must execute `list_blobs_in_container()` to check if design_result.md exists
+  - You must execute `read_blob_content()` to verify the content is meaningful
+  - **NO VERIFICATION = NO TERMINATION**: Always check for file existence before allowing success termination
 - **Dual output not completed**:
-  - Design document (`design_result.md`) has not been generated and saved to output folder
+  - Design document (`design_result.md`) has not been verified to exist in output folder
   - JSON response structure not ready for next step processing
+
+**FIELD POPULATION GUIDANCE:**
+Extract the following fields from agent conversation messages:
+
+📋 **summary**: Look for comprehensive design summaries, architectural overviews, or migration strategy descriptions from agents
+📋 **azure_services**: Extract lists of Azure services mentioned (AKS, App Service, Storage, Key Vault, etc.)
+📋 **architecture_decisions**: Find design decisions with rationale (containerization approach, networking choices, security patterns)
+📋 **outputs**: Look for agents mentioning file generation, documentation creation, or deliverable completion
+
+**COMPLETE SUCCESS TEMPLATE EXAMPLE:**
+When agents provide complete design information, extract into this format:
+
+```json
+{
+  "result": true,
+  "reason": "Design step completed with comprehensive Azure architecture - verified by [agent_name]",
+  "termination_output": {
+    "result": "Success",
+    "summary": "Comprehensive Azure architecture design for containerized application migration from [source_platform] to Azure Kubernetes Service (AKS). Design includes multi-tier architecture with secure networking, managed services integration, and enterprise-grade security controls.",
+    "azure_services": [
+      "Azure Kubernetes Service (AKS)",
+      "Azure Container Registry (ACR)",
+      "Azure Key Vault",
+      "Azure Application Gateway",
+      "Azure Monitor",
+      "Azure Storage Account",
+      "Azure SQL Database"
+    ],
+    "architecture_decisions": [
+      {
+        "decision": "Azure Kubernetes Service (AKS) as container orchestration platform",
+        "rationale": "Provides managed Kubernetes with enterprise security, scaling, and Azure services integration"
+      },
+      {
+        "decision": "Application Gateway with WAF for ingress",
+        "rationale": "Enables SSL termination, path-based routing, and web application firewall protection"
+      },
+      {
+        "decision": "Azure Container Registry for image management",
+        "rationale": "Secure, private container registry with vulnerability scanning and geo-replication"
+      }
+    ],
+    "outputs": [
+      {
+        "file": "design_result.md",
+        "description": "Comprehensive Azure architecture design document with service selection, security considerations, and migration strategy"
+      }
+    ]
+  },
+  "termination_type": "soft_completion",
+  "blocking_issues": []
+}
+```
 
 **CRITICAL: DO NOT TERMINATE WITH SUCCESS IF ANY REQUIRED FIELD IS INCOMPLETE OR CONTAINS PLACEHOLDER CONTENT**
 
@@ -236,27 +318,30 @@ SELECTION PRIORITY:
 5. Create detailed design ready for technical implementation
 
 **CRITICAL - RESPONSE FORMAT**:
-Respond with ONLY the participant name from this exact list:
-- Chief_Architect
-- Azure_Expert
-- EKS_Expert
-- GKE_Expert
+Respond with a JSON object containing the participant name in the 'result' field:
+
+**VALID PARTICIPANT NAMES ONLY**:
+- "Chief_Architect"
+- "Azure_Expert"
+- "EKS_Expert"
+- "GKE_Expert"
+
+**DO NOT USE THESE INVALID VALUES**:
+- "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ "Chief_Architect"
-✅ "Azure_Expert"
-✅ "EKS_Expert"
-✅ "GKE_Expert"
+✅ {"result": "Chief_Architect", "reason": "Strategic oversight needed for architecture validation"}
+✅ {"result": "Azure_Expert", "reason": "Azure service selection and best practices required"}
+✅ {"result": "EKS_Expert", "reason": "Source platform context needed for EKS migration"}
+✅ {"result": "GKE_Expert", "reason": "Source platform insights required for GKE migration"}
 
 INCORRECT Response Examples:
-❌ "Select Chief_Architect as the next participant to..."
-❌ "I choose Azure_Expert because..."
-❌ "Next participant: EKS_Expert"
-❌ "Success"
-❌ "Complete"
-❌ "Terminate"
+❌ "Chief_Architect" (missing JSON format)
+❌ {"result": "Success", "reason": "..."} (Success is not a valid participant name)
+❌ {"result": "Select Chief_Architect", "reason": "..."} (extra text in result field)
+❌ {"result": "Complete", "reason": "..."} (Complete is not a valid participant name)
 
-Respond with the participant name only - no explanations, no prefixes, no additional text.
+think carefully. **Respond with valid JSON only in the format: {"result": "participant_name", "reason": "explanation"}**.
 """
 DESIGN_RESULT_FILTER_PROMPT = """
 Summarize the key findings and insights from the design step.
@@ -459,63 +544,23 @@ class DesignStepGroupChatManager(StepSpecificGroupChatManager):
             valid_agents=list(participant_descriptions.keys()),
         )
 
+        logger.info(f"[AGENT_SELECTION] Raw AI response: '{response.content}'")
+        logger.info(
+            f"[AGENT_SELECTION] Parsed agent: '{participant_name_with_reason.result}'"
+        )
+        logger.info(
+            f"[AGENT_SELECTION] Available participants: {list(participant_descriptions.keys())}"
+        )
+
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
-        
-        # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = ["Success", "Complete", "Terminate", "Finished", "Done", "End", "Yes", "No", "True", "False"]
-        if selected_agent in invalid_agent_names:
-            logger.error(f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{response.content}'")
-            logger.error(f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback")
-            # Force fallback to Chief_Architect as a safe default
-            selected_agent = "Chief_Architect"
-            participant_name_with_reason = StringResult(
-                result="Chief_Architect", 
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'"
-            )
-
-        # Remove common prefixes that might be added by the AI
-        prefixes_to_remove = [
-            "Select ",
-            "Selected ",
-            "I select ",
-            "I choose ",
-            "Let me select ",
-            "I will select ",
-            "Next participant selected: ",
-            "Next participant: ",
-            "Selected participant: ",
-            "Participant: ",
-        ]
-
-        for prefix in prefixes_to_remove:
-            if selected_agent.startswith(prefix):
-                selected_agent = selected_agent[len(prefix) :].strip()
-                break
-
-        # Enhanced pattern to extract participant name from various response formats
-        import re
-
-        # Enhanced pattern to match various AI response formats
-        selection_patterns = [
-            r"^(?:Select\s+|Selected\s+|I\s+select\s+|I\s+choose\s+|Let\s+me\s+select\s+|I\s+will\s+select\s+)?(\w+)(?:\s+as\s+the\s+next\s+participant.*)?$",
-            r"(\w+)\s+(?:as\s+the\s+next\s+participant|should\s+be\s+next|for\s+the\s+next\s+step)",
-            r"Next:\s*(\w+)",
-            r"Agent:\s*(\w+)",
-        ]
-
-        for pattern in selection_patterns:
-            match = re.match(pattern, selected_agent, re.IGNORECASE)
-            if match:
-                potential_participant = match.group(1)
-                # Only use this if it matches one of our known participants
-                if potential_participant in participant_descriptions:
-                    selected_agent = potential_participant
-                    break
 
         print("*********************")
-        print(f"Next participant: {selected_agent}")
-        print(f"Reason: {participant_name_with_reason.reason}.")
+        print(f"Original response: '{response.content}'")
+        print(f"Parsed agent: '{participant_name_with_reason.result}'")
+        print(f"Final selected agent: '{selected_agent}'")
+        print(f"Available participants: {list(participant_descriptions.keys())}")
+        print(f"Reason: {participant_name_with_reason.reason}")
         print("*********************")
 
         # Track agent selection in telemetry
@@ -680,7 +725,9 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
         # Chief Architect - Architecture oversight and validation
         # In Design phase: Provides oversight and ensures architectural soundness
         agent_architect = await mcp_context.create_agent(
-            agent_config=architect_agent(phase="design").render(**self.process_context),
+            agent_config=architect_agent(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_architect)
@@ -688,7 +735,9 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
         # Azure Expert - PRIMARY LEAD for Design phase
         # In Design phase: Leads the architecture design, recommends Azure services
         agent_azure = await mcp_context.create_agent(
-            agent_config=azure_expert(phase="design").render(**self.process_context),
+            agent_config=azure_expert(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_azure)
@@ -699,13 +748,17 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
         # Note: In a real implementation, you might conditionally include these
         # based on detected source platform from Analysis phase
         agent_eks = await mcp_context.create_agent(
-            agent_config=eks_expert(phase="design").render(**self.process_context),
+            agent_config=eks_expert(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_eks)
 
         agent_gke = await mcp_context.create_agent(
-            agent_config=gke_expert(phase="design").render(**self.process_context),
+            agent_config=gke_expert(phase="design").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_gke)

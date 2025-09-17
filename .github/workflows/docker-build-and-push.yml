@@ -1,0 +1,102 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [main, dev, demo, hotfix]
+  pull_request:
+    branches: [main, dev, demo, hotfix]
+    types: [opened, ready_for_review, reopened, synchronize]
+  workflow_dispatch:
+  
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+      ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+      ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Setup Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          az --version  # Verify installation
+
+      - name: Login to Azure
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+      - name: Log in to Azure Container Registry
+        if: ${{ github.ref_name == 'main' || github.ref_name == 'dev' || github.ref_name == 'demo' || github.ref_name == 'hotfix' }}
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ env.ACR_USERNAME }}
+          password: ${{ env.ACR_PASSWORD }}
+      
+      - name: Get registry
+        id: registry
+        run: |
+          echo "ext_registry=${{ env.ACR_LOGIN_SERVER }}" >> $GITHUB_OUTPUT
+        
+      - name: Set Docker image tags
+        id: tag
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          DATE="${{ steps.date.outputs.date }}"
+          GITHUB_RUN_NUMBER="${{ github.run_number }}"
+          if [[ "$BRANCH" == "main" ]]; then
+            BASE_TAG="latest"
+          elif [[ "$BRANCH" == "dev" ]]; then
+            BASE_TAG="dev"
+          elif [[ "$BRANCH" == "demo" ]]; then
+            BASE_TAG="demo"
+          elif [[ "$BRANCH" == "hotfix" ]]; then
+            BASE_TAG="hotfix"
+          else
+            BASE_TAG="pullrequest-ignore"
+          fi
+          DATE_TAG="${BASE_TAG}_${DATE}_${GITHUB_RUN_NUMBER}"
+          echo "BASE_TAG=${BASE_TAG}" >> $GITHUB_ENV
+          echo "DATE_TAG=${DATE_TAG}" >> $GITHUB_ENV
+          echo "Base tag: $BASE_TAG, Date tag: $DATE_TAG"
+
+      - name: Build and Push ContentProcessorAPI Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/backend-api
+          file: ./src/backend-api/Dockerfile
+          push: ${{ github.ref_name == 'main' || github.ref_name == 'dev' || github.ref_name == 'demo' || github.ref_name == 'hotfix' }}
+          tags: |
+            ${{ steps.registry.outputs.ext_registry }}/backend-api:${{ env.BASE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/backend-api:${{ env.DATE_TAG }}
+
+      - name: Build and Push ContentProcessor Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/processor
+          file: ./src/processor/Dockerfile
+          push: ${{ github.ref_name == 'main' || github.ref_name == 'dev' || github.ref_name == 'demo' || github.ref_name == 'hotfix' }}
+          tags: |
+            ${{ steps.registry.outputs.ext_registry }}/processor:${{ env.BASE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/processor:${{ env.DATE_TAG }}
+            
+      - name: Build and Push ContentProcessorWeb Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/frontend
+          file: ./src/frontend/Dockerfile
+          push: ${{ github.ref_name == 'main' || github.ref_name == 'dev' || github.ref_name == 'demo' || github.ref_name == 'hotfix' }}
+          tags: |
+            ${{ steps.registry.outputs.ext_registry }}/frontend:${{ env.BASE_TAG }}
+            ${{ steps.registry.outputs.ext_registry }}/frontend:${{ env.DATE_TAG }}

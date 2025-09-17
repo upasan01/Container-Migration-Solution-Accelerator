@@ -5,10 +5,13 @@ This module demonstrates phase-specific agent selection for YAML
 You are coordinating the {{step_name}} step of Azure Kubernetes migration.
 Step objective: {{step_objective}}
 
-**IMPORTANT - USE MCP TOOLS FOR ACCURATE DATA**:
-- **Use datetime MCP tool** for ALL timestamp generation (avoid hardcoded dates)
-- **Use Microsoft Docs MCP tool** to lookup current AKS configuration syntax and Azure resource specifications
-- **Use blob storage MCP tools** to read source files and save converted YAML configurations
+**IMPORTANT - STRATEGIC MCP TOOLS USAGE**:
+- **datetime MCP tool**: For ALL timestamp generation (avoid hardcoded dates)
+- **Microsoft Docs MCP Strategic Workflow**:
+  1. **SEARCH**: Use `microsoft_docs_search` for AKS syntax, Azure resource types, configuration patterns
+  2. **FETCH**: Use `microsoft_docs_fetch` on result URLs for complete YAML examples and validation guides
+  3. **Critical for**: Current AKS API versions, Azure resource specifications, security configurations
+- **blob storage MCP tools**: Read source files and save converted YAML configurations
 
 You have concluded the YAML conversion discussion with technical consensus.
 Provide a structured report aligned with Yaml_ExtendedBooleanResult format:sion.
@@ -21,8 +24,6 @@ Classes:
 """
 
 import logging
-import re
-import unicodedata
 
 from semantic_kernel.agents import GroupChatOrchestration
 from semantic_kernel.agents.orchestration.group_chat import (
@@ -73,13 +74,33 @@ Output folder : {{output_file_folder}}
 **REQUIRED MARKDOWN REPORT STRUCTURE** (`file_converting_result.md`):
 The file_converting_result.md file must contain the following sections in markdown format:
 
+**🚨 MANDATORY MARKDOWN FORMATTING RULES:**
+- **Professional Table Format**: All tables must use proper markdown syntax with aligned columns
+- **Cell Content Limits**: Maximum 50 characters per table cell for readability
+- **Consistent Status Icons**: Use ✅ for Complete, ⚠️ for Partial, ❌ for Failed
+- **Proper Headers**: Use ## for main sections, ### for subsections
+- **Executive Quality**: Tables must render perfectly for stakeholder review
+- **NO JSON BLOBS**: Content must be proper markdown, not JSON wrapped in code blocks
+
 ## YAML Conversion Summary
 - Total files converted: [number]
 - Overall conversion accuracy: [percentage]
 - Conversion completion status: [Complete/Partial]
 
 ## File Conversion Details
-[Table format listing each source file, converted file, status, and accuracy]
+**MANDATORY TABLE FORMAT** - Use proper markdown table syntax with aligned columns:
+
+| Source File | Converted File | Status | Accuracy | Notes |
+|------------|----------------|---------|----------|-------|
+| file1.yaml | file1-aks.yaml | ✅ Complete | 95% | Successfully converted |
+| file2.yaml | file2-aks.yaml | ✅ Complete | 88% | Minor adjustments needed |
+
+**CRITICAL TABLE FORMATTING RULES:**
+- Maximum 50 characters per cell for readability
+- Use ✅ for Complete, ⚠️ for Partial, ❌ for Failed
+- Include percentage accuracy (e.g., "95%", "88%")
+- Keep notes concise and actionable
+- Ensure proper markdown table syntax with pipes and headers
 
 ## Multi-Dimensional Analysis
 ### Network Conversion
@@ -127,10 +148,13 @@ The file_converting_result.md file must contain the following sections in markdo
 **CRITICAL REQUIREMENT: COMPLETE DATA POPULATION MANDATORY**
 You MUST populate ALL fields in the Yaml_ExtendedBooleanResult structure. Incomplete responses will be rejected.
 
-**IMPORTANT - USE MCP TOOLS FOR ACCURATE DATA**:
+**IMPORTANT - STRATEGIC MCP TOOLS FOR ACCURATE DATA**:
 - **Use datetime MCP tool(datetime_service)** for ALL timestamp generation (avoid hardcoded dates)
 - **Use blob storage MCP tools (azure_blob_io_service)** to read actual file content for analysis
-- **Use Microsoft Docs MCP tool(microsoft_docs_service)** to verify Azure service compatibility
+- **Microsoft Docs MCP Strategic Usage (microsoft_docs_service)**:
+  1. **Search**: Query "AKS YAML configuration", "Azure resource syntax", "Kubernetes to AKS migration"
+  2. **Fetch**: Retrieve complete configuration guides from search URLs for accurate Azure service specs
+  3. **Essential for**: API version validation, Azure-specific configuration syntax, service compatibility
 
 **MANDATORY BLOB VERIFICATION BEFORE TERMINATION**:
 Before concluding files are missing, agents MUST:
@@ -201,6 +225,7 @@ TERMINATE WITH FAILURE when:
 
 **CONTINUE PROCESSING when**:
 - **QA verification not yet performed** - QA Engineer must check output folder and converted files
+- **Markdown format verification incomplete** - QA Engineer must verify file_converting_result.md is proper markdown format (NOT JSON blob)
 - **Files not yet saved** - Conversion work in progress but files not saved to blob storage
 - Agents report files are missing but have NOT used comprehensive blob tool verification
 - Initial blob searches failed but alternative paths haven't been tried
@@ -217,8 +242,13 @@ TERMINATE WITH FAILURE when:
 **MANDATORY: When terminating with SUCCESS, you MUST populate EVERY field in Yaml_ExtendedBooleanResult:**
 - You must get confirmation from QA Engineer about terminating with SUCCESS
 - QA Engineer must verify all converted files has been saved in the output folder
+- **QA Engineer must verify file_converting_result.md is proper markdown format** (NOT JSON blob wrapped in markdown)
+- QA Engineer must confirm file_converting_result.md contains readable tables with proper markdown syntax
+- QA Engineer must validate table formatting: aligned columns, status icons, cell content under 50 characters
+- QA Engineer must validate file_converting_result.md follows proper markdown syntax without JSON blob content
+- QA Engineer must confirm all tables use proper markdown table syntax with pipes and aligned headers
 - result: true
-- reason: "Detailed completion reason including QA verification status"
+- reason: "Detailed completion reason including QA verification status AND markdown format confirmation"
 - termination_output: MUST contain complete YamlOutput structure with:
   - converted_files: Complete list with ALL conversion details (source_file, converted_file, conversion_status, accuracy_rating, concerns, azure_enhancements)
   - multi_dimensional_analysis: ALL four dimensions (network, security, storage, compute) with complete DimensionalAnalysis
@@ -253,6 +283,9 @@ CONTINUE CONVERSION when:
 - Files have not been verified as saved in output folder
 - **Dual output not completed**:
   - Conversion report (`file_converting_result.md`) has not been generated and saved to output folder
+  - **Markdown format validation incomplete** - file_converting_result.md must be proper markdown (NOT JSON blob format)
+  - **QA markdown format verification required** - QA Engineer must confirm readable markdown structure and table formatting
+  - **Table syntax validation required** - QA Engineer must verify proper markdown table syntax with aligned columns
   - JSON response structure not ready for next step processing
 - Technical Writer has not yet created the comprehensive conversion report
 
@@ -302,10 +335,10 @@ Example SUCCESS response:
 Example CONTINUE response:
 {
   "result": false,
-  "reason": "QA verification not yet performed. Conversion report (file_converting_result.md) not yet created. Field validation check: [LIST INCOMPLETE FIELDS FROM CHECKLIST ABOVE]",
+  "reason": "QA verification not yet performed. Markdown format validation required for file_converting_result.md (must be proper markdown, not JSON blob). Field validation check: [LIST INCOMPLETE FIELDS FROM CHECKLIST ABOVE]",
   "termination_output": null,
   "termination_type": "soft_completion",
-  "blocking_issues": ["incomplete_qa_verification", "missing_conversion_report", "incomplete_field_population"]
+  "blocking_issues": ["incomplete_qa_verification", "markdown_format_validation_required", "missing_conversion_report", "incomplete_field_population"]
 }
 
 Example FAILURE response:
@@ -322,6 +355,8 @@ Example FAILURE response:
 □ No hardcoded names like "deployment.yaml" or "service.yaml" used
 □ File names verified through actual blob storage operations
 □ QA Engineer confirmed file existence and content quality
+□ **QA Engineer verified file_converting_result.md is proper markdown format** (NOT JSON blob)
+□ **Markdown format validation completed** - readable tables, headers, structured content confirmed
 
 NEVER respond with plain text. JSON ONLY.
 
@@ -349,7 +384,7 @@ Rotate between technical specialists to achieve high-quality YAML conversion:
 
 - YAML_Expert: Leads technical conversion and format validation with deep YAML expertise - **MUST use comprehensive blob search before reporting files missing**
 - Azure_Expert: Ensures Azure compatibility and applies platform-specific best practices - **MUST verify storage access and permissions thoroughly**
-- QA_Engineer: Validates conversion accuracy, quality standards, and production readiness - **MUST perform final verification of all search attempts**
+- QA_Engineer: Validates conversion accuracy, quality standards, and Azure migration readiness - **MUST perform final verification of all search attempts**
 - Technical_Writer: Creates comprehensive conversion reports and documentation - **MUST save file_converting_result.md report after QA verification**
 
 SELECTION PRIORITY:
@@ -357,7 +392,7 @@ SELECTION PRIORITY:
 2. Ensure ALL conversion specialists contribute their technical expertise
 3. Achieve comprehensive Azure compatibility through focused technical work
 4. Build consensus on conversion accuracy and quality validation
-5. Create validated, production-ready Azure YAML configurations
+5. Create validated, Azure migration-ready YAML configurations
 
 **Agent Selection Rules**:
 - If files reported missing but comprehensive search not performed → Select agent to do thorough verification
@@ -368,22 +403,30 @@ SELECTION PRIORITY:
 Select the next participant who can provide the most valuable technical conversion contribution or perform necessary blob verification.
 
 **CRITICAL - RESPONSE FORMAT**:
-Respond with ONLY the participant name from this exact list:
-- YAML_Expert
-- Azure_Expert
-- QA_Engineer
-- Technical_Writer
+Respond with a JSON object containing the participant name in the 'result' field:
+
+**VALID PARTICIPANT NAMES ONLY**:
+- "YAML_Expert"
+- "Azure_Expert"
+- "QA_Engineer"
+- "Technical_Writer"
+
+**DO NOT USE THESE INVALID VALUES**:
+- "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ "QA_Engineer"
-✅ "Azure_Expert"
+✅ {"result": "YAML_Expert", "reason": "YAML conversion expertise needed for technical transformation"}
+✅ {"result": "Azure_Expert", "reason": "Azure compatibility validation required"}
+✅ {"result": "QA_Engineer", "reason": "Quality validation and accuracy testing needed"}
+✅ {"result": "Technical_Writer", "reason": "Documentation and report generation required"}
 
 INCORRECT Response Examples:
-❌ "Selected QA_Engineer as the next participant to..."
-❌ "I choose Azure_Expert because..."
-❌ "Next participant: QA_Engineer"
+❌ "YAML_Expert" (missing JSON format)
+❌ {"result": "Success", "reason": "..."} (Success is not a valid participant name)
+❌ {"result": "Select YAML_Expert", "reason": "..."} (extra text in result field)
+❌ {"result": "Complete", "reason": "..."} (Complete is not a valid participant name)
 
-Respond with the participant name only - no explanations, no prefixes, no additional text.
+think carefully. **Respond with valid JSON only in the format: {"result": "participant_name", "reason": "explanation"}**.
 """
 
 YAML_RESULT_FILTER_PROMPT = """
@@ -604,12 +647,6 @@ class YamlStepGroupChatManager(StepSpecificGroupChatManager):
 
         # Apply smart truncation before API call to preserve context
         self._smart_truncate_chat_history(chat_history)
-        # self._smart_truncate_chat_history_with_token_limit(
-        #     chat_history,
-        #     max_total_tokens=10000,  # Increased by 50%: 5000 * 1.5 = 7500
-        #     max_messages=5,  # Increased by 50%: 2 * 1.5 = 3
-        #     max_tokens_per_message=2000,  # Increased by 50%: 200 * 1.5 = 300
-        # )
 
         response = await get_chat_message_content_with_retry(
             self.service,
@@ -628,74 +665,23 @@ class YamlStepGroupChatManager(StepSpecificGroupChatManager):
             valid_agents=list(participant_descriptions.keys()),
         )
 
+        logger.info(f"[AGENT_SELECTION] Raw AI response: '{response.content}'")
+        logger.info(
+            f"[AGENT_SELECTION] Parsed agent: '{participant_name_with_reason.result}'"
+        )
+        logger.info(
+            f"[AGENT_SELECTION] Available participants: {list(participant_descriptions.keys())}"
+        )
+
         # Clean up participant name if it contains extra text
         selected_agent = participant_name_with_reason.result.strip()
-        
-        # CRITICAL: Safety check for invalid agent names that should never be returned
-        invalid_agent_names = ["Success", "Complete", "Terminate", "Finished", "Done", "End", "Yes", "No", "True", "False"]
-        if selected_agent in invalid_agent_names:
-            logger.error(f"[AGENT_SELECTION] Invalid agent name '{selected_agent}' detected from response: '{response.content}'")
-            logger.error(f"[AGENT_SELECTION] This indicates a prompt confusion issue - using fallback")
-            # Force fallback to YAML_Expert as a safe default for YAML step
-            selected_agent = "YAML_Expert"
-            participant_name_with_reason = StringResult(
-                result="YAML_Expert", 
-                reason=f"Fallback selection due to invalid response: '{participant_name_with_reason.result}'"
-            )
-
-        # Remove invisible Unicode characters that can cause matching issues
-        # Remove zero-width characters and normalize Unicode
-        selected_agent = unicodedata.normalize("NFKC", selected_agent)
-        selected_agent = re.sub(
-            r"[\u200B-\u200D\uFEFF\u2060]", "", selected_agent
-        )  # Remove invisible chars
-        selected_agent = re.sub(
-            r"[^\w_]", "", selected_agent
-        )  # Keep only word chars and underscore
-        selected_agent = selected_agent.strip()
-
-        # Remove common prefixes that might be added by the AI
-        prefixes_to_remove = [
-            "Select ",
-            "Selected ",  # Past tense
-            "I select ",  # First person
-            "I selected ",  # First person past tense
-            "Choose ",  # Alternative verb
-            "Chosen ",  # Alternative past tense
-            "Next participant selected: ",
-            "Next participant: ",
-            "Selected participant: ",
-            "Participant: ",
-            "The next participant is ",  # Declarative form
-            "Next: ",  # Short form
-        ]
-
-        for prefix in prefixes_to_remove:
-            if selected_agent.startswith(prefix):
-                selected_agent = selected_agent[len(prefix) :].strip()
-                break
-
-        # Additional pattern matching for complex selections like "Select EKS_Expert as the next..."
-
-        # Enhanced pattern to extract participant name from various response formats
-        selection_pattern = r"^(?:(?:I\s+)?(?:Select(?:ed)?|Choose|Chosen)\s+)?(\w+)(?:\s+(?:as\s+the\s+next\s+participant|to\s+perform|for).*)?$"
-        match = re.match(selection_pattern, selected_agent, re.IGNORECASE)
-        if match:
-            potential_participant = match.group(1)
-            # Only use this if it matches one of our known participants
-            if potential_participant in participant_descriptions:
-                selected_agent = potential_participant
-
-        for prefix in prefixes_to_remove:
-            if selected_agent.startswith(prefix):
-                selected_agent = selected_agent[len(prefix) :].strip()
-                break
 
         print("*********************")
-        print(f"Original response: '{participant_name_with_reason.result}'")
-        print(f"Cleaned participant: '{selected_agent}'")
+        print(f"Original response: '{response.content}'")
+        print(f"Parsed agent: '{participant_name_with_reason.result}'")
+        print(f"Final selected agent: '{selected_agent}'")
         print(f"Available participants: {list(participant_descriptions.keys())}")
-        print(f"Reason: {participant_name_with_reason.reason}.")
+        print(f"Reason: {participant_name_with_reason.reason}")
         print("*********************")
 
         # Track agent selection in telemetry
@@ -859,7 +845,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # YAML Expert - PRIMARY LEAD for YAML phase
         # Handles configuration conversion, YAML generation, best practices
         agent_yaml = await mcp_context.create_agent(
-            agent_config=yaml_expert(phase="yaml").render(**self.process_context),
+            agent_config=yaml_expert(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_yaml)
@@ -867,7 +855,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # Azure Expert - Azure-specific configuration guidance
         # Provides Azure YAML patterns, service configurations, best practices
         agent_azure = await mcp_context.create_agent(
-            agent_config=azure_expert(phase="yaml").render(**self.process_context),
+            agent_config=azure_expert(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_azure)
@@ -875,7 +865,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # QA Engineer - Validation and testing focus
         # Validates converted YAML files, ensures quality, tests configurations
         agent_qa = await mcp_context.create_agent(
-            agent_config=qa_engineer(phase="yaml").render(**self.process_context),
+            agent_config=qa_engineer(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_qa)
@@ -883,7 +875,9 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         # Technical Writer - Report generation and documentation
         # Creates conversion reports, documents the migration process
         agent_writer = await mcp_context.create_agent(
-            agent_config=technical_writer(phase="yaml").render(**self.process_context),
+            agent_config=technical_writer(phase="yaml").render(
+                **self.process_context["analysis_result"]
+            ),
             service_id="default",
         )
         agents.append(agent_writer)

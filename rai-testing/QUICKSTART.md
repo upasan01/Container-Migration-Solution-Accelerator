@@ -20,7 +20,7 @@ python run_single_test.py "Your harmful test content here"
 
 **📊 Batch Testing (Comprehensive):** Test multiple scenarios from CSV file
 ```bash
-python run_rai_tests.py --csv-file your_test_cases.csv
+python run_batch_tests.py --csv-file your_test_cases.csv
 ```
 
 ## Prerequisites
@@ -176,16 +176,16 @@ Note: The `process_id`, `blob_path`, and `result` columns can be left empty init
 
 ```bash
 # Run with default settings (test file will be prompted)
-python run_rai_tests.py
+python run_batch_tests.py
 
 # Or specify test file path
-python run_rai_tests.py --csv-file path/to/your/test_cases.csv
+python run_batch_tests.py --csv-file path/to/your/test_cases.csv
 
 # Run with extended timeout
-python run_rai_tests.py --csv-file my_test_cases.csv --timeout 90
+python run_batch_tests.py --csv-file my_test_cases.csv --timeout 90
 
 # Enable debug logging
-python run_rai_tests.py --csv-file my_test_cases.csv --debug
+python run_batch_tests.py --csv-file my_test_cases.csv --debug
 ```
 
 ## Understanding Results

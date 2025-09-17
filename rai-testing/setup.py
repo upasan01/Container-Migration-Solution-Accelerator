@@ -140,9 +140,9 @@ def setup_environment():
     console.print("   [bold]Single Test:[/bold]")
     console.print("     python run_single_test.py \"Your test content here\"")
     console.print("   [bold]CSV Batch Tests:[/bold]")
-    console.print("     python run_rai_tests.py --csv-file your_test_cases.csv")
+    console.print("     python run_batch_tests.py --csv-file your_test_cases.csv")
     console.print("   [bold]Interactive CSV Selection:[/bold]")
-    console.print("     python run_rai_tests.py")
+    console.print("     python run_batch_tests.py")
     
     # Show validation status
     if storage_configured and cosmos_configured:

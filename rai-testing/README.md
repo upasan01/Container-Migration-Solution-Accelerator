@@ -26,7 +26,7 @@ rai-testing/
 ├── config.py                  # Configuration settings
 ├── requirements.txt           # Python dependencies
 ├── run_single_test.py         # Single test execution script
-├── run_rai_tests.py          # Batch CSV test execution script
+├── run_batch_tests.py          # Batch CSV test execution script
 ├── utils/                    # Utility modules
 │   ├── __init__.py
 │   ├── core_testing.py       # Core testing library (shared logic)
@@ -120,13 +120,13 @@ Create a CSV file with your test content using the required format shown above. 
 #### Run Tests
 ```bash
 # Run all tests from CSV file
-python run_rai_tests.py --csv-file my_test_cases.csv
+python run_batch_tests.py --csv-file my_test_cases.csv
 
 # Run limited number of tests
-python run_rai_tests.py --csv-file my_test_cases.csv --test-count 10
+python run_batch_tests.py --csv-file my_test_cases.csv --test-count 10
 
 # Enable debug logging  
-python run_rai_tests.py --csv-file my_test_cases.csv --debug
+python run_batch_tests.py --csv-file my_test_cases.csv --debug
 ```
 
 ## Test Workflow

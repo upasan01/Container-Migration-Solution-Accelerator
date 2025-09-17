@@ -6,9 +6,9 @@ Run RAI tests from a CSV file using the core testing library.
 Provides rich console interface for progress tracking and result reporting.
 
 Usage:
-    python run_rai_tests.py --csv-file test_cases.csv
-    python run_rai_tests.py --csv-file test_cases.csv --test-count 10
-    python run_rai_tests.py --csv-file test_cases.csv --debug
+    python run_batch_tests.py --csv-file test_cases.csv
+    python run_batch_tests.py --csv-file test_cases.csv --test-count 10
+    python run_batch_tests.py --csv-file test_cases.csv --debug
 """
 
 import asyncio

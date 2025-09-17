@@ -178,10 +178,13 @@ spec:
     def generate_yaml_file(
         self, 
         test_case: TestCase,
+        output_dir: str,
         resource_type: str = "pod",
-        output_dir: str = None
     ) -> str:
         """Generate a YAML file with test content embedded"""
+
+        if not output_dir:
+            raise ValueError("output_dir cannot be null or empty")
         
         if resource_type not in self.templates:
             raise ValueError(f"Unsupported resource type: {resource_type}")
@@ -228,18 +231,14 @@ spec:
                 "container_name": f"{app_name}-container"
             })
         
-        # Generate YAML content
         yaml_content = template.render(**template_vars)
         
-        # Create filename
         filename = f"{test_case.row_id}-{resource_type}-{unique_id}.yaml"
         
-        # Write to file if output directory specified
-        if output_dir:
-            os.makedirs(output_dir, exist_ok=True)
-            filepath = os.path.join(output_dir, filename)
-            with open(filepath, 'w', encoding='utf-8') as f:
-                f.write(yaml_content)
-            return filepath
-        
-        return yaml_content
+        # Write to file
+        os.makedirs(output_dir, exist_ok=True)
+        filepath = os.path.join(output_dir, filename)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(yaml_content)
+            
+        return filepath

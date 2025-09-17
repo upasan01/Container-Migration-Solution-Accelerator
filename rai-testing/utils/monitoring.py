@@ -50,6 +50,9 @@ class TestMonitor:
         
         if "responsible ai policy" in error_message_lower:
             return "Responsible AI Policy"
+        
+        if "(rai) policy" in error_message_lower:
+            return "RAI policy"
 
         return ""
     

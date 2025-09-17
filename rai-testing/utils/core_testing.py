@@ -72,7 +72,7 @@ class CoreTestRunner:
             )
             
             # Step 2: Generate YAML file
-            temp_dir = Path(tempfile.gettempdir()) / "rai_test" / process_id
+            temp_dir = Path.cwd() / "temp_test_files" / process_id
             temp_dir.mkdir(parents=True, exist_ok=True)
             
             yaml_file_path = self.yaml_generator.generate_yaml_file(

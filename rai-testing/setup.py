@@ -86,7 +86,7 @@ def setup_environment():
     cosmos_configured = check_cosmos_db_config(console)
     
     # Check required directories
-    directories = ["results", "temp_test_files"]
+    directories = ["temp_test_files"]
     for dir_name in directories:
         dir_path = Path(dir_name)
         if not dir_path.exists():

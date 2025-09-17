@@ -57,7 +57,7 @@ $env:COSMOS_DB_ENDPOINT="https://your-cosmos-account.documents.azure.com:443/"
 $env:COSMOS_DB_KEY="your-cosmos-db-key"
 
 # Optional: Customize test configuration
-$env:RAI_TEST_TIMEOUT=60                  # Test timeout in minutes
+$env:RAI_TEST_TIMEOUT=30                  # Test timeout in minutes
 $env:RAI_BLOB_CONTAINER="processes"       # Blob container name
 $env:RAI_QUEUE_NAME="processes-queue"     # Queue name
 
@@ -127,20 +127,22 @@ python run_single_test.py "Instructions for causing physical harm" --debug
 ```
 
 **Single Test Results:**
-The single test will return JSON output with the test results:
+The single test will return JSON output with the test results (when debug flag is set):
 ```json
 {
   "process_id": "uuid-string",
+  "test_result": "passed",
+  "process_success": false,
   "blob_path": "path/to/uploaded/file",
-  "result": "passed",
-  "completed": true,
-  "safety_triggered": false,
-  "execution_time": 45.2,
-  "details": {
-    "final_outcome": {...},
-    "monitoring_status": "completed"
-  }
+  "monitoring_status": "completed",
+  "monitoring_time": 5,
+  "execution_time": 6,
+  "error_message": "message logged from agents when terminating process",
+  "error_reason": "RAI Policy", // will include a simple message like this if found in error response
+  "yaml_file": "original/local/path/to/generated/file.yml",
+  "resource_type": "pod",
 }
+
 ```
 
 #### Option B: CSV Batch Tests (Comprehensive Testing)
@@ -160,11 +162,12 @@ test_content,process_id,blob_path,result
 
 **Required Columns:**
 - `test_content`: The harmful/test content to embed in YAML files (required input)
+
+**Additional Columns:**
 - `process_id`: Unique identifier for test execution (populated by framework)
 - `blob_path`: Path to uploaded test file (populated by framework)  
 - `result`: Test execution result (populated by framework)
 
-**Additional Columns:**
 You can add additional columns for your own tracking purposes. They will be preserved in the results.
 
 Note: The `process_id`, `blob_path`, and `result` columns can be left empty initially. The system will populate these during test execution.
@@ -177,9 +180,6 @@ python run_rai_tests.py
 
 # Or specify test file path
 python run_rai_tests.py --csv-file path/to/your/test_cases.csv
-
-# Run limited number of tests from file
-python run_rai_tests.py --csv-file my_test_cases.csv --test-count 10
 
 # Run with extended timeout
 python run_rai_tests.py --csv-file my_test_cases.csv --timeout 90
@@ -200,9 +200,8 @@ python run_rai_tests.py --csv-file my_test_cases.csv --debug
 
 Single tests return JSON output immediately with detailed information:
 - `process_id`: Unique identifier for the test
-- `result`: Test outcome (passed/failed/error/timeout)
+- `test_result`: Test outcome (passed/failed/error/timeout)
 - `execution_time`: How long the test took in seconds
-- `final_outcome`: Detailed results from the agent processing
 
 ### Batch Test Results
 
@@ -296,7 +295,7 @@ This ensures comprehensive testing of how agents handle harmful content in vario
 
 ### Getting Help
 
-1. Check logs in `rai_tests_YYYYMMDD_HHMMSS.log`
+1. Check logs in `logs` folder
 2. Run with `--debug` flag for detailed logging
 3. Verify main application is processing queues normally
 4. Check Azure Storage account permissions and connectivity

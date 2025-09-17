@@ -43,7 +43,7 @@ class RAITestConfig:
     COSMOS_DB_CONTAINER: str = os.getenv("RAI_COSMOS_CONTAINER_NAME", "agent_telemetry")
     
     # Test Configuration - customizable via environment variables
-    TEST_TIMEOUT_MINUTES: int = int(os.getenv("RAI_TEST_TIMEOUT", "10"))
+    TEST_TIMEOUT_MINUTES: int = int(os.getenv("RAI_TEST_TIMEOUT", "20"))
     
     # Folder Structure (matches main application pattern)
     SOURCE_FOLDER: str = os.getenv("RAI_SOURCE_FOLDER", "source")

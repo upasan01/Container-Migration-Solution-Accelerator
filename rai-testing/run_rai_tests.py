@@ -81,6 +81,7 @@ class RAITestOrchestrator:
             config_table.add_row("CSV File", str(csv_file))
             config_table.add_row("Test Count", str(len(test_cases)))
             config_table.add_row("Estimated Time to Complete", estimated_time)
+            config_table.add_row("Timeout per Test", self.config.TEST_TIMEOUT_MINUTES)
             
             self.console.print(Panel(config_table, title="🧪 Test Configuration"))
             

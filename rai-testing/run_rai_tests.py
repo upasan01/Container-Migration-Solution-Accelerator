@@ -54,7 +54,8 @@ class RAITestOrchestrator:
         Returns:
             Dictionary containing test results and summary
         """
-        setup_logging(debug=debug, log_to_console=False, log_to_file=f"/logs/rai_csv_test_{str(uuid.uuid4())[:8]}.log")
+        log_path = Path(__file__).parent / "logs" / f"rai_csv_test_{str(uuid.uuid4())[:8]}.log"
+        setup_logging(debug=debug, log_to_console=False, log_to_file=str(log_path))
             
         try:
             # Load test cases from CSV

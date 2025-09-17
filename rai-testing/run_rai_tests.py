@@ -27,6 +27,7 @@ from rich.panel import Panel
 from config import RAITestConfig
 from utils.test_manager import TestManager, TestCase
 from utils.core_testing import run_batch_tests
+from utils.logging_config import setup_logging
 
 
 class RAITestOrchestrator:
@@ -52,10 +53,7 @@ class RAITestOrchestrator:
         Returns:
             Dictionary containing test results and summary
         """
-        if debug:
-            logging.basicConfig(level=logging.DEBUG)
-        else:
-            logging.basicConfig(level=logging.INFO)
+        setup_logging(debug=debug)
             
         try:
             # Load test cases from CSV

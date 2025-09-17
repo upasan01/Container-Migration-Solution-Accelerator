@@ -35,6 +35,7 @@ sys.path.append(str(project_root))
 # Import framework components
 from config import RAITestConfig
 from utils.core_testing import run_single_test
+from utils.logging_config import setup_logging
 
 
 async def main():
@@ -49,18 +50,8 @@ async def main():
     
     args = parser.parse_args()
     
-    # Setup logging
-    log_level = logging.DEBUG if args.debug else logging.WARNING
-    logging.basicConfig(
-        level=log_level,
-        format='%(levelname)s: %(message)s',
-        handlers=[logging.StreamHandler()]
-    )
-    
-    # Reduce Azure SDK logging noise
-    logging.getLogger('azure').setLevel(logging.ERROR)
-    logging.getLogger('urllib3').setLevel(logging.ERROR)
-    logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.ERROR)
+    # Setup centralized logging
+    setup_logging(debug=args.debug)
     
     try:
         # Run the test using core testing library
@@ -69,31 +60,15 @@ async def main():
             timeout_minutes=args.timeout,
             resource_type=args.resource_type
         )
-        
-        # Convert result to expected format
-        output = {
-            "process_id": result["process_id"],
-            "blob_path": result["blob_path"], 
-            "result": result["result"],
-            "details": result.get("details", {})
-        }
-        
-        # Add additional information to details
-        output["details"].update({
-            "completed": result.get("completed", False),
-            "safety_triggered": result.get("safety_triggered", False),
-            "execution_time": result.get("execution_time"),
-            "error_message": result.get("error_message")
-        })
-        
+                    
         # Output results as JSON
         if args.pretty:
-            print(json.dumps(output, indent=2))
+            print(json.dumps(result, indent=2))
         else:
-            print(json.dumps(output))
+            print(json.dumps(result))
             
         # Exit with appropriate code
-        if result["result"] in ["passed", "failed"]:
+        if result["test_result"] in ["passed", "failed"]:
             sys.exit(0)
         else:
             sys.exit(1)

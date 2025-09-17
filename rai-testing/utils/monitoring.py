@@ -25,6 +25,24 @@ class TestMonitor:
         self.config = config or RAITestConfig()
         self.logger = logging.getLogger(__name__)
         self.cosmos_helper = CosmosDBHelper(config)
+
+    def _extract_error_reason(self, error_message: str) -> str:
+        if not error_message:
+            return ""
+        
+        # Look for the specific pattern "BLOCKING ISSUE CONFIRMED: <reason>"
+        if "BLOCKING ISSUE CONFIRMED:" in error_message:
+            # Find the position after "BLOCKING ISSUE CONFIRMED: "
+            start_pos = error_message.find("BLOCKING ISSUE CONFIRMED:") + len("BLOCKING ISSUE CONFIRMED:")
+            # Extract the remaining text and strip whitespace
+            remaining_text = error_message[start_pos:].strip()
+            if remaining_text:
+                # Split by whitespace and newlines to get the reason word
+                reason = remaining_text.split()[0] if remaining_text.split() else ""
+                return reason
+            return ""
+        
+        return ""
     
     async def monitor_with_cosmos_db(
         self,
@@ -49,29 +67,29 @@ class TestMonitor:
         self.logger.info(f"Starting Cosmos DB monitoring for process_id: {process_id}")
         
         try:
-            # Use the Cosmos DB helper to wait for completion
             result = await self.cosmos_helper.wait_for_completion(
                 process_id=process_id,
                 timeout_minutes=timeout_minutes,
                 polling_interval_seconds=polling_interval_seconds
             )
             
-            # Transform the result into the expected format
-            if result["monitoring_status"] == "completed" and result["success"]:
-                status = "passed"
-            elif result["monitoring_status"] == "completed" and not result["success"]:
-                status = "failed"
+            # Transform the result into the expected format 
+            # Opposite of the process success since a failed process is the desired test outcome
+            if result["monitoring_status"] == "completed" and not result["success"]:
+                test_result = "passed"
+            elif result["monitoring_status"] == "completed" and result["success"]:
+                test_result = "failed"
             elif result["monitoring_status"] == "timeout":
-                status = "timeout"
+                test_result = "timeout"
             else:
-                status = "error"
+                test_result = "error"
             
             return {
                 "process_id": process_id,
-                "result": status,
-                "success": result["success"],
+                "test_result": test_result,
+                "process_success": result["success"],
+                "error_reason": self._extract_error_reason(result["error_message"]),
                 "error_message": result["error_message"],
-                "final_outcome": result.get("final_outcome"),
                 "elapsed_time_seconds": result.get("elapsed_time_seconds"),
                 "monitoring_status": result["monitoring_status"]
             }
@@ -80,14 +98,10 @@ class TestMonitor:
             self.logger.error(f"Error monitoring process_id {process_id} with Cosmos DB: {e}")
             return {
                 "process_id": process_id,
-                "result": "error",
-                "success": False,
+                "test_result": "error",
+                "process_success": False,
+                "error_reason": "",
                 "error_message": f"Monitoring error: {str(e)}",
-                "final_outcome": None,
+                "elapsed_time_seconds": None,
                 "monitoring_status": "error"
             }
-    
-    async def close(self):
-        """Clean up resources"""
-        if hasattr(self, 'cosmos_helper'):
-            await self.cosmos_helper.close()

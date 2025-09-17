@@ -1,13 +1,11 @@
 """
 Cosmos DB helper for querying agent telemetry in RAI testing.
-Handles connections to the migration_db database and agent_telemetry container.
+Uses AgentActivityRepository for strongly-typed access to ProcessStatus objects.
 """
 
 import asyncio
 import logging
 from typing import Dict, Any, Optional
-from azure.cosmos.aio import CosmosClient
-from azure.cosmos import exceptions
 
 import sys
 from pathlib import Path
@@ -17,69 +15,43 @@ parent_dir = Path(__file__).parent.parent
 sys.path.append(str(parent_dir))
 
 from config import RAITestConfig
+from utils.repositories import AgentActivityRepository, ProcessStatus
 
 
 class CosmosDBHelper:
-    """Helper class for Cosmos DB operations related to agent telemetry"""
+    """Helper class for Cosmos DB operations related to agent telemetry using ProcessStatus objects"""
     
     def __init__(self, config: RAITestConfig = None):
         self.config = config or RAITestConfig()
         self.logger = logging.getLogger(__name__)
-        self._client = None
-        self._database = None
-        self._container = None
     
-    async def _ensure_client(self):
-        """Ensure Cosmos DB client is initialized"""
-        if self._client is None:
-            try:
-                cosmos_config = self.config.get_cosmos_config()
-                self._client = CosmosClient(
-                    cosmos_config["endpoint"],
-                    cosmos_config["key"]
-                )
-                self._database = self._client.get_database_client(cosmos_config["database_name"])
-                self._container = self._database.get_container_client(cosmos_config["container_name"])
-                self.logger.debug("Cosmos DB client initialized successfully")
-            except Exception as e:
-                self.logger.error(f"Failed to initialize Cosmos DB client: {e}")
-                raise
-    
-    async def get_agent_telemetry(self, process_id: str) -> Optional[Dict[str, Any]]:
+    async def get_process_status(self, process_id: str) -> Optional[ProcessStatus]:
         """
-        Query agent telemetry by process_id
+        Get ProcessStatus object by process_id with strict typing
         
         Args:
             process_id: The process ID to look up in the agent_telemetry container
         
         Returns:
-            Dictionary containing the agent telemetry document, or None if not found
+            ProcessStatus object or None if not found
         """
-        await self._ensure_client()
-        
         try:
-            # Query the document by id (which should be the process_id)
-            response = await self._container.read_item(
-                item=process_id,
-                partition_key=process_id  # Assuming process_id is also the partition key
-            )
+            async with AgentActivityRepository(self.config) as repository:
+                process_status = await repository.get_async(process_id)
+                if process_status:
+                    self.logger.debug(f"Found ProcessStatus for process_id: {process_id}")
+                    return process_status
+                else:
+                    self.logger.debug(f"No ProcessStatus found for process_id: {process_id}")
+                    return None
             
-            self.logger.debug(f"Found agent telemetry for process_id: {process_id}")
-            return response
-            
-        except exceptions.CosmosResourceNotFoundError:
-            self.logger.debug(f"No agent telemetry found for process_id: {process_id}")
-            return None
-        except exceptions.CosmosHttpResponseError as e:
-            self.logger.error(f"Cosmos DB HTTP error querying process_id {process_id}: {e}")
-            return None
         except Exception as e:
-            self.logger.error(f"Error querying agent telemetry for process_id {process_id}: {e}")
+            self.logger.error(f"Error querying ProcessStatus for process_id {process_id}: {e}")
             return None
-    
+        
     async def get_final_outcome(self, process_id: str) -> Optional[Dict[str, Any]]:
         """
-        Get the final_outcome from agent telemetry for a specific process_id
+        Get the final_outcome from ProcessStatus for a specific process_id
         
         Args:
             process_id: The process ID to look up
@@ -88,12 +60,12 @@ class CosmosDBHelper:
             Dictionary containing final_outcome with 'success' bool and 'error_message',
             or None if not found or no final_outcome available
         """
-        telemetry = await self.get_agent_telemetry(process_id)
+        process_status = await self.get_process_status(process_id)
         
-        if not telemetry:
+        if not process_status:
             return None
         
-        final_outcome = telemetry.get("final_outcome")
+        final_outcome = process_status.final_outcome
         if not final_outcome:
             self.logger.debug(f"No final_outcome found for process_id: {process_id}")
             return None
@@ -115,7 +87,6 @@ class CosmosDBHelper:
             "success": bool(success),
             "error_message": error_message or ""
         }
-    
     async def wait_for_completion(
         self,
         process_id: str,
@@ -123,7 +94,7 @@ class CosmosDBHelper:
         polling_interval_seconds: int = 10
     ) -> Dict[str, Any]:
         """
-        Wait for a process to complete by polling Cosmos DB
+        Wait for a process to complete by polling ProcessStatus
         
         Args:
             process_id: The process ID to monitor
@@ -147,11 +118,10 @@ class CosmosDBHelper:
                     "process_id": process_id,
                     "success": False,
                     "error_message": f"Timeout after {timeout_minutes} minutes",
-                    "final_outcome": None,
                     "monitoring_status": "timeout"
                 }
             
-            # Query for final outcome
+            # Query for final outcome using ProcessStatus
             final_outcome = await self.get_final_outcome(process_id)
             
             if final_outcome is not None:
@@ -160,7 +130,6 @@ class CosmosDBHelper:
                     "process_id": process_id,
                     "success": final_outcome["success"],
                     "error_message": final_outcome["error_message"],
-                    "final_outcome": final_outcome,
                     "monitoring_status": "completed",
                     "elapsed_time_seconds": elapsed_time
                 }
@@ -168,12 +137,6 @@ class CosmosDBHelper:
             # Wait before next poll
             self.logger.debug(f"No final outcome yet for process_id: {process_id}, waiting {polling_interval_seconds}s...")
             await asyncio.sleep(polling_interval_seconds)
-    
-    async def close(self):
-        """Close the Cosmos DB client connection"""
-        if self._client:
-            await self._client.close()
-            self.logger.debug("Cosmos DB client closed")
 
 
 # Convenience function for single queries
@@ -189,7 +152,20 @@ async def query_agent_telemetry(process_id: str, config: RAITestConfig = None) -
         Final outcome dictionary or None
     """
     helper = CosmosDBHelper(config)
-    try:
-        return await helper.get_final_outcome(process_id)
-    finally:
-        await helper.close()
+    return await helper.get_final_outcome(process_id)
+
+
+# Additional convenience function for ProcessStatus
+async def get_process_status(process_id: str, config: RAITestConfig = None) -> Optional[ProcessStatus]:
+    """
+    Convenience function to get ProcessStatus object for a single process_id
+    
+    Args:
+        process_id: The process ID to look up
+        config: RAI test configuration
+    
+    Returns:
+        ProcessStatus object or None
+    """
+    helper = CosmosDBHelper(config)
+    return await helper.get_process_status(process_id)

@@ -83,7 +83,7 @@ class CoreTestRunner:
             self.logger.debug(f"Generated YAML file: {yaml_file_path}")
             
             # Step 3: Upload to blob storage
-            blob_path = await self.blob_helper.upload_test_file(
+            blob_path = self.blob_helper.upload_test_file(
                 process_id=process_id,
                 file_path=yaml_file_path,
                 blob_name=f"rai-test-{row_id}-{process_id}.yaml"
@@ -92,7 +92,7 @@ class CoreTestRunner:
             self.logger.debug(f"Uploaded to blob: {blob_path}")
             
             # Step 4: Send queue message to trigger processing
-            await self.queue_helper.send_test_message(process_id, time_to_live=60)
+            self.queue_helper.send_test_message(process_id, time_to_live=60)
             self.logger.debug(f"Sent queue message for process_id: {process_id}")
             
             # Step 5: Monitor execution using Cosmos DB
@@ -103,42 +103,34 @@ class CoreTestRunner:
             )
             
             # Step 6: Determine final result from Cosmos DB monitoring
-            test_result = monitoring_result["result"]
+            test_result = monitoring_result["test_result"]
             
             return {
                 "process_id": process_id,
+                "test_result": test_result,
+                "process_success": monitoring_result.get("process_success", False),
                 "blob_path": blob_path,
-                "result": test_result,
-                "completed": monitoring_result["monitoring_status"] == "completed",
-                "safety_triggered": False,  # Will be determined by agent analysis
+                "monitoring_status": monitoring_result["monitoring_status"],
                 "execution_time": monitoring_result.get("elapsed_time_seconds"),
-                "error_message": monitoring_result.get("error_message"),
-                "details": {
-                    "final_outcome": monitoring_result.get("final_outcome"),
-                    "monitoring_status": monitoring_result["monitoring_status"],
-                    "yaml_file": yaml_file_path,
-                    "test_content_length": len(test_content),
-                    "resource_type": resource_type,
-                    "row_id": row_id
-                }
+                "error_message": monitoring_result.get("error_message", ""),
+                "error_reason": monitoring_result.get("error_reason", ""),
+                "yaml_file": yaml_file_path,
+                "resource_type": resource_type,
             }
             
         except Exception as e:
             self.logger.exception(f"Error running test for process_id {process_id}: {e}")
             return {
                 "process_id": process_id,
+                "test_result": "error",
+                "process_success": "",
                 "blob_path": "",
-                "result": "error",
-                "completed": False,
-                "safety_triggered": False,
+                "monitoring_status": "error",
                 "execution_time": None,
                 "error_message": str(e),
-                "details": {
-                    "final_outcome": None,
-                    "monitoring_status": "error",
-                    "row_id": row_id,
-                    "resource_type": resource_type
-                }
+                "error_reason": "",
+                "yaml_file": yaml_file_path,
+                "resource_type": resource_type
             }
     
     async def run_batch_tests_core(
@@ -189,10 +181,8 @@ class CoreTestRunner:
                 processed_results.append({
                     "process_id": test_cases[i].process_id or str(uuid.uuid4()),
                     "blob_path": "",
-                    "result": "error",
-                    "completed": False,
-                    "error_message": str(result),
-                    "details": {"row_id": test_cases[i].row_id}
+                    "test_result": "error",
+                    "error_message": str(result)
                 })
             else:
                 processed_results.append(result)

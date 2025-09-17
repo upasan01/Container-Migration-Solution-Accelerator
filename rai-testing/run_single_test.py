@@ -50,7 +50,7 @@ async def main():
     args = parser.parse_args()
     
     # Setup centralized logging
-    setup_logging(debug=args.debug)
+    setup_logging(debug=args.debug, log_to_console=True, log_to_file=f"/logs/rai_single_tests.log")
     
     try:
         # Run the test using core testing library

@@ -140,7 +140,7 @@ class CoreTestRunner:
         test_cases: List[TestCase],
         timeout_minutes: int = None,
         resource_type: str = "pod",
-        max_concurrent: int = None
+        progress_callback: callable = None
     ) -> List[Dict[str, Any]]:
         """
         Core batch test execution logic
@@ -149,47 +149,47 @@ class CoreTestRunner:
             test_cases: List of test cases to run
             timeout_minutes: How long to wait for each test
             resource_type: Type of Kubernetes resource to generate
-            max_concurrent: Maximum number of concurrent tests
+            max_concurrent: Maximum number of concurrent tests (ignored in synchronous mode)
+            progress_callback: Optional callback function to call after each test completion
             
         Returns:
             List of test results
         """
         
         timeout_minutes = timeout_minutes or self.config.TEST_TIMEOUT_MINUTES
-        max_concurrent = max_concurrent or self.config.MAX_CONCURRENT_TESTS
+        results = []
         
-        # Create semaphore to limit concurrent tests
-        semaphore = asyncio.Semaphore(max_concurrent)
-        
-        async def run_single_with_semaphore(test_case: TestCase) -> Dict[str, Any]:
-            async with semaphore:
-                return await self.run_single_test_core(
+        # Run tests synchronously, one by one
+        for test_case in test_cases:
+            try:
+                result = await self.run_single_test_core(
                     test_content=test_case.test_content,
                     process_id=test_case.process_id,
                     timeout_minutes=timeout_minutes,
                     resource_type=resource_type,
                     row_id=test_case.row_id
                 )
-        
-        # Run all tests concurrently with semaphore control
-        tasks = [run_single_with_semaphore(test_case) for test_case in test_cases]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Handle any exceptions that occurred
-        processed_results = []
-        for i, result in enumerate(results):
-            if isinstance(result, Exception):
-                self.logger.error(f"Test {i} failed with exception: {result}")
-                processed_results.append({
-                    "process_id": test_cases[i].process_id or str(uuid.uuid4()),
+                results.append(result)
+                
+                # Call progress callback if provided
+                if progress_callback:
+                    progress_callback()
+                    
+            except Exception as e:
+                self.logger.error(f"Test {test_case.row_id} failed with exception: {e}")
+                results.append({
+                    "process_id": test_case.process_id or str(uuid.uuid4()),
                     "blob_path": "",
                     "test_result": "error",
-                    "error_message": str(result)
+                    "error_message": str(e),
+                    "row_id": test_case.row_id
                 })
-            else:
-                processed_results.append(result)
+                
+                # Call progress callback even for failed tests
+                if progress_callback:
+                    progress_callback()
         
-        return processed_results
+        return results
     
     async def cleanup_temp_files(self):
         """Clean up temporary files"""
@@ -247,8 +247,8 @@ async def run_batch_tests(
     test_cases: List[TestCase],
     timeout_minutes: int = None,
     resource_type: str = "pod",
-    max_concurrent: int = None,
-    config: RAITestConfig = None
+    config: RAITestConfig = None,
+    progress_callback: callable = None
 ) -> List[Dict[str, Any]]:
     """
     Convenience function to run multiple tests
@@ -257,8 +257,8 @@ async def run_batch_tests(
         test_cases: List of test cases
         timeout_minutes: Test timeout per test
         resource_type: Kubernetes resource type
-        max_concurrent: Max concurrent tests
         config: Configuration object
+        progress_callback: Optional callback function to call after each test completion
         
     Returns:
         List of test results
@@ -269,7 +269,7 @@ async def run_batch_tests(
             test_cases=test_cases,
             timeout_minutes=timeout_minutes,
             resource_type=resource_type,
-            max_concurrent=max_concurrent
+            progress_callback=progress_callback
         )
     finally:
         await runner.cleanup_temp_files()

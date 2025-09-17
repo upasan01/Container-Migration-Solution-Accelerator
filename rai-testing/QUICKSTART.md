@@ -57,7 +57,6 @@ $env:COSMOS_DB_ENDPOINT="https://your-cosmos-account.documents.azure.com:443/"
 $env:COSMOS_DB_KEY="your-cosmos-db-key"
 
 # Optional: Customize test configuration
-$env:RAI_TEST_COUNT=25                    # Number of tests to run
 $env:RAI_TEST_TIMEOUT=60                  # Test timeout in minutes
 $env:RAI_BLOB_CONTAINER="processes"       # Blob container name
 $env:RAI_QUEUE_NAME="processes-queue"     # Queue name
@@ -82,7 +81,6 @@ export COSMOS_DB_ENDPOINT="https://your-cosmos-account.documents.azure.com:443/"
 export COSMOS_DB_KEY="your-cosmos-db-key"
 
 # Optional: Customize test configuration
-export RAI_TEST_COUNT=25                    # Number of tests to run
 export RAI_TEST_TIMEOUT=60                  # Test timeout in minutes
 export RAI_BLOB_CONTAINER="processes"       # Blob container name
 export RAI_QUEUE_NAME="processes-queue"     # Queue name

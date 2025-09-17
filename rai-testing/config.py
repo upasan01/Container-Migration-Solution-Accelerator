@@ -43,8 +43,6 @@ class RAITestConfig:
     COSMOS_DB_CONTAINER: str = os.getenv("RAI_COSMOS_CONTAINER_NAME", "agent_telemetry")
     
     # Test Configuration - customizable via environment variables
-    DEFAULT_TEST_COUNT: int = int(os.getenv("RAI_TEST_COUNT", "25"))
-    MAX_CONCURRENT_TESTS: int = int(os.getenv("RAI_MAX_CONCURRENT", "5"))
     TEST_TIMEOUT_MINUTES: int = int(os.getenv("RAI_TEST_TIMEOUT", "10"))
     
     # Folder Structure (matches main application pattern)

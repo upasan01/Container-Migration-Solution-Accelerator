@@ -120,23 +120,22 @@ class RAITestOrchestrator:
     async def _update_csv_with_results(self, results: List[Dict[str, Any]]) -> None:
         """Update CSV file with test results"""
         for result in results:
-            if "details" in result and "row_id" in result["details"]:
-                row_id = result["details"]["row_id"]
-                self.test_manager.update_test_result(
-                    row_id=row_id,
-                    process_id=result.get("process_id"),
-                    blob_path=result.get("blob_path"),
-                    result=result.get("result", "error")
-                )
+            self.test_manager.update_test_result(
+                row_id=result["row_id"],
+                process_id=result.get("process_id"),
+                blob_path=result.get("blob_path"),
+                result=result.get("test_result", "error"),
+                reason=result.get("error_reason", "")
+            )
         
         # Save updated CSV
         self.test_manager.save_updated_csv()
         
     def _generate_summary(self, results: List[Dict[str, Any]], test_cases: List[TestCase]) -> Dict[str, Any]:
         """Generate test results summary"""
-        passed = sum(1 for r in results if r.get("result") == "passed")
-        failed = sum(1 for r in results if r.get("result") == "failed")
-        errors = sum(1 for r in results if r.get("result") in ["error", "timeout"])
+        passed = sum(1 for r in results if r.get("test_result") == "passed")
+        failed = sum(1 for r in results if r.get("test_result") == "failed")
+        errors = sum(1 for r in results if r.get("test_result") in ["error", "timeout"])
         
         return {
             "success": True,

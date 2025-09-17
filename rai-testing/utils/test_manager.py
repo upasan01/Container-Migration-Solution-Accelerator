@@ -19,6 +19,7 @@ class TestCase:
     process_id: Optional[str] = None
     blob_path: Optional[str] = None
     result: Optional[str] = None
+    reason: Optional[str] = None
 
 
 class TestManager:
@@ -57,7 +58,8 @@ class TestManager:
                     test_content=row.get('test_content', '').strip(),
                     process_id=row.get('process_id', '').strip() or None,
                     blob_path=row.get('blob_path', '').strip() or None,
-                    result=row.get('result', '').strip() or None
+                    result=row.get('result', '').strip() or None,
+                    reason=row.get('reason', '').strip() or None
                 )
                 
                 # Skip empty test_content rows
@@ -72,7 +74,8 @@ class TestManager:
         row_id: int, 
         process_id: str,
         blob_path: str,
-        result: str
+        result: str,
+        reason: str
     ) -> None:
         """Update test result for a specific row"""
         
@@ -90,6 +93,7 @@ class TestManager:
         test_case.process_id = process_id
         test_case.blob_path = blob_path
         test_case.result = result
+        test_case.reason = reason
     
     def save_updated_csv(self, output_path: str = None) -> str:
         """Save updated CSV file with test results"""
@@ -103,7 +107,7 @@ class TestManager:
         output_path = Path(output_path)
         
         # Determine fieldnames for output
-        output_fieldnames = ['row_id', 'test_content', 'process_id', 'blob_path', 'result']
+        output_fieldnames = ['row_id', 'test_content', 'process_id', 'blob_path', 'result', 'reason']
         
         # Add any additional fields from original CSV
         for field in self.fieldnames:
@@ -120,7 +124,8 @@ class TestManager:
                     'test_content': test_case.test_content,
                     'process_id': test_case.process_id or '',
                     'blob_path': test_case.blob_path or '',
-                    'result': test_case.result or ''
+                    'result': test_case.result or '',
+                    'reason': test_case.reason or ''
                 }
                 writer.writerow(row_data)
         

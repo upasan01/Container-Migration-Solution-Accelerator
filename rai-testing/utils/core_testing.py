@@ -116,6 +116,7 @@ class CoreTestRunner:
                 "error_reason": monitoring_result.get("error_reason", ""),
                 "yaml_file": yaml_file_path,
                 "resource_type": resource_type,
+                "row_id": row_id
             }
             
         except Exception as e:
@@ -130,7 +131,8 @@ class CoreTestRunner:
                 "error_message": str(e),
                 "error_reason": "",
                 "yaml_file": yaml_file_path,
-                "resource_type": resource_type
+                "resource_type": resource_type,
+                "row_id": row_id
             }
     
     async def run_batch_tests_core(

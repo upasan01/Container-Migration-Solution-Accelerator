@@ -46,10 +46,25 @@ logger = logging.getLogger(__name__)
 
 # Documentation step prompt templates
 DOCUMENTATION_TERMINATION_PROMPT = """
-You are coordinating the {{step_name}} step of Azure Kubernetes migration.
+You are coordinating the {{step_name}} step of Azure Kubernetes migration using Sequential Authority pattern.
 Objective: {{step_objective}}
 
-**🚨 CRITICAL AI LIMITATION REMINDER 🚨**:
+**🚨🔥 SEQUENTIAL AUTHORITY WORKFLOW - DOCUMENTATION PHASE 🔥🚨**
+
+**🎯 SEQUENTIAL AUTHORITY WORKFLOW**:
+1. **Foundation Leader (Technical Writer)**: Execute ALL MCP operations, create migration_report.md, coordinate comprehensive report
+2. **Enhancement Specialist (Azure Expert)**: Enhance with Azure-specific insights and optimizations WITHOUT redundant MCP calls
+3. **Final Validator (Chief Architect)**: Validate executive readiness and technical consistency WITHOUT re-reading files
+4. **Documentation Specialist (QA Engineer)**: Ensure quality and completeness WITHOUT redundant content operations
+
+**� EFFICIENCY ENFORCEMENT**:
+- ONLY Technical Writer should execute MCP operations (read_blob_content for previous step files, save_content_to_blob for migration_report.md)
+- Azure Expert enhances WITHOUT redundant file reading
+- Chief Architect validates WITHOUT re-accessing previous files
+- QA Engineer ensures quality WITHOUT redundant content operations
+- Expected ~75% reduction in redundant MCP operations compared to parallel collaboration
+
+**�🚨 CRITICAL AI LIMITATION REMINDER 🚨**:
 - **AI cannot certify production readiness** - Only human experts can make deployment decisions
 - **All outputs are recommendations only** - Require human validation before implementation
 - **Use advisory language** - "should", "recommended", "suggested" rather than "certified", "approved", "ready"
@@ -58,6 +73,31 @@ Objective: {{step_objective}}
 **MANDATORY DUAL OUTPUT REQUIREMENTS**:
 1. **Create comprehensive `migration_report.md` file** in {{output_file_folder}} (for human consumption)
 2. **Return structured JSON data** (for completion tracking and automation)
+
+**SEQUENTIAL AUTHORITY TERMINATION RULES**:
+
+TERMINATE SUCCESS when:
+- Technical Writer (Foundation Leader) completed comprehensive report creation with all MCP operations
+- Azure Expert (Enhancement Specialist) enhanced with Azure-specific insights
+- Chief Architect (Final Validator) validated executive readiness and consistency
+- QA Engineer (Documentation Specialist) ensured quality and completeness
+- **🔴 MANDATORY FILE VERIFICATION**: `migration_report.md` generated and verified by Technical Writer
+  - Technical Writer uses `list_blobs_in_container()` to confirm file exists in output folder
+  - Technical Writer uses `read_blob_content()` to verify content is properly generated
+  - **NO FILES, NO PASS**: Step cannot complete without verified file generation by foundation leader
+
+TERMINATE FAILURE when:
+- Technical errors prevent access/operations
+- Critical system failures or timeouts
+- Previous step files missing or corrupted (verified by Technical Writer)
+
+CONTINUE when:
+- Technical Writer (Foundation Leader) report creation not completed
+- Azure Expert (Enhancement Specialist) enhancement not completed
+- Chief Architect (Final Validator) validation not completed
+- QA Engineer (Documentation Specialist) quality review not completed
+- Migration report file NOT generated or incomplete
+- **ANY MANDATORY FIELD IS MISSING OR NULL**
 
 **REQUIRED MARKDOWN REPORT STRUCTURE** (`migration_report.md`):
 The migration_report.md file must contain the following sections in markdown format:
@@ -124,6 +164,19 @@ The Technical Writer leads documentation with comprehensive expert collaboration
 TERMINATE WITH SUCCESS when:
 - Chief Architect has reviewed and provided feedback on all documentation content in migration report
 - Chief Architect must confirm the file generated and saved in converted file folder
+- **🔴 FOUNDATION LEADER DATA COMPLETENESS VERIFICATION**: Technical Writer personally validates data quality
+  - Technical Writer reads migration_report.md content using `read_blob_content()`
+  - Technical Writer verifies aggregated_results contain complete synthesis of all previous step outputs (Analysis, Design, YAML)
+  - Technical Writer verifies expert_collaboration data captures meaningful insights from all participating domain experts
+  - Technical Writer verifies process_metrics accurately reflect the entire migration workflow performance
+  - Technical Writer confirms all critical documentation data fields contain executive-ready content for final deliverable
+  - **DATA QUALITY GATE**: Technical Writer must explicitly state "Data completeness verified for final migration deliverable" before termination
+- **🔴 FILE CONTENT COMPLETENESS VERIFICATION**: Technical Writer validates file generation quality
+  - Technical Writer uses `list_blobs_in_container()` to confirm migration_report.md exists in output folder
+  - Technical Writer uses `read_blob_content()` to verify migration report contains comprehensive executive summary, technical details, and operational guidance
+  - Technical Writer confirms file content includes complete synthesis of all previous step deliverables and actionable migration guidance
+  - Technical Writer validates documentation meets professional standards and provides complete migration project closure
+  - **FILE QUALITY GATE**: Technical Writer must explicitly state "File content completeness verified for executive delivery" before termination
 - **DUAL OUTPUT COMPLETED**:
   - Comprehensive migration report (`migration_report.md`) generated and saved to output folder
   - JSON response structure prepared for completion tracking and automation
@@ -194,6 +247,16 @@ CONTINUE DOCUMENTATION when:
 - Quality review and validation processes are underway
 - Additional documentation sections or refinements are being developed
 - Agents are actively working on comprehensive migration documentation
+- **🔴 FOUNDATION LEADER DATA VERIFICATION INCOMPLETE**: Technical Writer has not confirmed data completeness
+  - Aggregated results contain placeholder content, missing data from previous steps, or lack comprehensive synthesis
+  - Expert collaboration data is incomplete, missing domain expert insights, or lacks meaningful consensus documentation
+  - Process metrics contain placeholder values or do not accurately reflect the migration workflow performance
+  - Data quality verification statement "Data completeness verified for final migration deliverable" not provided by Technical Writer
+- **🔴 FILE CONTENT VERIFICATION INCOMPLETE**: Technical Writer has not confirmed file content completeness
+  - Migration report file has not been verified to exist using `list_blobs_in_container()`
+  - File content has not been validated using `read_blob_content()` to ensure comprehensive documentation quality
+  - Documentation content lacks executive summary, technical details, or operational guidance required for final deliverable
+  - File quality verification statement "File content completeness verified for executive delivery" not provided by Technical Writer
 - **Dual output not completed**:
   - Migration report (`migration_report.md`) has not been generated and saved to output folder
   - JSON response structure not ready for completion tracking
@@ -264,29 +327,33 @@ DOCUMENTATION_SELECTION_PROMPT = """
 You are coordinating the {{step_name}} step for {{step_objective}}.
 Available participants: {{participants}}
 
-COLLABORATIVE CONSENSUS APPROACH:
-- Technical Writer coordinates but ALL relevant experts contribute their domain expertise
-- Each expert provides specialized insights based on the detected source platform:
-  - Azure Expert: Deployment/operations insights for all migrations
-  - EKS Expert: Migration considerations and operational procedures (ONLY if source platform is EKS)
-  - GKE Expert: Cross-platform best practices and operational procedures (ONLY if source platform is GKE)
-  - Chief Architect: Strategic oversight for all migrations
-  - QA Engineer: Quality validation for all migrations
+SEQUENTIAL AUTHORITY WORKFLOW APPROACH:
+Execute foundation → enhancement → validation workflow:
+
+- Technical_Writer: FOUNDATION LEADER - Establishes authoritative documentation foundation and coordinates comprehensive report creation
+- Azure_Expert: ENHANCEMENT SPECIALIST - Enhances foundation with Azure deployment/operations insights ONLY when assigned by Technical Writer
+- Chief_Architect: ENHANCEMENT SPECIALIST - Provides strategic oversight enhancements ONLY when assigned by Technical Writer
+- QA_Engineer: ENHANCEMENT SPECIALIST - Adds quality validation insights ONLY when assigned by Technical Writer
+- EKS_Expert: ENHANCEMENT SPECIALIST - Provides EKS migration considerations ONLY when assigned by Technical Writer (ONLY if source platform is EKS)
+- GKE_Expert: ENHANCEMENT SPECIALIST - Offers GKE cross-platform best practices ONLY when assigned by Technical Writer (ONLY if source platform is GKE)
 
 **PLATFORM-AWARE SELECTION RULES**:
 - **Check analysis results** for platform detection (EKS vs GKE)
-- **Only select the matching platform expert** for platform-specific documentation
+- **Only select the matching platform expert** for platform-specific documentation enhancement
 - **Do not select non-matching platform expert** who should be in quiet mode
 - Example: If analysis determined GKE → Only select GKE_Expert, avoid selecting EKS_Expert
 
 SELECTION PRIORITY:
-- Seek input from ALL relevant domain experts before finalizing documentation sections
-- Rotate between experts to ensure comprehensive coverage and true consensus
-- Ensure ONLY the appropriate platform expert participates actively
-- Build comprehensive migration documentation with focused platform expertise
+1. Technical Writer establishes authoritative documentation foundation as Foundation Leader
+2. Expert enhancement when assigned by Technical Writer for specialized domain insights
+3. Complete comprehensive migration documentation through Sequential Authority workflow
 
-Select the next participant to contribute their specialized expertise to documentation.
-Priority: Ensure ALL relevant experts contribute their domain-specific perspectives for comprehensive migration documentation.
+**Agent Selection Rules (Sequential Authority)**:
+- Start with Technical_Writer to establish authoritative documentation foundation
+- Select Expert when Technical_Writer assigns them for specialized domain enhancement
+- Follow Sequential Authority workflow: Foundation → Enhancement → Completion
+
+Select the next participant who can provide the most valuable documentation contribution.
 
 **CRITICAL - RESPONSE FORMAT**:
 Respond with a JSON object containing the participant name in the 'result' field:
@@ -303,12 +370,12 @@ Respond with a JSON object containing the participant name in the 'result' field
 - "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ {"result": "Technical_Writer", "reason": "Documentation coordination and writing expertise needed"}
-✅ {"result": "Azure_Expert", "reason": "Azure deployment and operations insights required"}
-✅ {"result": "Chief_Architect", "reason": "Strategic oversight for migration documentation needed"}
-✅ {"result": "QA_Engineer", "reason": "Quality validation and testing documentation required"}
-✅ {"result": "EKS_Expert", "reason": "EKS migration considerations and operational procedures needed"}
-✅ {"result": "GKE_Expert", "reason": "GKE cross-platform best practices and operational procedures required"}
+✅ {"result": "Technical_Writer", "reason": "Foundation establishment and comprehensive report creation required"}
+✅ {"result": "Azure_Expert", "reason": "Azure deployment enhancement assigned by Technical Writer"}
+✅ {"result": "Chief_Architect", "reason": "Strategic oversight enhancement assigned by Technical Writer"}
+✅ {"result": "QA_Engineer", "reason": "Quality validation enhancement assigned by Technical Writer"}
+✅ {"result": "EKS_Expert", "reason": "EKS migration enhancement assigned by Technical Writer"}
+✅ {"result": "GKE_Expert", "reason": "GKE cross-platform enhancement assigned by Technical Writer"}
 
 INCORRECT Response Examples:
 ❌ "Technical_Writer" (missing JSON format)

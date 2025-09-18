@@ -694,9 +694,17 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
             return
 
     def _create_standard_documentation_task(self) -> str:
-        """Create enhanced comprehensive migration documentation task template utilizing rich step data."""
+        """Create enhanced comprehensive migration documentation task template utilizing rich step data with Sequential Authority pattern."""
         return """
-        **🎯 COMPREHENSIVE MIGRATION DOCUMENTATION OBJECTIVE**: Generate professional migration report leveraging ALL step data
+        🚨🔥 **SEQUENTIAL AUTHORITY PROTOCOL - DOCUMENTATION PHASE** 🔥🚨
+
+        **🎯 COMPREHENSIVE MIGRATION DOCUMENTATION OBJECTIVE**: Generate professional migration report leveraging ALL step data using Sequential Authority pattern for maximum efficiency
+
+        **🎯 SEQUENTIAL AUTHORITY WORKFLOW**:
+        1. **Foundation Leader**: Technical Writer performs initial report creation and ALL MCP operations
+        2. **Enhancement Specialist**: Azure Expert enhances with Azure-specific insights and optimizations
+        3. **Final Validator**: Chief Architect validates executive readiness and technical consistency
+        4. **Documentation Specialist**: QA Engineer ensures quality and completeness for delivery
 
         **📊 MIGRATION OVERVIEW**:
         - Source Platform: {{source_platform}} (Confidence: {{platform_confidence}})
@@ -781,11 +789,18 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
            - Best practices and lessons learned compilation
            - Platform-specific considerations and Azure optimization strategies
 
-        **👥 EXPERT RESPONSIBILITIES WITH ENHANCED CONTEXT**:
-        - **Chief Architect**: Create executive-ready assessment using {{migration_readiness_score}} readiness score, validate architectural consistency across {{architecture_decisions_count}} decisions
-        - **{{source_platform}} Expert**: Document platform-specific insights from {{total_files_analyzed}} file analysis, address {{migration_concerns_count}} platform concerns
-        - **Azure Expert**: Provide detailed guidance on {{azure_services_count}} Azure services, optimize configurations for {{overall_conversion_accuracy}} conversion accuracy
-        - **Technical Writer**: Create professional documentation integrating {{total_expert_insights}} expert insights with clear structure and actionable recommendations
+        **🎯 SEQUENTIAL AUTHORITY EXPERT RESPONSIBILITIES**:
+        - **Technical Writer (Foundation Leader)**: Execute ALL MCP operations (read previous step files, create migration_report.md), coordinate comprehensive report creation, establish document structure and quality
+        - **Azure Expert (Enhancement Specialist)**: Enhance with Azure-specific insights, optimization strategies, and service recommendations WITHOUT redundant MCP operations
+        - **Chief Architect (Final Validator)**: Validate executive readiness, technical consistency, and architectural alignment WITHOUT re-reading files
+        - **QA Engineer (Documentation Specialist)**: Ensure quality, completeness, and delivery readiness WITHOUT redundant content operations
+
+        **🚀 EFFICIENCY OPTIMIZATION**:
+        - Technical Writer performs ALL MCP operations (read_blob_content for previous step files, save_content_to_blob for migration_report.md)
+        - Azure Expert enhances WITHOUT redundant file reading
+        - Chief Architect validates WITHOUT re-accessing previous files
+        - QA Engineer ensures quality WITHOUT redundant content operations
+        - Expected ~75% reduction in redundant MCP operations compared to parallel collaboration
 
         **✅ SUCCESS CRITERIA WITH MEASURABLE OUTCOMES**:
         - Complete utilization of analysis data from {{total_files_analyzed}} files
@@ -793,11 +808,15 @@ class DocumentationStep(KernelProcessStep[DocumentationStepState], ToolTrackingM
         - Comprehensive conversion analysis of {{total_files_converted}} converted files
         - Executive-ready summary with {{migration_readiness_score}} readiness assessment
         - Technical implementation guide with {{architecture_decisions_count}} architectural decisions
+        - Sequential Authority workflow followed for maximum efficiency
 
         **📤 MANDATORY OUTPUT STRUCTURE**:
         - **migration_report.md** in {{output_file_folder}}
-        - all participants should actively collaborate to co-author and edit the migration report
-        - Ensure clarity, professionalism, and actionable insights through team collaboration
+        - Technical Writer (Foundation Leader) creates the report collaboratively with Sequential Authority enhancement
+        - Ensure clarity, professionalism, and actionable insights through Sequential Authority workflow
+        - **CRITICAL**: Don't delete, modify, or clean up any existing files from previous steps (analysis, design, conversion results)
+        - **READ-ONLY FOR PREVIOUS RESULTS**: Only Technical Writer reads from existing previous step files for reference, never modify them
+        - **SEQUENTIAL CREATION**: Technical Writer creates migration_report.md, Azure Expert enhances, Chief Architect validates, QA Engineer finalizes
         - **COLLABORATIVE APPROACH**: Actively work together to create the best possible migration report
         - **CRITICAL**: Don't delete, modify, or clean up any existing files from previous steps (analysis, design, conversion results)
         - **READ-ONLY FOR PREVIOUS RESULTS**: Only read from existing previous step files for reference, never modify them

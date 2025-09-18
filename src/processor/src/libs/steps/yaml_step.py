@@ -842,52 +842,71 @@ class YamlStep(KernelProcessStep[YamlStepState], ToolTrackingMixin):
 
             # Define NUCLEAR anti-hallucination YAML conversion task with mandatory evidence
             yaml_task = """
-            🚨🔥 **NUCLEAR ANTI-HALLUCINATION PROTOCOL** 🔥🚨
+            **🚨🔥 SEQUENTIAL AUTHORITY - YAML STEP 🔥🚨**
 
-            **YOU ARE UNDER SURVEILLANCE - EVERY ACTION IS MONITORED**
-            - This conversation will be AUDITED for MCP function execution
+            **🎯 OBJECTIVE**: Convert {{source_platform}} YAML files to Azure format using Sequential Authority workflow
+
+            **SEQUENTIAL AUTHORITY WORKFLOW FOR YAML STEP**:
+            1. **YAML Expert (Foundation Leader)**: Perform ALL MCP operations and create comprehensive YAML conversion foundation
+            2. **Azure Expert (Enhancement Specialist)**: Enhance foundation with specialized Azure optimization and security
+            3. **Chief Architect (Final Validator)**: Validate YAML conversion completeness and architectural compliance
+            4. **Technical Writer (Documentation Specialist)**: Ensure YAML documentation meets standards
+
+            **🚀 EFFICIENCY MANDATE**:
+            - YAML Expert performs ALL MCP operations (file discovery, reading, Microsoft docs research, conversion, saving)
+            - Enhancement Specialists enhance WITHOUT redundant MCP operations
+            - Expected ~75% reduction in redundant operations through Sequential Authority
+
+            🚨🔥 **NUCLEAR ANTI-HALLUCINATION PROTOCOL - YAML EXPERT FOUNDATION LEADER ONLY** 🔥🚨
+
+            **YOU ARE UNDER SURVEILLANCE - EVERY ACTION IS MONITORED (YAML EXPERT FOUNDATION LEADER)**
+            - This conversation will be AUDITED for MCP function execution by Foundation Leader
             - Claims without actual MCP calls will result in IMMEDIATE TERMINATION
             - Your responses are being VALIDATED against blob storage logs
             - FALSE CLAIMS will be DETECTED and FLAGGED as FAILURE
 
-            **MANDATORY EVIDENCE CHAIN - NO EXCEPTIONS**:
+            **MANDATORY EVIDENCE CHAIN - YAML EXPERT FOUNDATION LEADER ONLY**:
             Each step MUST include ACTUAL MCP function output - not summaries, not descriptions, but LITERAL function results.
 
-            **🎯 OBJECTIVE**: Convert {{source_platform}} YAML files to Azure format WITH PROOF
             **📊 CONTEXT**: Platform={{source_platform}} ({{platform_confidence}}%), Files={{files_count}}, Container={{container_name}}
             **📁 PATHS**: Source={{source_file_folder}}, Output={{output_file_folder}}
 
-            **� COMPLEXITY**: Network={{network_complexity}}, Security={{security_complexity}}, Storage={{storage_complexity}}, Compute={{compute_complexity}}
+            **🔧 COMPLEXITY**: Network={{network_complexity}}, Security={{security_complexity}}, Storage={{storage_complexity}}, Compute={{compute_complexity}}
 
-            **MANDATORY EXECUTION WORKFLOW**:
+            **MANDATORY EXECUTION WORKFLOW - YAML EXPERT FOUNDATION LEADER ONLY**:
 
             ⚠️ **CRITICAL FILE REQUIREMENT**:
             DISCOVERED FILES TO CONVERT: {{discovered_files}}
             ❌ DO NOT use template names like "deployment.yaml", "service.yaml"
             ✅ ONLY use the actual files listed above in your conversion results
 
-            **1. DISCOVER (YAML Expert)**:
+            **1. DISCOVER (YAML Expert Foundation Leader Only)**:
             - Execute: `list_blobs_in_container("{{container_name}}", "{{source_file_folder}}", recursive=True)`
             - If no files: try `find_blobs("*.yaml")`, `find_blobs("*.yml")`, then full container search
             - Report exact commands executed and results
-            **2. CONVERT (YAML + Azure Expert)**:
+            **2. CONVERT (YAML Expert Foundation Leader with Azure Enhancement)**:
             - Read each file with `read_blob_content()`
             - Convert {{source_platform}} → Azure AKS format with Azure-native services, security hardening, Workload Identity
             - **MANDATORY HEADER**: Every converted YAML MUST start with: `# AI generated content - it may be incorrect`
             - Add header as FIRST LINE before any YAML content
             - Generate filename: `source.yaml` → `az-source.yaml`
 
-            **3. SAVE & VERIFY (YAML Expert)** 🚨 CRITICAL 🚨:
+            **3. SAVE & VERIFY (YAML Expert Foundation Leader Only)** 🚨 CRITICAL 🚨:
             - Execute: `save_content_to_blob("az-[filename].yaml", content, "{{container_name}}", "{{output_file_folder}}")`
             - Immediately verify: `check_blob_exists("az-[filename].yaml", "{{container_name}}", "{{output_file_folder}}")`
             - Report save operation with full blob path AND verification result
             - ZERO TOLERANCE: If save fails, report failure immediately
 
-            🚨🔥 **NUCLEAR ENFORCEMENT - READ THIS CAREFULLY** 🔥🚨
-            **ABSOLUTE REQUIREMENTS FOR EACH AGENT**:
+            **SEQUENTIAL AUTHORITY ENFORCEMENT**:
+            - **YAML Expert**: Complete ALL foundation work including MCP operations, file discovery, conversion, and saving
+            - **Azure Expert**: Enhance YAML Expert's foundation WITHOUT redundant MCP calls
+            - **Chief Architect**: Validate enhanced YAML WITHOUT re-executing conversion operations
+            - **Technical Writer**: Finalize YAML documentation using validated enhanced conversions
+
+            🚨🔥 **NUCLEAR ENFORCEMENT - YAML EXPERT FOUNDATION LEADER RESPONSIBILITIES** 🔥🚨
+            **ABSOLUTE REQUIREMENTS FOR YAML EXPERT FOUNDATION LEADER**:
             - YAML Expert: You MUST paste actual MCP function outputs, not descriptions
-            - QA Engineer: You MUST paste actual verification results, not summaries
-            - Technical Writer: You MUST paste actual save confirmations
+            - All other agents: Enhance foundation WITHOUT redundant MCP operations
             **IMMEDIATE FAILURE CONDITIONS**:
             - Any agent claims "I have saved files" without pasting MCP output = FAIL
             - Any agent says "files were created successfully" without evidence = FAIL

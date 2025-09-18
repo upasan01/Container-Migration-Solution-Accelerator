@@ -942,7 +942,20 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
 
             # Define enhanced design task leveraging analysis results
             design_task = """
-            **🎯 COMPREHENSIVE AZURE ARCHITECTURE DESIGN OBJECTIVE**: Create intelligent Azure architecture recommendations based on detailed analysis results
+            **🚨🔥 SEQUENTIAL AUTHORITY - DESIGN STEP 🔥🚨**
+
+            **🎯 COMPREHENSIVE AZURE ARCHITECTURE DESIGN OBJECTIVE**: Create intelligent Azure architecture recommendations using Sequential Authority workflow
+
+            **SEQUENTIAL AUTHORITY WORKFLOW FOR DESIGN STEP**:
+            1. **Azure Expert (Foundation Leader)**: Perform ALL MCP operations and create comprehensive design foundation
+            2. **Platform Expert (Enhancement Specialist)**: Enhance foundation with specialized source platform migration insights
+            3. **Chief Architect (Final Validator)**: Validate design completeness and architectural soundness
+            4. **Technical Writer (Documentation Specialist)**: Ensure design report meets documentation standards
+
+            **🚀 EFFICIENCY MANDATE**:
+            - Azure Expert performs ALL MCP operations (analysis reading, source file discovery, Microsoft docs research)
+            - Enhancement Specialists enhance WITHOUT redundant MCP operations
+            - Expected ~75% reduction in redundant operations through Sequential Authority
 
             **📊 ANALYSIS INTELLIGENCE CONTEXT**:
             - Migration Type: {{migration_type}}
@@ -952,7 +965,6 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             - Analyzed Files: {{files_discovered}}
             - Source Folder(Kubernetes manifest files) : {{source_file_folder}}
             - Overall Complexity: {{overall_complexity}}
-
 
             **📁 DESIGN SCOPE**:
             - Analysis Results: {{output_file_folder}}/analysis_result.md
@@ -969,33 +981,39 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             - Storage Complexity: {{storage_complexity}}
             - Compute Complexity: {{compute_complexity}}
 
-            **[TOOLS] STRATEGIC MICROSOFT DOCS RESEARCH METHODOLOGY**:
-            You have access to comprehensive Microsoft Azure documentation tools. **MANDATORY TWO-STEP RESEARCH PROCESS**:
-            
-            **🔍 STEP 1 - SEARCH FOR DISCOVERY**:
+            **[TOOLS] STRATEGIC MICROSOFT DOCS RESEARCH METHODOLOGY - AZURE EXPERT FOUNDATION LEADER ONLY**:
+            **🚨 CRITICAL: ONLY AZURE EXPERT (FOUNDATION LEADER) EXECUTES MCP OPERATIONS 🚨**
+
+            **🔍 STEP 1 - SEARCH FOR DISCOVERY (Azure Expert Foundation Leader Only)**:
             Use `microsoft_docs_search` to identify relevant documentation:
             - **Azure Architecture Center**: Search "{{platform_detected}} to Azure migration reference architecture"
             - **Service Documentation**: Search "AKS configuration", "Application Gateway setup", "Azure Storage options"
             - **Migration Best Practices**: Search "{{migration_type}} migration best practices", "Azure migration guidelines"
             - **Security Standards**: Search "Azure security baseline {{overall_complexity}} complexity"
-            
-            **📚 STEP 2 - FETCH FOR COMPREHENSIVE DETAILS**:
+
+            **📚 STEP 2 - FETCH FOR COMPREHENSIVE DETAILS (Azure Expert Foundation Leader Only)**:
             Use `microsoft_docs_fetch` on URLs from search results to get complete information:
             - **Complete Configuration Guides**: Full YAML examples, parameter references, troubleshooting
             - **Step-by-Step Procedures**: End-to-end migration workflows, implementation checklists
             - **Architecture Patterns**: Complete reference architectures with detailed component specifications
             - **Security Implementation**: Full security configuration guides, compliance requirements
-            
-            **🎯 STRATEGIC FETCH TRIGGERS**:
+
+            **🎯 STRATEGIC FETCH TRIGGERS (Azure Expert Foundation Leader Only)**:
             - When you need complete YAML/JSON configuration syntax
             - When search results mention "detailed guide" or "complete tutorial"
             - When implementing complex multi-service architectures
             - When addressing security or compliance requirements
 
-            **BEFORE STARTING DESIGN**:
+            **BEFORE STARTING DESIGN (Azure Expert Foundation Leader Only)**:
             1. Verify analysis_result.md exists: check_blob_exists('analysis_result.md', container_name='{{container_name}}', folder_path='{{output_file_folder}}')
             2. List available source files: list_blobs_in_container(container_name='{{container_name}}', folder_path='{{source_file_folder}}')
             3. If files missing, report specific missing files and request Analysis step rerun
+
+            **SEQUENTIAL AUTHORITY ENFORCEMENT**:
+            - **Azure Expert**: Complete ALL foundation work including MCP operations, analysis reading, and initial design
+            - **Enhancement Specialists**: Enhance Azure Expert's foundation WITHOUT redundant MCP calls
+            - **Final Validator**: Validate enhanced design WITHOUT re-executing research operations
+            - **Documentation Specialist**: Finalize design report using validated enhanced design
 
             **TROUBLESHOOTING FILE ACCESS**:
             If you cannot access required files:
@@ -1010,11 +1028,11 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
             3. **{{platform_detected}}-to-Azure Migration Strategy**: Tailored approach based on source platform
             4. **Risk-Informed Implementation Plan**: Address concerns identified in analysis phase
 
-            **👥 EXPERT COORDINATION WITH ANALYSIS CONTEXT**:
-            - **Chief Architect**: Strategic design leadership leveraging {{files_count}} files analysis
-            - **{{platform_detected}} Expert**: Source platform expertise for accurate Azure mapping
-            - **Azure Expert**: {{target_platform}} architecture optimized for {{overall_complexity}} complexity
-            - **Security Architect**: Address security complexity: {{security_complexity}}
+            **👥 SEQUENTIAL AUTHORITY EXPERT COORDINATION**:
+            - **Azure Expert (Foundation Leader)**: Complete foundation design including ALL MCP operations, analysis reading, and Microsoft docs research
+            - **{{platform_detected}} Expert (Enhancement Specialist)**: Enhance Azure foundation with specialized source platform migration insights
+            - **Chief Architect (Final Validator)**: Validate enhanced design for architectural soundness and completeness
+            - **Technical Writer (Documentation Specialist)**: Finalize validated design with professional documentation standards
 
             **✅ ENHANCED SUCCESS CRITERIA**:
             - Complete Azure architecture addressing all {{files_count}} analyzed files
@@ -1208,7 +1226,7 @@ class DesignStep(KernelProcessStep[DesignStepState], ToolTrackingMixin):
                             process_id,
                             "Conversation_Manager",
                             "experts_collaborating",
-                            "Expert collaboration in progress - Azure Expert, Technical Architect, and platform experts working together",
+                            "Expert collaboration in progress - Azure Expert, Chief Architect, and platform experts working together",
                         )
 
                         orchestration_result = await self._orchestrator.invoke(

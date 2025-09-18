@@ -364,12 +364,10 @@ const ProcessPage: React.FC = () => {
       <style dangerouslySetInnerHTML={{ __html: scrollbarStyles }} />
       <div className="landing-page flex flex-col relative h-screen">
         {/* Header - Same as Landing Page */}
-        <div onClick={handleLeave} style={{ cursor: "pointer" }}>
-          <Header subtitle="Container Migration">
-            <HeaderTools>
-            </HeaderTools>
-          </Header>
-        </div>
+        <Header subtitle="Container Migration" onTitleClick={handleLeave}>
+          <HeaderTools>
+          </HeaderTools>
+        </Header>
 
         {/* Main Content */}
         <main className={`main-content ${isPanelOpen ? "shifted" : ""} flex-1 flex overflow-auto bg-mode-neutral-background-1-rest relative`}>

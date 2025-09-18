@@ -727,9 +727,17 @@ class AnalysisStep(KernelProcessStep[AnalysisStepState], ToolTrackingMixin):
                 raise RuntimeError(
                     "Analysis orchestrator not initialized - critical failure"
                 )
-            # Define analysis task for expert agents
+            # Define analysis task for expert agents with Sequential Authority pattern
             analysis_task = """
-            **ANALYSIS STEP OBJECTIVE**: Comprehensive source platform analysis and file discovery for Azure migration
+            🚨🔥 **SEQUENTIAL AUTHORITY PROTOCOL - ANALYSIS PHASE** 🔥🚨
+
+            **ANALYSIS STEP OBJECTIVE**: Comprehensive source platform analysis and file discovery for Azure migration using Sequential Authority pattern for maximum efficiency
+
+            **🎯 SEQUENTIAL AUTHORITY WORKFLOW**:
+            1. **Foundation Leader**: Chief Architect performs initial comprehensive analysis and file discovery
+            2. **Enhancement Specialist**: Platform Expert (EKS/GKE/Other) validates platform identification and adds specialized insights
+            3. **Final Validator**: QA Engineer verifies completeness and accuracy of analysis results
+            4. **Documentation Specialist**: Technical Writer ensures report quality and structure
 
             **📚 MICROSOFT DOCS STRATEGIC RESEARCH**:
             Reference strategic usage guide: docs/MicrosoftDocsStrategicUsage.md
@@ -754,16 +762,24 @@ class AnalysisStep(KernelProcessStep[AnalysisStepState], ToolTrackingMixin):
             4. **Azure Migration Readiness**: Initial assessment of migration complexity and considerations
             5. **File-by-File Analysis**: Detailed breakdown of each configuration file
 
-            **EXPERT RESPONSIBILITIES**:
-            - Chief Architect: Lead comprehensive analysis, coordinate team, provide strategic oversight
-            - Platform Expert (EKS/GKE): Deep platform identification, source-specific patterns and considerations
-            - Azure Expert: Azure migration context, service mapping possibilities, complexity assessment
+            **🎯 SEQUENTIAL AUTHORITY EXPERT RESPONSIBILITIES**:
+            - **Chief Architect (Foundation Leader)**: Lead comprehensive analysis, execute ALL MCP operations for file discovery and initial analysis, coordinate team workflow, provide strategic oversight
+            - **Platform Expert (Enhancement Specialist)**: Validate platform identification, add source-specific patterns and considerations, enhance Chief Architect's analysis
+            - **QA Engineer (Final Validator)**: Verify completeness and accuracy of analysis results, validate file discovery and platform identification
+            - **Technical Writer (Documentation Specialist)**: Ensure report quality, structure, and clarity for next step consumption
+
+            **🚀 EFFICIENCY OPTIMIZATION**:
+            - Chief Architect performs ALL initial MCP operations (file discovery, content reading, analysis)
+            - Platform Expert enhances and validates WITHOUT redundant MCP calls
+            - QA Engineer validates results WITHOUT re-discovering files
+            - Technical Writer focuses on documentation quality WITHOUT redundant analysis
 
             **SUCCESS CRITERIA**:
             - All source files discovered with complete metadata
             - Platform definitively identified with high confidence
             - Multi-dimensional complexity fully assessed
             - Azure migration pathway clearly identified
+            - Sequential Authority workflow followed for maximum efficiency
 
             **MANDATORY DUAL OUTPUT**:
             1. Create a comprehensive **analysis_result.md** file in {{output_file_folder}} (for human consumption)
@@ -840,13 +856,36 @@ class AnalysisStep(KernelProcessStep[AnalysisStepState], ToolTrackingMixin):
                 },
                 "summary": "Comprehensive analysis completed: [Platform] with [X] files analyzed",
                 "expert_insights": [
-                    "Chief architect provided strategic migration framework",
-                    "Platform expert identified critical source platform patterns",
-                    "Azure expert assessed migration complexity and service mappings"
+                    "Chief Architect (Foundation Leader) provided comprehensive analysis framework and executed all MCP operations",
+                    "Platform Expert (Enhancement Specialist) validated platform identification and added specialized insights",
+                    "QA Engineer (Final Validator) verified completeness and accuracy of analysis results",
+                    "Technical Writer (Documentation Specialist) ensured report quality and structure"
                 ],
+                "sequential_authority_workflow": {
+                    "foundation_leader": "Chief Architect",
+                    "enhancement_specialist": "Platform Expert",
+                    "final_validator": "QA Engineer",
+                    "documentation_specialist": "Technical Writer",
+                    "mcp_operations_performed_by": "Chief Architect",
+                    "efficiency_achieved": "~75% reduction in redundant MCP operations"
+                },
                 "analysis_file": "{{output_file_folder}}/analysis_result.md"
             }
             ```
+
+            **🛑 SEQUENTIAL AUTHORITY TERMINATION RULES**:
+
+            1. **Foundation Leader (Chief Architect)**: Execute ALL MCP operations for file discovery and analysis
+            2. **Enhancement Specialist (Platform Expert)**: Validate and enhance WITHOUT redundant MCP calls
+            3. **Final Validator (QA Engineer)**: Verify results and completeness WITHOUT re-executing discovery
+            4. **Documentation Specialist (Technical Writer)**: Focus on report quality WITHOUT additional analysis
+
+            **TERMINATION ENFORCEMENT**:
+            - Only Chief Architect should perform list_blobs_in_container, read_blob_content, check_blob_exists
+            - Platform Expert should enhance platform identification using Chief Architect's findings
+            - QA Engineer should validate completeness using existing results
+            - Technical Writer should ensure professional documentation quality
+            - NO agent should duplicate MCP operations performed by the Foundation Leader
             """
 
             # Using Template and replace values

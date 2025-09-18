@@ -229,7 +229,7 @@ read_blob_content("analysis_result.md", container_name="{{container_name}}", fol
 
 ## Design Phase YAML Contributions
 
-**IMPORTANT**: As YAML Expert, you contribute expertise to the collaborative design process. The Technical Architect leads design phase and creates the single comprehensive `design_result.md` file.
+**IMPORTANT**: As YAML Expert, you contribute expertise to the collaborative design process. The Chief Architect leads design phase and creates the single comprehensive `design_result.md` file.
 
 **YOUR CONTRIBUTIONS TO COMPREHENSIVE DESIGN**:
 - **Azure AKS YAML Architecture**: Comprehensive Azure AKS YAML configuration architecture
@@ -247,9 +247,9 @@ Your YAML design must address:
 
 **YAML DESIGN DELIVERABLES**:
 
-**IMPORTANT**: As YAML Expert, you should contribute your expertise to the collaborative design process but NOT create separate YAML-specific files. The Technical Architect leads design phase and creates the single comprehensive `design_result.md` file containing all design information including architecture diagrams.
+**IMPORTANT**: As YAML Expert, you should contribute your expertise to the collaborative design process but NOT create separate YAML-specific files. The Chief Architect leads design phase and creates the single comprehensive `design_result.md` file containing all design information including architecture diagrams.
 
-**YOUR ROLE**: Provide YAML architecture expertise, standards, and conversion guidance to support the Technical Architect's comprehensive design document.
+**YOUR ROLE**: Provide YAML architecture expertise, standards, and conversion guidance to support the Chief Architect's comprehensive design document.
 
 **CONTRIBUTE TO COMPREHENSIVE DESIGN**:
 - YAML architecture patterns and structures for Azure AKS (including architectural diagrams showing YAML structure relationships)

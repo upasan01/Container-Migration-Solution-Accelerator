@@ -13,7 +13,7 @@ Step objective: {{step_objective}}
   3. **Critical for**: Current AKS API versions, Azure resource specifications, security configurations
 - **blob storage MCP tools**: Read source files and save converted YAML configurations
 
-You have concluded the YAML conversion discussion with technical consensus.
+You have concluded the YAML conversion discussion with Sequential Authority workflow completion.
 Provide a structured report aligned with Yaml_ExtendedBooleanResult format:sion.
 The YAML phase focuses on technical implementation with validation,
 requiring a different agent mix than Analysis or Design phases.
@@ -122,7 +122,7 @@ The file_converting_result.md file must contain the following sections in markdo
 [QA verification findings and validation status]
 
 ## Expert Insights
-[Summary of insights from YAML Expert, Azure Expert, and QA Engineer]
+[Summary of insights from Sequential Authority workflow: YAML Expert foundation, Azure Expert enhancements, QA Engineer validation]
 
 **CRITICAL REQUIREMENT: ALL MANDATORY EXECUTION STEPS MUST BE COMPLETED**
 
@@ -170,6 +170,19 @@ TERMINATION DECISION CRITERIA:
 TERMINATE WITH SUCCESS when:
 - **ALL 5 MANDATORY STEPS COMPLETED**: Discovery, conversion, saving, QA verification, and reporting
 - **QA VERIFICATION PASSED**: QA Engineer confirmed all files saved and accessible in output folder
+- **🔴 FOUNDATION LEADER DATA COMPLETENESS VERIFICATION**: YAML Expert personally validates data quality
+  - YAML Expert reads file_converting_result.md content using `read_blob_content()`
+  - YAML Expert verifies converted_files array contains complete 1:1 mapping of all source files to Azure equivalents
+  - YAML Expert verifies multi_dimensional_analysis provides actionable insights for Documentation step
+  - YAML Expert verifies conversion metrics accurately reflect the conversion process results
+  - YAML Expert confirms all critical conversion data fields contain meaningful content ready for migration documentation
+  - **DATA QUALITY GATE**: YAML Expert must explicitly state "Data completeness verified for Documentation step consumption" before termination
+- **🔴 FILE CONTENT COMPLETENESS VERIFICATION**: YAML Expert validates file generation quality
+  - YAML Expert uses `list_blobs_in_container()` to confirm all converted Azure YAML files exist in output folder
+  - YAML Expert uses `read_blob_content()` to verify converted files contain valid Azure YAML syntax and configurations
+  - YAML Expert confirms file_converting_result.md contains comprehensive conversion tables and analysis (not placeholder content)
+  - YAML Expert validates all converted files are Azure-compatible and deployment-ready
+  - **FILE QUALITY GATE**: YAML Expert must explicitly state "File content completeness verified for Azure deployment" before termination
 - **DUAL OUTPUT COMPLETED**:
   - Markdown report (`file_converting_result.md`) created and saved to output folder
   - JSON response structure prepared for next step processing
@@ -178,13 +191,14 @@ TERMINATE WITH SUCCESS when:
 - Conversion accuracy meets quality standards for each file
 - Azure-specific enhancements have been applied where appropriate
 - Multi-dimensional analysis completed (network, security, storage, compute)
-- Expert consensus achieved on all conversion quality and validation
+- Sequential Authority workflow completed (Foundation → Enhancement → Validation → Documentation)
 - **Files have been ACTUALLY SAVED and VERIFIED using blob tools**
-- **🤝 EXPERT COLLABORATION ACHIEVED**: Evidence of consensus-based conversion decisions
-  - YAML Expert, Azure Expert, and QA Engineer collaboration documented
-  - Technical conflicts resolved through collaborative consensus building
-  - Conversion quality validated through collective expert agreement
-  - Final results represent collaborative technical intelligence, not individual decisions
+- **🤝 SEQUENTIAL AUTHORITY WORKFLOW COMPLETED**: Evidence of foundation → enhancement → validation → documentation progression
+  - YAML Expert foundation conversion established and documented
+  - Azure Expert enhancements applied to foundation conversion
+  - QA Engineer validation and quality verification completed
+  - Technical Writer documentation of validated workflow results
+  - Conversion follows authority chain workflow, not parallel collaboration
 
 **MANDATORY FIELD VALIDATION** (ALL FIELDS REQUIRED FOR SUCCESS):
 ✅ result: MUST be true (NOT NULL)
@@ -221,11 +235,21 @@ TERMINATE WITH FAILURE when:
 - Critical files cannot be converted to valid Azure format
 - Conversion accuracy falls below acceptable standards
 - Essential Azure compatibility requirements cannot be met
-- Expert consensus cannot be achieved on conversion quality
+- Foundation Leader (YAML Expert) indicates conversion cannot be completed
 
 **CONTINUE PROCESSING when**:
 - **QA verification not yet performed** - QA Engineer must check output folder and converted files
 - **Markdown format verification incomplete** - QA Engineer must verify file_converting_result.md is proper markdown format (NOT JSON blob)
+- **🔴 FOUNDATION LEADER DATA VERIFICATION INCOMPLETE**: YAML Expert has not confirmed data completeness
+  - Converted files mapping contains missing entries, placeholder text, or lacks 1:1 correspondence with source files
+  - Multi-dimensional analysis is incomplete, contains "TBD" content, or lacks actionable insights for Documentation step
+  - Conversion metrics contain placeholder values or do not accurately reflect the actual conversion process results
+  - Data quality verification statement "Data completeness verified for Documentation step consumption" not provided by YAML Expert
+- **🔴 FILE CONTENT VERIFICATION INCOMPLETE**: YAML Expert has not confirmed file content completeness
+  - Converted Azure YAML files have not been verified to exist using `list_blobs_in_container()`
+  - File content has not been validated using `read_blob_content()` to ensure Azure YAML syntax and deployment readiness
+  - Conversion report file contains placeholder sections, incomplete tables, or insufficient technical details
+  - File quality verification statement "File content completeness verified for Azure deployment" not provided by YAML Expert
 - **Files not yet saved** - Conversion work in progress but files not saved to blob storage
 - Agents report files are missing but have NOT used comprehensive blob tool verification
 - Initial blob searches failed but alternative paths haven't been tried
@@ -379,26 +403,27 @@ Available participants: {{participants}}
 
 **NEVER select an agent to conclude files are missing unless they have used ALL these search methods**
 
-FOCUSED CONVERSION TEAM APPROACH:
-Rotate between technical specialists to achieve high-quality YAML conversion:
+SEQUENTIAL AUTHORITY WORKFLOW APPROACH:
+Execute foundation → enhancement → validation → documentation workflow:
 
-- YAML_Expert: Leads technical conversion and format validation with deep YAML expertise - **MUST use comprehensive blob search before reporting files missing**
-- Azure_Expert: Ensures Azure compatibility and applies platform-specific best practices - **MUST verify storage access and permissions thoroughly**
-- QA_Engineer: Validates conversion accuracy, quality standards, and Azure migration readiness - **MUST perform final verification of all search attempts**
-- Technical_Writer: Creates comprehensive conversion reports and documentation - **MUST save file_converting_result.md report after QA verification**
+- YAML_Expert: FOUNDATION LEADER - Establishes authoritative YAML conversion foundation - **PERFORMS comprehensive blob search and authoritative source discovery**
+- Azure_Expert: ENHANCEMENT SPECIALIST - Enhances foundation with Azure-specific optimizations ONLY when assigned by YAML Expert
+- QA_Engineer: FINAL VALIDATOR - Validates foundation + Azure enhancements for quality and migration readiness
+- Technical_Writer: DOCUMENTATION SPECIALIST - Documents validated conversion results after QA approval
 
 SELECTION PRIORITY:
-1. **First Priority**: Select agents who will perform thorough blob verification using multiple search patterns
-2. Ensure ALL conversion specialists contribute their technical expertise
-3. Achieve comprehensive Azure compatibility through focused technical work
-4. Build consensus on conversion accuracy and quality validation
-5. Create validated, Azure migration-ready YAML configurations
+1. **YAML Expert establishes authoritative conversion foundation** - performs comprehensive source discovery
+2. **Azure Expert enhances foundation when assigned** - assignment-based activation for Azure optimizations
+3. **QA Engineer validates integrated conversion** - tests foundation + enhancements for quality
+4. **Technical Writer documents validated results** - creates final documentation after validation
+5. Create validated, Azure migration-ready YAML configurations through Sequential Authority workflow
 
-**Agent Selection Rules**:
-- If files reported missing but comprehensive search not performed → Select agent to do thorough verification
-- If one search method failed → Select agent to try alternative patterns and locations
-- If blob access issues → Select Azure_Expert to troubleshoot storage permissions
-- Only after comprehensive verification → Proceed with conversion or escalation
+**Agent Selection Rules (Sequential Authority)**:
+- Start with YAML_Expert to establish authoritative foundation and perform comprehensive source discovery
+- Select Azure_Expert when YAML Expert assigns them for Azure-specific enhancements
+- Select QA_Engineer when foundation + enhancements are ready for validation
+- Select Technical_Writer when QA Engineer has validated the conversion for final documentation
+- Follow Sequential Authority workflow: Foundation → Enhancement → Validation → Documentation
 
 Select the next participant who can provide the most valuable technical conversion contribution or perform necessary blob verification.
 
@@ -783,15 +808,16 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
     Orchestrator specifically for YAML step operations.
 
     AGENT SELECTION STRATEGY FOR YAML PHASE:
-    This demonstrates how YAML phase has different agent focus than Design or Analysis.
+    This demonstrates how YAML phase uses Sequential Authority workflow for efficient conversion.
 
-    YAML Phase Agents (Implementation-focused):
-    - YAML Expert: PRIMARY LEAD - Configuration conversion, YAML generation
-    - Azure Expert: Azure-specific YAML patterns and configurations
-    - QA Engineer: Validation, testing, quality assurance
+    YAML Phase Agents (Sequential Authority Model):
+    - YAML Expert: FOUNDATION LEADER - Authoritative source discovery and YAML conversion foundation
+    - Azure Expert: ENHANCEMENT SPECIALIST - Azure-specific optimizations when assigned
+    - QA Engineer: FINAL VALIDATOR - Quality validation of foundation + enhancements
+    - Technical Writer: DOCUMENTATION SPECIALIST - Documents validated conversion results
 
-    Notice: No Chief Architect (design is done) or platform experts (source analysis is done)
-    This phase is focused on technical implementation and validation.
+    This implements Sequential Authority workflow eliminating redundant source discovery,
+    different from parallel collaboration patterns in other phases.
     """
 
     async def create_yaml_orchestration_with_context(
@@ -835,15 +861,16 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         """
         Create YAML-specific agent team.
 
-        This demonstrates PHASE-SPECIFIC AGENT CONTROL for implementation:
-        - Focus on technical execution rather than design
-        - Emphasis on validation and quality
-        - Different expertise mix than design phase
+        This demonstrates SEQUENTIAL AUTHORITY WORKFLOW for YAML conversion:
+        - Foundation Leader establishes authoritative conversion foundation
+        - Enhancement Specialist applies Azure-specific optimizations
+        - Final Validator ensures quality and migration readiness
+        - Documentation Specialist creates comprehensive documentation
         """
         agents = []
 
-        # YAML Expert - PRIMARY LEAD for YAML phase
-        # Handles configuration conversion, YAML generation, best practices
+        # YAML Expert - FOUNDATION LEADER in Sequential Authority workflow
+        # Performs authoritative source discovery and establishes conversion foundation
         agent_yaml = await mcp_context.create_agent(
             agent_config=yaml_expert(phase="yaml").render(
                 **self.process_context["analysis_result"]
@@ -852,8 +879,8 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         )
         agents.append(agent_yaml)
 
-        # Azure Expert - Azure-specific configuration guidance
-        # Provides Azure YAML patterns, service configurations, best practices
+        # Azure Expert - ENHANCEMENT SPECIALIST in Sequential Authority workflow
+        # Enhances YAML Expert's foundation with Azure-specific optimizations when assigned
         agent_azure = await mcp_context.create_agent(
             agent_config=azure_expert(phase="yaml").render(
                 **self.process_context["analysis_result"]
@@ -862,8 +889,8 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         )
         agents.append(agent_azure)
 
-        # QA Engineer - Validation and testing focus
-        # Validates converted YAML files, ensures quality, tests configurations
+        # QA Engineer - FINAL VALIDATOR in Sequential Authority workflow
+        # Validates foundation + Azure enhancements for quality and migration readiness
         agent_qa = await mcp_context.create_agent(
             agent_config=qa_engineer(phase="yaml").render(
                 **self.process_context["analysis_result"]
@@ -872,8 +899,8 @@ class YamlOrchestrator(StepGroupChatOrchestrator):
         )
         agents.append(agent_qa)
 
-        # Technical Writer - Report generation and documentation
-        # Creates conversion reports, documents the migration process
+        # Technical Writer - DOCUMENTATION SPECIALIST in Sequential Authority workflow
+        # Documents validated conversion results after QA approval
         agent_writer = await mcp_context.create_agent(
             agent_config=technical_writer(phase="yaml").render(
                 **self.process_context["analysis_result"]

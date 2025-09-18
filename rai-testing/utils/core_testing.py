@@ -64,64 +64,42 @@ class CoreTestRunner:
         try:
             start_time = asyncio.get_event_loop().time()
 
-            # Step 1: Create test case object
             test_case = TestCase(
                 row_id=row_id,
                 test_content=test_content,
                 process_id=process_id
             )
-            
-            # Step 2: Generate YAML file
-            temp_dir = Path.cwd() / "temp_test_files" / process_id
-            temp_dir.mkdir(parents=True, exist_ok=True)
-            
-            yaml_file_path = self.yaml_generator.generate_yaml_file(
+
+            # Step 1: Create file, upload to blob, and queue message
+            test_case = await self.queue_single_test_core(
                 test_case=test_case,
-                resource_type=resource_type,
-                output_dir=str(temp_dir)
+                resource_type=resource_type
             )
-            
-            self.temp_files.append(yaml_file_path)
-            self.logger.debug(f"Generated YAML file: {yaml_file_path}")
-            
-            # Step 3: Upload to blob storage
-            blob_path = self.blob_helper.upload_test_file(
-                process_id=process_id,
-                file_path=yaml_file_path,
-                blob_name=f"rai-test-{row_id}-{process_id}.yaml"
-            )
-            
-            self.logger.debug(f"Uploaded to blob: {blob_path}")
-            
-            # Step 4: Send queue message to trigger processing
-            self.queue_helper.send_test_message(process_id, time_to_live=60)
-            self.logger.debug(f"Sent queue message for process_id: {process_id}")
-            
-            # Step 5: Monitor execution using Cosmos DB
+                        
+            # Step 2: Monitor execution using Cosmos DB
             monitoring_result = await self.monitor.monitor_with_cosmos_db(
-                process_id=process_id,
+                process_id=test_case.process_id,
                 timeout_minutes=timeout_minutes,
                 polling_interval_seconds=self.config.COSMOS_POLLING_INTERVAL_SECONDS
             )
             
-            # Step 6: Determine final result from Cosmos DB monitoring
+            # Step 3: Determine final result from Cosmos DB monitoring
             test_result = monitoring_result["test_result"]
 
             elapsed_time = asyncio.get_event_loop().time() - start_time
             
             return {
-                "process_id": process_id,
+                "process_id": test_case.process_id,
                 "test_result": test_result,
                 "process_success": monitoring_result.get("process_success", False),
-                "blob_path": blob_path,
+                "blob_path": test_case.blob_path,
                 "monitoring_status": monitoring_result["monitoring_status"],
                 "monitoring_time": monitoring_result.get("elapsed_time_seconds"),
                 "execution_time": elapsed_time,
                 "error_message": monitoring_result.get("error_message", ""),
                 "error_reason": monitoring_result.get("error_reason", ""),
-                "yaml_file": yaml_file_path,
                 "resource_type": resource_type,
-                "row_id": row_id
+                "row_id": test_case.row_id
             }
             
         except Exception as e:
@@ -135,7 +113,6 @@ class CoreTestRunner:
                 "execution_time": None,
                 "error_message": str(e),
                 "error_reason": "",
-                "yaml_file": yaml_file_path,
                 "resource_type": resource_type,
                 "row_id": row_id
             }
@@ -197,6 +174,103 @@ class CoreTestRunner:
         
         return results
     
+    async def queue_single_test_core(
+        self,
+        test_case: TestCase,
+        resource_type: str = "pod"
+    ) -> TestCase:
+        """
+        Core single test queue execution logic
+        
+        Args:
+            test_content: The harmful/test content to embed in YAML
+            process_id: Optional process ID (generated if not provided)
+            resource_type: Type of Kubernetes resource to generate
+            row_id: Row identifier for tracking
+            
+        Returns:
+            Dict with process_id, blob_path, result, and details
+        """
+                
+        try:
+            # Step 1: Generate YAML file
+            temp_dir = Path.cwd() / "temp_test_files" / test_case.process_id
+            temp_dir.mkdir(parents=True, exist_ok=True)
+            
+            yaml_file_path = self.yaml_generator.generate_yaml_file(
+                test_case=test_case,
+                resource_type=resource_type,
+                output_dir=str(temp_dir)
+            )
+            
+            self.temp_files.append(yaml_file_path)
+            self.logger.debug(f"Generated YAML file: {yaml_file_path}")
+            
+            # Step 2: Upload to blob storage
+            blob_path = self.blob_helper.upload_test_file(
+                process_id=test_case.process_id,
+                file_path=yaml_file_path,
+                blob_name=f"rai-test-{test_case.row_id}-{test_case.process_id}.yaml"
+            )
+            
+            self.logger.debug(f"Uploaded to blob: {blob_path}")
+            
+            test_case.blob_path = blob_path         
+
+            # Step 3: Send queue message to trigger processing
+            self.queue_helper.send_test_message(test_case.process_id, time_to_live=60)
+            self.logger.debug(f"Sent queue message for process_id: {test_case.process_id}")
+                  
+            return test_case
+            
+        except Exception as e:
+            self.logger.exception(f"Error queuing test for process_id {test_case.process_id}: {e}")
+            return TestCase()
+    
+    async def queue_batch_tests_core(
+        self,
+        test_cases: List[TestCase],
+        resource_type: str = "pod",
+        progress_callback: callable = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Core queuing of batch test execution logic
+        
+        Args:
+            test_cases: List of test cases to run
+            resource_type: Type of Kubernetes resource to generate
+            progress_callback: Optional callback function to call after each test completion
+            
+        Returns:
+            List of test cases (no results since tests are only queued)
+        """
+        
+        test_queue_results = []
+        
+        # Queue tests synchronously
+        for test_case in test_cases:
+            try:
+                test_case.process_id = str(uuid.uuid4())
+                test_case = await self.queue_single_test_core(
+                    test_case=test_case,
+                    resource_type=resource_type
+                )                                    
+            except Exception as e:
+                self.logger.error(f"Test {test_case.row_id} failed with exception: {e}")
+                
+            test_queue_results.append({
+                "process_id": test_case.process_id,
+                "test_content": test_case.test_content,
+                "row_id": test_case.row_id,
+                "blob_path": test_case.blob_path
+            })
+
+            # Call progress callback even for failed tests
+            if progress_callback:
+                progress_callback()
+
+        return test_queue_results
+    
     async def cleanup_temp_files(self):
         """Clean up temporary files"""
         for temp_file in self.temp_files:
@@ -248,7 +322,6 @@ async def run_single_test(
     finally:
         await runner.cleanup_temp_files()
 
-
 async def run_batch_tests(
     test_cases: List[TestCase],
     timeout_minutes: int = None,
@@ -274,6 +347,34 @@ async def run_batch_tests(
         return await runner.run_batch_tests_core(
             test_cases=test_cases,
             timeout_minutes=timeout_minutes,
+            resource_type=resource_type,
+            progress_callback=progress_callback
+        )
+    finally:
+        await runner.cleanup_temp_files()
+
+async def queue_batch_tests(
+    test_cases: List[TestCase],
+    resource_type: str = "pod",
+    config: RAITestConfig = None,
+    progress_callback: callable = None
+) -> List[Dict[str, Any]]:
+    """
+    Convenience function to queue multiple tests
+    
+    Args:
+        test_cases: List of test cases
+        resource_type: Kubernetes resource type
+        config: Configuration object
+        progress_callback: Optional callback function to call after each test completion
+        
+    Returns:
+        List of test cases with Process Id that were queued
+    """
+    runner = CoreTestRunner(config)
+    try:
+        return await runner.queue_batch_tests_core(
+            test_cases=test_cases,
             resource_type=resource_type,
             progress_callback=progress_callback
         )

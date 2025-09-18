@@ -177,6 +177,7 @@ class CoreTestRunner:
     async def queue_single_test_core(
         self,
         test_case: TestCase,
+        time_to_live: int = 60,
         resource_type: str = "pod"
     ) -> TestCase:
         """
@@ -218,7 +219,7 @@ class CoreTestRunner:
             test_case.blob_path = blob_path         
 
             # Step 3: Send queue message to trigger processing
-            self.queue_helper.send_test_message(test_case.process_id, time_to_live=60)
+            self.queue_helper.send_test_message(test_case.process_id, time_to_live=time_to_live)
             self.logger.debug(f"Sent queue message for process_id: {test_case.process_id}")
                   
             return test_case
@@ -253,7 +254,8 @@ class CoreTestRunner:
                 test_case.process_id = str(uuid.uuid4())
                 test_case = await self.queue_single_test_core(
                     test_case=test_case,
-                    resource_type=resource_type
+                    resource_type=resource_type,
+                    time_to_live=86400 # 1 day
                 )                                    
             except Exception as e:
                 self.logger.error(f"Test {test_case.row_id} failed with exception: {e}")

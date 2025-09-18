@@ -47,7 +47,7 @@ class BatchTestOrchestrator:
         
         Args:
             csv_file: Path to CSV file with test cases
-            no_wait: Do not wait for all tests to complete. This will queue all tests to run. Execute "update_batch_results.py" after all tests complete to update the CSV.
+            no_wait: Do not wait for all tests to complete. This will queue all tests to run. Execute "run_batch_update.py" after all tests complete to update the CSV.
             include_full_response: Whether to include full error response in results
             debug: Enable debug logging
         
@@ -83,7 +83,7 @@ class BatchTestOrchestrator:
             self.console.print(Panel(config_table, title="🧪 Test Configuration"))
 
             if no_wait:
-                self.console.print("⏳ Queueing all tests to run. Use 'update_batch_results.py' later to update CSV with results.", style="yellow")
+                self.console.print("⏳ Queueing all tests to run. Use 'run_batch_update.py' later to update CSV with results.", style="yellow")
 
             # Run tests using core testing library
             with Progress(
@@ -93,7 +93,7 @@ class BatchTestOrchestrator:
                 TaskProgressColumn(text_format="[progress.percentage]{task.percentage:>3.0f}%"),
                 console=self.console
             ) as progress:
-                task = progress.add_task("Running tests", total=len(test_cases))
+                task = progress.add_task("Queuing tests" if no_wait else "Running tests", total=len(test_cases))
                 
                 if no_wait:
                     results = await queue_batch_tests(
@@ -215,14 +215,14 @@ class BatchTestOrchestrator:
         self.console.print(Panel(results_table, title="📊 Test Results" if not no_wait else "📊 Test Queue Results"))
 
         if no_wait:
-            self.console.print(f"⚠️ {str(summary['total_tests'])} Tests have been queued. Use 'update_batch_results.py' later to update CSV with results.", style="yellow")
+            self.console.print(f"⚠️  {str(summary['total_tests'])} Tests have been queued. Use 'run_batch_update.py' later to update CSV with results.", style="yellow")
         else:
             self.console.print(f"✅ Results saved to: {summary['csv_file']}")
 
 
 @click.command()
 @click.option('--csv-file', required=True, help='Path to CSV file containing test cases.')
-@click.option('--no-wait', is_flag=True, help='Do not wait for all tests to complete. This will queue all tests to run. Execute "update_batch_results.py" after all tests complete to update the CSV with the results.')
+@click.option('--no-wait', is_flag=True, help='Do not wait for all tests to complete. This will queue all tests to run. Execute "run_batch_update.py" after all tests complete to update the CSV with the results.')
 @click.option('--include-full-response', is_flag=True, help='Include full error response in CSV results.')
 @click.option('--debug', is_flag=True, help='Enable debug logging')
 def main(csv_file: str, no_wait: bool, include_full_response: bool, debug: bool):

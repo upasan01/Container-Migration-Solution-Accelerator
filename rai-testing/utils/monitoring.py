@@ -16,6 +16,7 @@ sys.path.append(str(parent_dir))
 
 from config import RAITestConfig
 from .cosmos_helper import CosmosDBHelper
+from .test_formatter import extract_error_reason
 
 
 class TestMonitor:
@@ -25,36 +26,6 @@ class TestMonitor:
         self.config = config or RAITestConfig()
         self.logger = logging.getLogger(__name__)
         self.cosmos_helper = CosmosDBHelper(config)
-
-    def _extract_error_reason(self, error_message: str) -> str:
-        if not error_message:
-            return ""
-        
-        # Convert to lowercase for case-insensitive matching
-        error_message_lower = error_message.lower()
-        
-        # Look for the specific pattern "BLOCKING ISSUE CONFIRMED: <reason>"
-        if "blocking issue confirmed:" in error_message_lower:
-            # Find the position after "BLOCKING ISSUE CONFIRMED: "
-            start_pos = error_message_lower.find("blocking issue confirmed:") + len("blocking issue confirmed:")
-            # Extract the remaining text from the original message and strip whitespace
-            remaining_text = error_message[start_pos:].strip()
-            if remaining_text:
-                # Split by whitespace and newlines to get the reason word
-                reason = remaining_text.split()[0] if remaining_text.split() else ""
-                return reason
-            return ""
-        
-        if "rai policy" in error_message_lower:
-            return "RAI policy"
-        
-        if "responsible ai policy" in error_message_lower:
-            return "Responsible AI Policy"
-        
-        if "(rai) policy" in error_message_lower:
-            return "RAI policy"
-
-        return ""
     
     async def monitor_with_cosmos_db(
         self,
@@ -100,7 +71,7 @@ class TestMonitor:
                 "process_id": process_id,
                 "test_result": test_result,
                 "process_success": result["success"],
-                "error_reason": self._extract_error_reason(result["error_message"]),
+                "error_reason": extract_error_reason(result["error_message"] or ""),
                 "error_message": result["error_message"],
                 "elapsed_time_seconds": result.get("elapsed_time_seconds"),
                 "monitoring_status": result["monitoring_status"]

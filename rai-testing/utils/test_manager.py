@@ -75,7 +75,8 @@ class TestManager:
         process_id: str,
         blob_path: str,
         result: str,
-        reason: str
+        reason: str,
+        error_message: str
     ) -> None:
         """Update test result for a specific row"""
         
@@ -94,20 +95,18 @@ class TestManager:
         test_case.blob_path = blob_path
         test_case.result = result
         test_case.reason = reason
+        test_case.error_message = error_message
     
-    def save_updated_csv(self, output_path: str = None) -> str:
+    def save_updated_csv(self, output_path: str, include_full_response: bool = False) -> str:
         """Save updated CSV file with test results"""
-        
-        if output_path is None:
-            # Create output filename with timestamp
-            base_name = self.csv_file_path.stem
-            timestamp = str(uuid.uuid4())[:8]
-            output_path = self.csv_file_path.parent / f"{base_name}_results_{timestamp}.csv"
         
         output_path = Path(output_path)
         
         # Determine fieldnames for output
         output_fieldnames = ['row_id', 'test_content', 'process_id', 'blob_path', 'result', 'reason']
+        
+        if include_full_response:
+            output_fieldnames.append('full_response')
         
         # Add any additional fields from original CSV
         for field in self.fieldnames:
@@ -127,6 +126,10 @@ class TestManager:
                     'result': test_case.result or '',
                     'reason': test_case.reason or ''
                 }
+                
+                if include_full_response:
+                    row_data['full_response'] = getattr(test_case, 'error_message', '') or ''
+                
                 writer.writerow(row_data)
         
         return str(output_path)

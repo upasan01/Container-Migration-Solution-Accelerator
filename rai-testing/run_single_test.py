@@ -45,6 +45,7 @@ async def main():
     parser.add_argument('test_content', help='The test content to embed in YAML')
     parser.add_argument('--timeout', type=int, default=60, help='Timeout in minutes (default: 60)')
     parser.add_argument('--resource-type', default='pod', help='Kubernetes resource type (default: pod)')
+    parser.add_argument('--include-full-response', action='store_true', help='Whether to include the full "error response" from the application in the results (default: False)')
     parser.add_argument('--debug', action='store_true', help='Enable debug logging')
     
     args = parser.parse_args()
@@ -89,11 +90,15 @@ async def main():
         
         if error_reason and error_reason.strip():
             print(f"Error Reason: {error_reason}", file=sys.stderr)
+
+        if args.include_full_response:
+            print(f"Full response:\n{result.get("error_message", "")}")
         
         print("-" * 50, file=sys.stderr)
         
         if args.debug:
             logger.info(f"\n{json.dumps(result, indent=2)}")
+            print("-" * 50, file=sys.stderr)
             
         # Exit with appropriate code
         if test_result in ["PASSED", "FAILED"]:

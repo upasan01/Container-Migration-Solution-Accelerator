@@ -41,12 +41,13 @@ class RAITestOrchestrator:
         # Test manager will be initialized when CSV file is provided
         self.test_manager: Optional[TestManager] = None
 
-    async def run_tests(self, csv_file: str, debug: bool = False) -> Dict[str, Any]:
+    async def run_tests(self, csv_file: str, include_full_response: bool = False, debug: bool = False) -> Dict[str, Any]:
         """
         Run RAI tests from CSV file using core testing library
         
         Args:
             csv_file: Path to CSV file with test cases
+            include_full_response: Whether to include full error response in results
             debug: Enable debug logging
         
         Returns:
@@ -97,7 +98,7 @@ class RAITestOrchestrator:
                 )
             
             # Update CSV with results
-            await self._update_csv_with_results(results, file_path=csv_file)
+            await self._update_csv_with_results(results, file_path=csv_file, include_full_response=include_full_response)
             
             elapsed_time = asyncio.get_event_loop().time() - start_time
 
@@ -121,7 +122,7 @@ class RAITestOrchestrator:
                 "errors": 1
             }
 
-    async def _update_csv_with_results(self, results: List[Dict[str, Any]], file_path: str) -> None:
+    async def _update_csv_with_results(self, results: List[Dict[str, Any]], file_path: str, include_full_response: bool) -> None:
         """Update CSV file with test results"""
         for result in results:
             self.test_manager.update_test_result(
@@ -129,11 +130,11 @@ class RAITestOrchestrator:
                 process_id=result.get("process_id"),
                 blob_path=result.get("blob_path"),
                 result=result.get("test_result", "error"),
-                reason=result.get("error_reason", "")
+                reason=result.get("error_reason", ""),
+                error_message=result.get("error_message", "")
             )
         
-        # Save updated CSV
-        self.test_manager.save_updated_csv(output_path=file_path)
+        self.test_manager.save_updated_csv(output_path=file_path,include_full_response=include_full_response)
         
     def _generate_summary(self, results: List[Dict[str, Any]], test_cases: List[TestCase], total_time: float) -> Dict[str, Any]:
         """Generate test results summary"""
@@ -190,17 +191,18 @@ class RAITestOrchestrator:
 
 @click.command()
 @click.option('--csv-file', required=True, help='Path to CSV file containing test cases')
+@click.option('--include-full-response', is_flag=True, help='Include full error response in CSV results')
 @click.option('--debug', is_flag=True, help='Enable debug logging')
-def main(csv_file: str, debug: bool):
+def main(csv_file: str, include_full_response: bool, debug: bool):
     """Run RAI tests from CSV file"""
-    asyncio.run(run_async_main(csv_file, debug))
+    asyncio.run(run_async_main(csv_file, include_full_response, debug))
 
 
-async def run_async_main(csv_file: str, debug: bool):
+async def run_async_main(csv_file: str, include_full_response: bool, debug: bool):
     """Async main function for running RAI tests"""
     orchestrator = RAITestOrchestrator()
-    result = await orchestrator.run_tests(csv_file, debug)
-    
+    result = await orchestrator.run_tests(csv_file, include_full_response, debug)
+
     # Exit with appropriate code
     if result.get("success", False):
         exit(0)

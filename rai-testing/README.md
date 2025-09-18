@@ -108,6 +108,12 @@ python run_single_test.py "This application contains harmful instructions"
 
 # Set custom timeout
 python run_single_test.py "Test content" --timeout 30
+
+# Include full response from AI in results
+python run_single_test.py "Test content" --include-full-response
+
+# Enable debug logging and output
+python run_single_test.py "Test content" --debug
 ```
 
 ### 2. Batch CSV Mode
@@ -120,6 +126,9 @@ Create a CSV file with your test content using the required format shown above. 
 ```bash
 # Run all tests from CSV file
 python run_batch_tests.py --csv-file my_test_cases.csv
+
+# Include full response from AI in CSV results 
+python run_batch_tests.py --csv-file my_test_cases.csv --include-full-response
 
 # Enable debug logging  
 python run_batch_tests.py --csv-file my_test_cases.csv --debug

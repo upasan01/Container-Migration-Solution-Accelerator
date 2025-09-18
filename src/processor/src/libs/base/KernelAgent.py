@@ -4,23 +4,7 @@ from typing import Any
 
 from azure.core.credentials import AccessToken
 from azure.identity import (
-    AzureCliCredential,
-    AzureDeveloperCliCredential,
-    DefaultAzureCredential,
-    ManagedIdentityCredential,
     get_bearer_token_provider,
-)
-from azure.identity.aio import (
-    AzureCliCredential as AsyncAzureCliCredential,
-)
-from azure.identity.aio import (
-    AzureDeveloperCliCredential as AsyncAzureDeveloperCliCredential,
-)
-from azure.identity.aio import (
-    DefaultAzureCredential as AsyncDefaultAzureCredential,
-)
-from azure.identity.aio import (
-    ManagedIdentityCredential as AsyncManagedIdentityCredential,
 )
 from pydantic import Field, PrivateAttr, ValidationError
 from semantic_kernel.agents import (
@@ -701,13 +685,13 @@ class semantic_kernel_agent(SKBaseModel):
         #             f"[TOKEN_CONTROL] Source Expert '{agent_name}' limited to 1800 tokens - detailed analysis"
         #         )
 
-        #     # TECHNICAL ARCHITECT: Higher limits for coordination and oversight
+        #     # Chief Architect: Higher limits for coordination and oversight
         #     elif "technical_architect" in agent_name_lower:
         #         execution_settings.max_completion_tokens = (
         #             2500  # COORDINATION: Comprehensive oversight
         #         )
         #         logging.info(
-        #             f"[TOKEN_CONTROL] Technical Architect '{agent_name}' allocated 2500 tokens - coordination role"
+        #             f"[TOKEN_CONTROL] Chief Architect '{agent_name}' allocated 2500 tokens - coordination role"
         #         )
 
         #     # QA ENGINEER: Moderate limits for thorough validation

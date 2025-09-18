@@ -42,11 +42,11 @@ async def main():
     """Main entry point for single test execution"""
     
     parser = argparse.ArgumentParser(description='Run a single RAI test')
-    parser.add_argument('test_content', help='The test content to embed in YAML')
-    parser.add_argument('--timeout', type=int, default=60, help='Timeout in minutes (default: 60)')
-    parser.add_argument('--resource-type', default='pod', help='Kubernetes resource type (default: pod)')
-    parser.add_argument('--include-full-response', action='store_true', help='Whether to include the full "error response" from the application in the results (default: False)')
-    parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+    parser.add_argument('test_content', help='The test content to embed in YAML.')
+    parser.add_argument('--timeout', type=int, default=60, help='Timeout in minutes (default: 60).')
+    parser.add_argument('--resource-type', default='pod', help='Kubernetes resource type (default: pod).')
+    parser.add_argument('--include-full-response', action='store_true', help='Whether to include the full "error response" from the application in the results (default: False).')
+    parser.add_argument('--debug', action='store_true', help='Enable debug logging.')
     
     args = parser.parse_args()
     

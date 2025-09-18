@@ -41,12 +41,13 @@ class RAITestOrchestrator:
         # Test manager will be initialized when CSV file is provided
         self.test_manager: Optional[TestManager] = None
 
-    async def run_tests(self, csv_file: str, include_full_response: bool = False, debug: bool = False) -> Dict[str, Any]:
+    async def run_tests(self, csv_file: str, no_wait: bool = False, include_full_response: bool = False, debug: bool = False) -> Dict[str, Any]:
         """
         Run RAI tests from CSV file using core testing library
         
         Args:
             csv_file: Path to CSV file with test cases
+            no_wait: Do not wait for all tests to complete. This will queue all tests to run. Execute "update_batch_results.py" after all tests complete to update the CSV.
             include_full_response: Whether to include full error response in results
             debug: Enable debug logging
         
@@ -64,16 +65,17 @@ class RAITestOrchestrator:
             self.test_manager = TestManager(csv_file)
             test_cases = self.test_manager.load_test_cases()
             
-            self.console.print(f"✅ CSV file loaded: {len(test_cases)} test cases found")
+            self.console.print(f"✅ CSV file loaded: {len(test_cases)} test cases found.")
                 
             # Display test configuration
-            estimated_minutes = len(test_cases) * 1.2  # each test typically takes a minute or so, adding a slight buffer to the estimate
+            estimated_minutes = len(test_cases) * (0.1 if no_wait else 1.2)
             estimated_time = f"{int(estimated_minutes // 60)}h {int(estimated_minutes % 60)}m" if estimated_minutes >= 60 else f"{int(estimated_minutes)}m"
             
             config_table = Table()
             config_table.add_column("Setting", style="cyan")
             config_table.add_column("Value", style="white")
             config_table.add_row("CSV File", str(csv_file))
+            config_table.add_row("Wait for each result?", "No" if no_wait else "Yes")
             config_table.add_row("Test Count", str(len(test_cases)))
             config_table.add_row("Estimated Time to Complete", estimated_time)
             config_table.add_row("Timeout per Test", str(self.config.TEST_TIMEOUT_MINUTES))
@@ -190,18 +192,19 @@ class RAITestOrchestrator:
 
 
 @click.command()
-@click.option('--csv-file', required=True, help='Path to CSV file containing test cases')
-@click.option('--include-full-response', is_flag=True, help='Include full error response in CSV results')
+@click.option('--csv-file', required=True, help='Path to CSV file containing test cases.')
+@click.option('--no-wait', is_flag=True, help='Do not wait for all tests to complete. This will queue all tests to run. Execute "update_batch_results.py" after all tests complete to update the CSV with the results.')
+@click.option('--include-full-response', is_flag=True, help='Include full error response in CSV results.')
 @click.option('--debug', is_flag=True, help='Enable debug logging')
-def main(csv_file: str, include_full_response: bool, debug: bool):
+def main(csv_file: str, no_wait: bool, include_full_response: bool, debug: bool):
     """Run RAI tests from CSV file"""
-    asyncio.run(run_async_main(csv_file, include_full_response, debug))
+    asyncio.run(run_async_main(csv_file, no_wait, include_full_response, debug))
 
 
-async def run_async_main(csv_file: str, include_full_response: bool, debug: bool):
+async def run_async_main(csv_file: str, no_wait: bool, include_full_response: bool, debug: bool):
     """Async main function for running RAI tests"""
     orchestrator = RAITestOrchestrator()
-    result = await orchestrator.run_tests(csv_file, include_full_response, debug)
+    result = await orchestrator.run_tests(csv_file, no_wait, include_full_response, debug)
 
     # Exit with appropriate code
     if result.get("success", False):

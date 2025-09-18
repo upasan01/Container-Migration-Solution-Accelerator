@@ -147,6 +147,18 @@ existing_content = read_blob_content("design_result.md", container_name="{{conta
 - ❌ Broken subgraphs: `[Landing Zone Subscription]` → ✅ `["Landing Zone Subscription"]`
 - ❌ Invalid node shapes: `[(Node <info>)]` → ✅ `[Node - info]`
 - ❌ Broken arrows: `-- label -->` → ✅ `-->|label|`
+- ❌ **LINE BREAKS IN NODES**: `AKS Cluster\n(System & User Node Pools)` → ✅ `AKS Cluster<br/>(System & User Node Pools)`
+
+**🚨 CRITICAL: MERMAID LINE BREAK SYNTAX 🚨**
+**NEVER use `\n` for line breaks in Mermaid node labels - it causes syntax errors!**
+- ❌ **WRONG**: `AKSCluster[AKS Cluster\n(System & User Node Pools)]`
+- ✅ **CORRECT**: `AKSCluster["AKS Cluster<br/>(System & User Node Pools)"]`
+- ✅ **ALTERNATIVE**: `AKSCluster["AKS Cluster<br>(System & User Node Pools)"]`
+
+**MERMAID LINE BREAK RULES:**
+- Use `<br/>` or `<br>` for line breaks in node labels
+- Always wrap multi-line labels in quotes: `["Label<br/>Second Line"]`
+- Test all Mermaid diagrams before saving to ensure syntax validity
 
 ## 📋 CRITICAL: MARKDOWN TABLE FORMATTING 📋
 **ENSURE PERFECT MARKDOWN TABLE SYNTAX:**

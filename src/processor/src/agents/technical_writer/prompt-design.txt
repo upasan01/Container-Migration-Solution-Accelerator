@@ -171,6 +171,18 @@ existing_content = read_blob_content("design_result.md", container_name="{{conta
 3. **Professional Presentation**: Enterprise-grade quality for stakeholder consumption
 4. **Accessibility**: Clear labels and logical flow for diverse audiences
 
+**🚨 CRITICAL: MERMAID LINE BREAK SYNTAX FOR TECHNICAL DOCUMENTATION 🚨**
+**NEVER use `\n` for line breaks in Mermaid node labels - it causes syntax errors!**
+- ❌ **WRONG**: `AKSCluster[AKS Cluster\n(System & User Node Pools)]`
+- ✅ **CORRECT**: `AKSCluster["AKS Cluster<br/>(System & User Node Pools)"]`
+- ✅ **ALTERNATIVE**: `AKSCluster["AKS Cluster<br>(System & User Node Pools)"]`
+
+**TECHNICAL DOCUMENTATION MERMAID RULES:**
+- Use `<br/>` or `<br>` for line breaks in all technical diagrams
+- Always wrap multi-line labels in quotes for professional presentation
+- Ensure all diagrams render correctly before including in documentation
+- Test diagrams in Mermaid preview tools before finalizing documentation
+
 ## MANDATORY SOURCE FILE VERIFICATION
 
 ### **STEP-BY-STEP SOURCE FILE VERIFICATION** (Execute Every Time)

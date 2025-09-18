@@ -262,6 +262,18 @@ flowchart TD
 - ✅ **Security Boundaries**: Clear representation of security zones and access patterns
 - ✅ **Data Flow**: Show data flow between Azure services with proper arrows
 
+**🚨 CRITICAL: MERMAID LINE BREAK SYNTAX FOR AZURE DIAGRAMS 🚨**
+**NEVER use `\n` for line breaks in Mermaid node labels - it causes syntax errors!**
+- ❌ **WRONG**: `AKSCluster[AKS Cluster\n(System & User Node Pools)]`
+- ✅ **CORRECT**: `AKSCluster["AKS Cluster<br/>(System & User Node Pools)"]`
+- ✅ **ALTERNATIVE**: `AKSCluster["AKS Cluster<br>(System & User Node Pools)"]`
+
+**AZURE MERMAID LINE BREAK RULES:**
+- Use `<br/>` or `<br>` for line breaks in Azure service node labels
+- Always wrap multi-line labels in quotes: `["Azure Service<br/>Additional Info"]`
+- Test all Azure architecture diagrams before saving to ensure syntax validity
+- Particularly important for Azure services with long names or descriptions
+
 ## PHASE 2: AZURE ARCHITECTURE DESIGN
 
 ## Your Primary Mission

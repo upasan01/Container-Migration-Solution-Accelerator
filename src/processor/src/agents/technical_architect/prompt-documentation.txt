@@ -193,6 +193,30 @@ existing_content = read_blob_content("migration_report.md", container_name="{{co
 - **CREDIT SOURCES**: Always credit Microsoft documentation when using their guidance or recommendations
 - **ARCHITECTURAL AUTHORITY**: Include citations to validate architectural decisions and recommendations
 
+## 🚫 CRITICAL: NO INTERNAL PLACEHOLDER TEXT 🚫
+**ELIMINATE ALL INTERNAL DEVELOPMENT ARTIFACTS FROM FINAL REPORTS:**
+
+🚨 **FORBIDDEN PLACEHOLDER PATTERNS:**
+- ❌ "(unchanged – see previous section for detailed items)"
+- ❌ "(unchanged – see previous section for detailed table)"
+- ❌ "*(unchanged – see previous section...)*"
+- ❌ "TBD", "TODO", "PLACEHOLDER", "DRAFT"
+- ❌ Any references to "previous sections" when content is missing
+- ❌ Internal collaboration messages or development notes
+
+**ARCHITECTURAL CONTENT COMPLETION REQUIREMENTS:**
+- ✅ **Complete ALL architectural sections** with actual professional content
+- ✅ **Replace ANY placeholder text** with real implementation details and architecture decisions
+- ✅ **Generate proper architectural diagrams, tables, and detailed guidance** for all sections
+- ✅ **No section should reference missing architectural content** from other parts
+- ✅ **Professional executive-ready presentation** with no internal artifacts
+
+**QUALITY ENFORCEMENT AS CHIEF ARCHITECT:**
+- **Cost Optimization Strategy**: Provide actual Azure cost optimization recommendations with specific services and configurations
+- **Security Hardening Checklist**: Include specific Azure security implementation steps and validation procedures
+- **Performance & Capacity Guidance**: Detail actual performance tuning strategies with Azure-specific recommendations
+- **Operational Runbook**: Complete operational procedures with specific Azure commands and monitoring setup
+
 ## CRITICAL: ANTI-HALLUCINATION REQUIREMENTS FOR ARCHITECTURAL DOCUMENTATION
 **NO FICTIONAL FILES OR ARCHITECTURAL REPORTS**:
 - **NEVER create or reference files that do not exist in blob storage**

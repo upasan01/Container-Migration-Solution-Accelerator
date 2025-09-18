@@ -574,14 +574,10 @@ const BatchStoryPage = () => {
   if (!dataLoaded && loading) {
     return (
       <div className={styles.root}>
-        <div onClick={handleHeaderClick} style={{ cursor: "pointer" }}>
-          <Header subtitle="Container Migration">
-            <div onClick={(e) => e.stopPropagation()}>
-              <HeaderTools>
-              </HeaderTools>
-            </div>
-          </Header>
-        </div>
+        <Header subtitle="Container Migration" onTitleClick={handleHeaderClick}>
+          <HeaderTools>
+          </HeaderTools>
+        </Header>
         <div className={styles.loadingContainer} style={{ flex: 1 }}>
           <Spinner size="large" />
           <Text size={500}>Loading batch data...</Text>
@@ -592,14 +588,10 @@ const BatchStoryPage = () => {
 
   return (
     <div className={styles.root}>
-      <div onClick={handleHeaderClick} style={{ cursor: "pointer" }}>
-        <Header subtitle="Container Migration">
-          <div onClick={(e) => e.stopPropagation()}>
-            <HeaderTools>
-            </HeaderTools>
-          </div>
-        </Header>
-      </div>
+      <Header subtitle="Container Migration" onTitleClick={handleHeaderClick}>
+        <HeaderTools>
+        </HeaderTools>
+      </Header>
 
       <div className={styles.content}>
         <PanelLeft panelWidth={400} panelResize={true}>

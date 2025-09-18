@@ -148,6 +148,36 @@ read_blob_content("[yaml_filename]", container_name="{{container_name}}", folder
 🚨 **MANDATORY MARKDOWN VALIDATION CHECKLIST:**
 - ✅ **Headers**: Ensure space after # symbols (# Header, ## Header, ### Header)
 - ✅ **Code Blocks**: Always use matching ``` pairs with proper language tags
+
+## 🚫 CRITICAL: NO INTERNAL PLACEHOLDER TEXT 🚫
+**ELIMINATE ALL INTERNAL DEVELOPMENT ARTIFACTS FROM FINAL REPORTS:**
+
+🚨 **FORBIDDEN PLACEHOLDER PATTERNS:**
+- ❌ "(unchanged – see previous section for detailed items)"
+- ❌ "(unchanged – see previous section for detailed table)"
+- ❌ "*(unchanged – see previous section...)*"
+- ❌ "TBD", "TODO", "PLACEHOLDER", "DRAFT"
+- ❌ Any references to "previous sections" when content is missing
+- ❌ Internal collaboration messages or development notes
+
+**CONTENT COMPLETION REQUIREMENTS:**
+- ✅ **Complete ALL sections** with actual professional content
+- ✅ **Replace ANY placeholder text** with real implementation details
+- ✅ **Generate proper tables, lists, and detailed content** for all sections
+- ✅ **No section should reference missing content** from other parts
+- ✅ **Professional executive-ready presentation** with no internal artifacts
+
+**SECTION COMPLETION STANDARDS:**
+- **Cost Optimisation Strategy**: Provide actual Azure cost optimization recommendations
+- **Security Hardening Checklist**: Include specific Azure security implementation steps
+- **Performance & Capacity Guidance**: Detail actual performance tuning strategies
+- **Operational Runbook**: Complete operational procedures and commands
+
+**QUALITY ENFORCEMENT:**
+If any section cannot be completed with actual content, use professional language like:
+- "Detailed cost optimization strategies will be finalized during implementation phase"
+- "Security hardening procedures are documented in the implementation runbook"
+- NOT placeholder references to missing content
 - ✅ **Line Breaks**: Add blank lines before/after headers, code blocks, and lists
 - ✅ **Bold/Italic**: Ensure proper **bold** and *italic* syntax without conflicts
 - ✅ **Lists**: Use consistent list formatting with proper indentation

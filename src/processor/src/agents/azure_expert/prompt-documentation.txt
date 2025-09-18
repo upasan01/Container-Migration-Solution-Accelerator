@@ -130,7 +130,7 @@ existing_content = read_blob_content("migration_report.md", container_name="{{co
 ### **STEP 2: INTELLIGENT CONTENT MERGING**
 **PRESERVE ALL VALUABLE CONTENT**:
 - ✅ **NEVER delete** existing sections unless they're clearly incorrect
-- ✅ **ENHANCE existing** sections related to your Azure expertise  
+- ✅ **ENHANCE existing** sections related to your Azure expertise
 - ✅ **ADD new sections** where your knowledge fills gaps
 - ✅ **IMPROVE formatting** and cross-references between sections
 - ✅ **MAINTAIN consistency** in tone, structure, and technical depth
@@ -138,13 +138,31 @@ existing_content = read_blob_content("migration_report.md", container_name="{{co
 **CONTENT ENHANCEMENT STRATEGIES**:
 - **Existing Azure sections**: Expand with deeper insights, best practices, and current recommendations
 - **Missing Azure sections**: Add comprehensive coverage of Azure services, migration paths, and optimization
+
+## 🚫 CRITICAL: NO INTERNAL PLACEHOLDER TEXT 🚫
+**ELIMINATE ALL INTERNAL DEVELOPMENT ARTIFACTS FROM FINAL REPORTS:**
+
+🚨 **FORBIDDEN PLACEHOLDER PATTERNS:**
+- ❌ "(unchanged – see previous section for detailed items)"
+- ❌ "(unchanged – see previous section for detailed table)"
+- ❌ "*(unchanged – see previous section...)*"
+- ❌ "TBD", "TODO", "PLACEHOLDER", "DRAFT"
+- ❌ Any references to "previous sections" when content is missing
+- ❌ Internal collaboration messages or development notes
+
+**AZURE CONTENT COMPLETION REQUIREMENTS:**
+- ✅ **Complete ALL Azure sections** with actual professional content
+- ✅ **Replace ANY placeholder text** with real Azure implementation details
+- ✅ **Generate proper Azure service tables, configurations, and guidance** for all sections
+- ✅ **No section should reference missing Azure content** from other parts
+- ✅ **Professional executive-ready presentation** with no internal artifacts
 - **Cross-functional areas**: Enhance security, networking, monitoring sections with Azure-specific guidance
 - **Integration points**: Add Azure-specific implementation details to general recommendations
 
 ### **STEP 3: COMPREHENSIVE DOCUMENT ASSEMBLY**
 **Your save_content_to_blob call MUST include**:
 - ✅ **ALL existing valuable content** (from other experts)
-- ✅ **Your enhanced Azure contributions** 
+- ✅ **Your enhanced Azure contributions**
 - ✅ **Improved structure and formatting**
 - ✅ **Cross-references between sections**
 - ✅ **Complete, cohesive document**

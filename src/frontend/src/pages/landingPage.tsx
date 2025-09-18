@@ -92,14 +92,10 @@ export const LandingPage = (): JSX.Element => {
   return (
     <div className="landing-page flex flex-col relative h-screen">
       {/* Header */}
-      <div onClick={handleLeave} style={{ cursor: "pointer" }}>
-        <Header subtitle="Container Migration">
-          <div onClick={(e) => e.stopPropagation()}>
-            <HeaderTools>
-            </HeaderTools>
-          </div>
-        </Header>
-      </div>
+      <Header subtitle="Container Migration" onTitleClick={handleLeave}>
+        <HeaderTools>
+        </HeaderTools>
+      </Header>
       {/* Main Content */}
       <main className={`main-content ${isPanelOpen ? "shifted" : ""} flex-1 flex overflow-auto bg-mode-neutral-background-1-rest relative`}>
         <div className="container mx-auto flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">

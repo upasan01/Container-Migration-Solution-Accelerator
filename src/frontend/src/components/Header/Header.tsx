@@ -9,14 +9,16 @@ import { Subtitle2 } from "@fluentui/react-components";
  * @prop {string} [title="Microsoft"] - Main title text.
  * @prop {string} [subtitle] - Optional subtitle displayed next to the title.
  * @prop {React.ReactNode} [children] - Optional header toolbar (e.g., buttons, menus).
+ * @prop {() => void} [onTitleClick] - Optional click handler for title/logo area.
  */
 type HeaderProps = {
   title?: string;
   subtitle?: string;
   children?: React.ReactNode;
+  onTitleClick?: () => void;
 };
 
-const Header: React.FC<HeaderProps> = ({ title = "Contoso", subtitle, children }) => {
+const Header: React.FC<HeaderProps> = ({ title = "Contoso", subtitle, children, onTitleClick }) => {
   return (
     <header
       style={{
@@ -36,11 +38,13 @@ const Header: React.FC<HeaderProps> = ({ title = "Contoso", subtitle, children }
       data-figma-component="Header"
     >
       <div
+        onClick={onTitleClick}
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           gap: "8px",
+          cursor: onTitleClick ? "pointer" : "default",
         }}
       >
         {/* Render custom logo or default MsftColor logo */}

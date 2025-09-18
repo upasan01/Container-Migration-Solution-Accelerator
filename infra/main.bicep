@@ -38,8 +38,8 @@ param location string = resourceGroup().location
 @description('Optional. Location for all AI service resources. This location can be different from the resource group location.')
 param aiDeploymentLocation string?
 
-@description('Required. The host (excluding https://) of an existing container registry. This is the `loginServer` when using Azure Container Registry.')
-param containerRegistryHost string
+@description('Optional. The host (excluding https://) of an existing container registry. This is the `loginServer` when using Azure Container Registry.')
+param containerRegistryHost string = 'containermigrationacr.azurecr.io'
 
 @minLength(1)
 @allowed(['Standard', 'GlobalStandard'])

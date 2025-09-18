@@ -2,28 +2,15 @@
 Analysis Step Orchestration for Migration Process.
 
 This module provides specialized orchestration for the Analysis step:
-- File discovery and platform detection
-- Chief Architect leads the analysis
-- Platform experts (EKS, GKE) provide source identification
-- Azure expert provides migration context
+- Chief Architect creates authoritative foundation analysis
+- Sequential platform expert assignment and enhancement
+- Single source of truth for file discovery and platform detection
 
 Following SK Process Framework best practices:
 - Focused on analysis step responsibility
-            ChatMessageContent(
-                role=AuthorRole.USER,
-                # "Select the next participant for analysis step.",
-            ),
-        )
-
-        # EXTREME truncation to prevent context length errors
-        # With 3,389 function tokens, we need to be even more aggressive
-        self._smart_truncate_chat_history_with_token_limit(
-            chat_history,
-            max_total_tokens=3000,  # Optimized: Reduced for cost efficiency
-            max_messages=8,         # Optimized: Reasonable message count
-            max_tokens_per_message=400,  # Optimized: Reduced to 400 tokens per message
-        )nation criteria
-- Expert agent coordination
+- Sequential Authority workflow (Foundation → Enhancement)
+- Single-pass source discovery with expert specialization
+- Expert agent coordination via foundation handoff
 """
 
 import logging
@@ -132,15 +119,52 @@ Chief Architect has AUTHORITY to make immediate hard termination decisions for O
 - Partial Kubernetes content requiring expert evaluation
 - Security/RAI concerns needing detailed expert analysis
 
+**🔧 SEQUENTIAL AUTHORITY WORKFLOW FOR ANALYSIS**:
+
+**1. FOUNDATION LEADER (Chief Architect)**:
+- Execute ALL MCP operations: list_blobs_in_container, find_blobs, read_blob_content
+- Perform initial file discovery and platform analysis
+- Create comprehensive foundation analysis and analysis_result.md file
+- Provide strategic oversight and coordinate expert workflow
+
+**2. ENHANCEMENT SPECIALIST (Platform Expert - EKS/GKE)**:
+- Validate platform identification based on Chief Architect's findings
+- Add source-specific patterns and considerations WITHOUT redundant MCP calls
+- Enhance analysis with specialized platform expertise
+
+**3. FINAL VALIDATOR (QA Engineer)**:
+- Verify completeness and accuracy of analysis results WITHOUT re-executing discovery
+- Validate file discovery and platform identification quality
+- Ensure analysis meets standards for next step consumption
+
+**4. DOCUMENTATION SPECIALIST (Technical Writer)**:
+- Ensure report quality, structure, and clarity WITHOUT additional analysis
+- Focus on documentation excellence using existing findings
+
+**🚀 EFFICIENCY ENFORCEMENT**:
+- ONLY Chief Architect should execute MCP operations (list_blobs_in_container, find_blobs, read_blob_content, save_content_to_blob)
+- Platform Expert enhances WITHOUT redundant tool usage
+- QA Engineer validates WITHOUT re-discovering files
+- Technical Writer ensures quality WITHOUT repeating analysis
+- Expected ~75% reduction in redundant MCP operations
+
 TERMINATE SUCCESS when:
-- Platform identified (EKS/GKE) with high confidence
-- All YAML/YML files discovered, catalogued, and analyzed
-- Expert consensus on platform and complete file analysis
-- **🔴 MANDATORY FILE VERIFICATION**: `analysis_result.md` generated and verified in {{output_file_folder}}
-  - Use `list_blobs_in_container()` to confirm file exists in output folder
-  - Use `read_blob_content()` to verify content is properly generated
-  - **NO FILES, NO PASS**: Step cannot complete without verified file generation
-  - analysis_result.md have to describe all analyzed *.yaml or *.yml files
+- Chief Architect (Foundation Leader) completed comprehensive analysis with all MCP operations
+- Platform Expert (Enhancement Specialist) validated and enhanced platform identification
+- QA Engineer (Final Validator) verified completeness and accuracy
+- Technical Writer (Documentation Specialist) ensured report quality
+- **🔴 MANDATORY FILE VERIFICATION**: `analysis_result.md` generated and verified by Chief Architect
+  - Chief Architect uses `list_blobs_in_container()` to confirm file exists in output folder
+  - Chief Architect uses `read_blob_content()` to verify content is properly generated
+  - **NO FILES, NO PASS**: Step cannot complete without verified file generation by foundation leader
+  - analysis_result.md must describe all analyzed *.yaml or *.yml files with Sequential Authority completion
+- **🔴 FOUNDATION LEADER DATA COMPLETENESS VERIFICATION**: Chief Architect personally validates data quality
+  - Chief Architect reads analysis_result.md content using `read_blob_content()`
+  - Chief Architect verifies platform detection section contains specific, actionable platform identification (not "unknown" or "TBD")
+  - Chief Architect verifies source file inventory is complete with all discovered YAML/YML files properly categorized
+  - Chief Architect verifies complexity analysis provides detailed, implementable insights for Design step
+  - Chief Architect confirms all critical data fields contain meaningful content ready for Azure architecture design
+  - **DATA QUALITY GATE**: Chief Architect must explicitly state "Data completeness verified for Design step consumption" before termination
 
 TERMINATE FAILURE when:
 - Technical errors prevent access/operations
@@ -148,12 +172,18 @@ TERMINATE FAILURE when:
 - **HARD TERMINATION**: Any of the 6 obvious scenarios confirmed by independent verification
 
 CONTINUE when:
-- Platform uncertain but files exist
-- File discovery in progress
-- Expert collaboration ongoing
+- Chief Architect (Foundation Leader) phase not completed
+- Platform Expert (Enhancement Specialist) validation not completed
+- QA Engineer (Final Validator) verification not completed
+- Technical Writer (Documentation Specialist) quality review not completed
 - ANY files show "TBD" or incomplete analysis
-- Analysis result file NOT generated
+- Analysis result file NOT generated or incomplete
 - **ANY MANDATORY FIELD IS MISSING OR NULL**
+- **FOUNDATION LEADER DATA VERIFICATION INCOMPLETE**: Chief Architect has not confirmed data completeness
+  - Platform detection contains placeholder text, "unknown", "TBD", or lacks specificity for Design step
+  - Source file inventory is incomplete, missing files, or lacks proper categorization for architecture planning
+  - Complexity analysis contains vague or incomplete assessments that cannot guide Azure service selection
+  - Data quality verification statement "Data completeness verified for Design step consumption" not provided by Chief Architect
 
 **MANDATORY FIELD VALIDATION** (ALL FIELDS REQUIRED FOR SUCCESS):
 ✅ platform_detected: MUST be "EKS", "GKE", or "No Platform - No Files Found" (NOT NULL/empty)
@@ -198,13 +228,13 @@ CONTINUE when:
    - Compile into overall_score, concerns array, recommendations array
 
 6. **expert_insights**: Extract key quotes and insights from each expert's contributions
-   - Find meaningful analysis statements from each expert (EKS_Expert, GKE_Expert, Technical_Architect, etc.)
+   - Find meaningful analysis statements from each expert (EKS_Expert, GKE_Expert, Chief_Architect, etc.)
    - Format as: "Expert_Name: Key insight or analysis finding"
 
-7. **analysis_file**: Must be exact path from MCP tool verification
-   - **MANDATORY**: Execute `list_blobs_in_container(container_name, output_folder)` to confirm file exists
-   - **MANDATORY**: Execute `read_blob_content("analysis_result.md", container_name, output_folder)` to verify content
-   - Only use confirmed path if file verification succeeds
+7. **analysis_file**: Must be exact path from Chief Architect's MCP tool verification
+   - **Chief Architect Responsibility**: Execute `list_blobs_in_container(container_name, output_folder)` to confirm file exists
+   - **Chief Architect Responsibility**: Execute `read_blob_content("analysis_result.md", container_name, output_folder)` to verify content
+   - Only use confirmed path if Chief Architect's file verification succeeds
    - DO NOT terminate if file doesn't exist or is empty
 
 **DATA EXTRACTION CHECKLIST BEFORE TERMINATION:**
@@ -214,8 +244,8 @@ CONTINUE when:
 □ Gathered complexity assessments from technical experts
 □ Compiled readiness scores and recommendations
 □ Extracted meaningful insights from each expert participant
-□ **EXECUTED FILE VERIFICATION**: Used MCP tools to confirm analysis_result.md exists and contains content
-□ **DOCUMENTED VERIFICATION**: Included actual MCP tool outputs in termination reasoning
+□ **EXECUTED FILE VERIFICATION**: Chief Architect used MCP tools to confirm analysis_result.md exists and contains content
+□ **DOCUMENTED VERIFICATION**: Included actual MCP tool outputs from Chief Architect in termination reasoning
 
 **EVIDENCE-BASED HARD TERMINATION FORMAT** (when is_hard_terminated=true):
 {
@@ -285,7 +315,7 @@ Example SUCCESS response:
     "summary": "Comprehensive analysis completed successfully. EKS platform detected with high confidence based on AWS-specific patterns and configurations found across 12 YAML files.",
     "expert_insights": [
       "EKS Expert: AWS Load Balancer Controller patterns and EKS-specific annotations detected in service definitions",
-      "Technical Architect: Well-structured microservices architecture with proper separation of concerns",
+      "Chief Architect: Well-structured microservices architecture with proper separation of concerns",
       "Chief Architect: Platform migration complexity is manageable with proper planning phase"
     ],
     "analysis_file": "converted/analysis_result.md"
@@ -309,25 +339,34 @@ Only terminate AFTER agents use MCP tools for file discovery and complete analys
 """
 
 ANALYSIS_SELECTION_PROMPT = """
-Coordinate {{step_name}}: {{step_objective}}
-Available: {{participants}}
+You are coordinating the {{step_name}} step for {{step_objective}}.
+Available participants: {{participants}}
 
-PLATFORM DETECTION APPROACH:
-- Chief_Architect: Strategic oversight and platform detection coordination
-- EKS_Expert: EKS configurations analysis (ACTIVE until platform determined)
-- GKE_Expert: GKE patterns analysis (ACTIVE until platform determined)
+SEQUENTIAL AUTHORITY WORKFLOW APPROACH:
+Execute foundation → enhancement → validation workflow:
+
+- Chief_Architect: FOUNDATION LEADER - Establishes authoritative analysis foundation and platform detection
+- EKS_Expert: ENHANCEMENT SPECIALIST - Enhances foundation with EKS-specific insights ONLY when assigned by Chief Architect
+- GKE_Expert: ENHANCEMENT SPECIALIST - Enhances foundation with GKE-specific insights ONLY when assigned by Chief Architect
 
 **PLATFORM DETECTION RULES**:
-PHASE 1 - Platform Detection: Both EKS and GKE experts actively participate
-PHASE 2 - Post Detection: Only the matching platform expert continues
-- If EKS detected → Only select EKS_Expert for platform-specific tasks
-- If GKE detected → Only select GKE_Expert for platform-specific tasks
+PHASE 1 - Foundation Establishment: Chief Architect performs comprehensive source discovery and initial platform detection
+PHASE 2 - Platform Enhancement: Only the matching platform expert enhances Chief Architect's foundation
+- If EKS detected → Only select EKS_Expert for platform-specific enhancement
+- If GKE detected → Only select GKE_Expert for platform-specific enhancement
 - Non-matching expert should be in quiet mode after platform determination
 
 SELECTION PRIORITY:
-1. Platform detection and consensus → All experts contribute
-2. Post platform detection → Only matching expert participates
-3. Complete file analysis with focused platform expertise
+1. Chief Architect establishes authoritative analysis foundation as Foundation Leader
+2. Platform Expert enhances foundation when assigned by Chief Architect
+3. Complete analysis through Sequential Authority workflow for platform-specific expertise
+
+**Agent Selection Rules (Sequential Authority)**:
+- Start with Chief_Architect to establish authoritative foundation
+- Select Platform Expert when Chief_Architect assigns them for platform-specific enhancement
+- Follow Sequential Authority workflow: Foundation → Enhancement → Validation
+
+Select the next participant who can provide the most valuable technical analysis contribution.
 
 **CRITICAL - RESPONSE FORMAT**:
 Respond with a JSON object containing the participant name in the 'result' field:
@@ -341,9 +380,9 @@ Respond with a JSON object containing the participant name in the 'result' field
 - "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ {"result": "Chief_Architect", "reason": "Strategic oversight needed for platform detection coordination"}
-✅ {"result": "EKS_Expert", "reason": "EKS configuration analysis required"}
-✅ {"result": "GKE_Expert", "reason": "GKE patterns analysis needed"}
+✅ {"result": "Chief_Architect", "reason": "Foundation establishment and authoritative analysis required"}
+✅ {"result": "EKS_Expert", "reason": "EKS platform enhancement assigned by Chief Architect"}
+✅ {"result": "GKE_Expert", "reason": "GKE platform enhancement assigned by Chief Architect"}
 
 INCORRECT Response Examples:
 ❌ "Chief_Architect" (missing JSON format)
@@ -361,10 +400,11 @@ Summarize the key findings and insights from the analysis step.
 
 class AnalysisStepGroupChatManager(StepSpecificGroupChatManager):
     """
-    Group chat manager specialized for Analysis Step.
+    Group chat manager specialized for Analysis Step with Sequential Authority workflow.
 
-    Focus: File discovery, platform detection, initial assessment
-    Agents: Chief (lead), EKS Expert, GKE Expert, Azure Expert
+    Focus: Foundation creation by Chief Architect, specialized enhancement by platform experts
+    Workflow: Chief Architect (foundation) → Platform Expert assignment → Specialized enhancement
+    Agents: Chief Architect (foundation leader), EKS Expert (specialist), GKE Expert (specialist)
     """
 
     final_termination_result: Analysis_ExtendedBooleanResult | None = None
@@ -747,7 +787,7 @@ class AnalysisOrchestrator(StepGroupChatOrchestrator):
             members=agents,
             manager=AnalysisStepGroupChatManager(
                 step_name="Analysis",
-                step_objective="Discover source files and identify platform type",
+                step_objective="Chief Architect creates foundation analysis, platform experts enhance with specialization",
                 service=self.kernel_agent.kernel.services["default"],
                 max_rounds=50,  # Reduced from 50 to prevent token overflow while still allowing thorough analysis
                 process_context=self.process_context,

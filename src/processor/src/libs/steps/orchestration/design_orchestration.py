@@ -14,7 +14,7 @@ Step objective: {{step_objective}}
 - **Use Microsoft Docs MCP tool** to lookup current Azure service information, pricing, and best practices
 - **Use blob storage MCP tools** to save design artifacts and access source analysis
 
-You have concluded the design discussion with architectural consensus.
+You have concluded the design discussion with Sequential Authority workflow completion.
 Provide a structured report aligned with Design_ExtendedBooleanResult format:ch orchestrator can specify exactly which agents participate in that phase,
 allowing for focused collaboration based on the step's objectives.
 
@@ -90,6 +90,9 @@ The design_result.md file must contain the following sections in markdown format
 - Target Azure platform: [AKS/other services]
 - Design completion status: [Complete/Partial]
 
+## Target Architecture Diagram
+[MANDATORY: Include a properly formatted Mermaid diagram using the templates provided in the Technical Architect prompt. The diagram must pass syntax validation and render correctly.]
+
 ## Selected Azure Services
 [Detailed list of chosen Azure services with justification]
 
@@ -109,7 +112,14 @@ The design_result.md file must contain the following sections in markdown format
 [Cost analysis and optimization recommendations]
 
 ## Expert Insights
-[Summary of insights from Technical Architect and Azure Expert]
+[Summary of insights from Chief Architect and Azure Expert]
+
+**🚨 CRITICAL: MERMAID DIAGRAM VALIDATION REQUIREMENT**:
+- The "Target Architecture Diagram" section MUST contain a valid Mermaid flowchart
+- Use the templates from Technical Architect prompt for proper syntax
+- Diagram must use `flowchart TD` format with proper subgraph nesting
+- All Azure services must be properly represented with correct node syntax
+- Validate syntax before saving to ensure diagram renders correctly
 
 **ANALYSIS TASK**: Review the expert conversation and extract the final design results.
 
@@ -139,14 +149,27 @@ TERMINATE SUCCESS when:
   read_blob_content("design_result.md", container_name="{{container_name}}", folder_path="{{output_file_folder}}")
   ```
   **PASTE THE COMPLETE CONTENT IMMEDIATELY**
+- **🔴 FOUNDATION LEADER DATA COMPLETENESS VERIFICATION**: Azure Expert personally validates data quality
+  - Azure Expert reads design_result.md content using `read_blob_content()`
+  - Azure Expert verifies Azure service recommendations are specific, actionable, and appropriate for the detected platform
+  - Azure Expert verifies architecture decisions contain detailed rationale and implementation guidance for YAML conversion
+  - Azure Expert verifies design outputs specify complete file deliverables ready for YAML step consumption
+  - Azure Expert confirms all critical design data fields contain meaningful content ready for Kubernetes-to-Azure YAML conversion
+  - **DATA QUALITY GATE**: Azure Expert must explicitly state "Data completeness verified for YAML step consumption" before termination
+- **🔴 FILE CONTENT COMPLETENESS VERIFICATION**: Azure Expert validates file generation quality
+  - Azure Expert confirms design_result.md contains comprehensive architecture sections (not placeholder content)
+  - Azure Expert verifies file content includes specific Azure service configurations and implementation details
+  - Azure Expert validates design document provides actionable technical guidance for YAML conversion process
+  - **FILE QUALITY GATE**: Azure Expert must explicitly state "File content completeness verified for YAML conversion" before termination
 - **DUAL OUTPUT COMPLETED**:
   - Markdown report (`design_result.md`) verified to exist and contain meaningful content in output folder
   - JSON response structure prepared for next step processing
 - **NO FILES, NO PASS**: Step cannot complete without verified file generation - you MUST execute MCP tools to verify
-- **🤝 EXPERT COLLABORATION ACHIEVED**: Evidence of consensus-based design decisions
-  - Chief Architect and Azure Expert collaboration documented
-  - Conflicting recommendations resolved through consensus building
-  - Design represents collective expert intelligence, not individual decisions
+- **🤝 SEQUENTIAL AUTHORITY WORKFLOW COMPLETED**: Evidence of foundation → enhancement → validation progression
+  - Azure Expert foundation design established and documented
+  - Platform experts (EKS/GKE) enhancements applied when assigned
+  - Chief Architect final validation and integration completed
+  - Design follows authority chain workflow, not parallel collaboration
 
 **MANDATORY FIELD VALIDATION** (ALL FIELDS REQUIRED FOR SUCCESS):
 ✅ result: MUST be "Success" or "Fail" (NOT NULL/empty)
@@ -162,20 +185,29 @@ TERMINATE SUCCESS when:
 - Each array entry must have meaningful content and proper structure
 
 TERMINATE FAILURE when:
-- Agents explicitly indicate failure or blocking issues
-- Critical Azure service selections cannot be determined after full discussion
-- Expert consensus indicates the design cannot be completed
+- Foundation Leader (Azure Expert) explicitly indicates failure or blocking issues
+- Critical Azure service selections cannot be determined through authority chain
+- Authority workflow indicates the design cannot be completed
 
 CONTINUE when:
 - No agent has provided the complete JSON termination format yet
 - **ANY REQUIRED FIELD IS MISSING OR INCOMPLETE**
 - Architecture design discussions are actively progressing
-- Agents are still working toward consensus
+- Authority chain is still progressing through workflow steps
 - JSON response exists but contains empty arrays or placeholder content
 - **🔴 MANDATORY FILE VERIFICATION NOT COMPLETED**: You have not yet verified `design_result.md` file exists using MCP tools
   - You must execute `list_blobs_in_container()` to check if design_result.md exists
   - You must execute `read_blob_content()` to verify the content is meaningful
   - **NO VERIFICATION = NO TERMINATION**: Always check for file existence before allowing success termination
+- **🔴 FOUNDATION LEADER DATA VERIFICATION INCOMPLETE**: Azure Expert has not confirmed data completeness
+  - Azure service recommendations contain placeholder text, "TBD", or lack specificity for YAML conversion
+  - Architecture decisions are incomplete, missing rationale, or lack implementation guidance for YAML step
+  - Design outputs contain vague descriptions that cannot guide Kubernetes-to-Azure YAML conversion process
+  - Data quality verification statement "Data completeness verified for YAML step consumption" not provided by Azure Expert
+- **🔴 FILE CONTENT VERIFICATION INCOMPLETE**: Azure Expert has not confirmed file content completeness
+  - Design document contains placeholder sections, incomplete technical details, or insufficient implementation guidance
+  - File content lacks specific Azure service configurations needed for YAML conversion process
+  - File quality verification statement "File content completeness verified for YAML conversion" not provided by Azure Expert
 - **Dual output not completed**:
   - Design document (`design_result.md`) has not been verified to exist in output folder
   - JSON response structure not ready for next step processing
@@ -299,7 +331,7 @@ Available participants: {{participants}}
 FOCUSED ARCHITECTURE TEAM APPROACH:
 Rotate between architectural specialists to build comprehensive Azure design:
 
-- Chief_Architect: Provides strategic oversight and architectural validation
+- Chief_Architect: Provides final validation of foundation + platform enhancements
 - Azure_Expert: Leads Azure service selection and best practices implementation
 - EKS_Expert: Provides source platform context for accurate mapping from EKS to Azure (ONLY if source platform is EKS)
 - GKE_Expert: Offers source platform context for accurate mapping from GKE to Azure (ONLY if source platform is GKE)
@@ -311,10 +343,10 @@ Rotate between architectural specialists to build comprehensive Azure design:
 - Example: If analysis determined EKS → Only select EKS_Expert, avoid selecting GKE_Expert
 
 SELECTION PRIORITY:
-1. Ensure ALL relevant architectural experts contribute their specialized knowledge
-2. Include ONLY the platform expert matching the detected source platform
-3. Build comprehensive Azure architecture through focused collaboration
-4. Achieve expert consensus on all major architectural components
+1. Azure Expert establishes authoritative foundation design as Foundation Leader
+2. Include ONLY the platform expert matching the detected source platform for enhancement
+3. Chief Architect validates integration as Final Validator
+4. Execute Sequential Authority workflow for design completion
 5. Create detailed design ready for technical implementation
 
 **CRITICAL - RESPONSE FORMAT**:
@@ -330,7 +362,7 @@ Respond with a JSON object containing the participant name in the 'result' field
 - "Success", "Complete", "Terminate", "Finish" are NOT participant names
 
 CORRECT Response Examples:
-✅ {"result": "Chief_Architect", "reason": "Strategic oversight needed for architecture validation"}
+✅ {"result": "Chief_Architect", "reason": "Final validation needed for integrated design"}
 ✅ {"result": "Azure_Expert", "reason": "Azure service selection and best practices required"}
 ✅ {"result": "EKS_Expert", "reason": "Source platform context needed for EKS migration"}
 ✅ {"result": "GKE_Expert", "reason": "Source platform insights required for GKE migration"}
@@ -350,7 +382,7 @@ Summarize the key findings and insights from the design step.
 # You are coordinating the {{step_name}} step of Azure Kubernetes migration.
 # Step objective: {{step_objective}}
 
-# You have concluded the design discussion with expert consensus.
+# You have concluded the design discussion with Sequential Authority workflow completion.
 # Provide a structured report aligned with Design_ExtendedBooleanResult format:
 
 # {
@@ -387,7 +419,7 @@ class DesignStepGroupChatManager(StepSpecificGroupChatManager):
     Group chat manager specialized for Design Step.
 
     Focus: Azure architecture design, service mapping, recommendations
-    Agents: Chief Architect (lead), Azure Expert, platform experts for context
+    Agents: Azure Expert (Foundation Leader), platform experts (Enhancement), Chief Architect (Validator)
     """
 
     final_termination_result: Design_ExtendedBooleanResult | None = None
@@ -664,14 +696,14 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
     AGENT SELECTION STRATEGY FOR DESIGN PHASE:
     This demonstrates how each phase can control its agent participation.
 
-    Design Phase Agents:
-    - Chief Architect: Architectural oversight and design validation
-    - Azure Expert: PRIMARY LEAD - Azure services, architecture patterns, best practices
-    - EKS Expert: Source platform insights for migration context (optional)
-    - GKE Expert: Source platform insights for migration context (optional)
+    Design Phase Agents (Sequential Authority Model):
+    - Azure Expert: FOUNDATION LEADER - Establishes authoritative foundation design
+    - EKS Expert: ENHANCEMENT SPECIALIST - EKS-specific insights when assigned
+    - GKE Expert: ENHANCEMENT SPECIALIST - GKE-specific insights when assigned
+    - Chief Architect: FINAL VALIDATOR - Integration validation and approval
 
-    This is different from Analysis phase which might focus more on Chief Architect leadership,
-    or YAML phase which would emphasize YAML Expert + QA Engineer collaboration.
+    This implements Sequential Authority workflow eliminating redundant source discovery,
+    different from parallel collaboration patterns in other phases.
     """
 
     async def create_design_orchestration_with_context(
@@ -722,8 +754,8 @@ class DesignOrchestrator(StepGroupChatOrchestrator):
         """
         agents = []
 
-        # Chief Architect - Architecture oversight and validation
-        # In Design phase: Provides oversight and ensures architectural soundness
+        # Chief Architect - Final Validator in Sequential Authority workflow
+        # In Design phase: Validates foundation design enhanced by platform experts
         agent_architect = await mcp_context.create_agent(
             agent_config=architect_agent(phase="design").render(
                 **self.process_context["analysis_result"]

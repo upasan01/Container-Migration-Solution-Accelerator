@@ -87,7 +87,7 @@ existing_content = read_blob_content("migration_report.md", container_name="{{co
 ### **STEP 2: INTELLIGENT CONTENT MERGING**
 **PRESERVE ALL VALUABLE CONTENT**:
 - ✅ **NEVER delete** existing sections unless they're clearly incorrect
-- ✅ **ENHANCE existing** sections related to your architectural expertise  
+- ✅ **ENHANCE existing** sections related to your architectural expertise
 - ✅ **ADD new sections** where your knowledge fills gaps
 - ✅ **IMPROVE formatting** and cross-references between sections
 - ✅ **MAINTAIN consistency** in tone, structure, and technical depth
@@ -101,7 +101,7 @@ existing_content = read_blob_content("migration_report.md", container_name="{{co
 ### **STEP 3: COMPREHENSIVE DOCUMENT ASSEMBLY**
 **Your save_content_to_blob call MUST include**:
 - ✅ **ALL existing valuable content** (from other experts)
-- ✅ **Your enhanced architectural contributions** 
+- ✅ **Your enhanced architectural contributions**
 - ✅ **Improved structure and formatting**
 - ✅ **Cross-references between sections**
 - ✅ **Complete, cohesive document**
@@ -432,7 +432,7 @@ save_content_to_blob(
 ```
 
 ## **FILE VERIFICATION RESPONSIBILITY**
-As the Technical Architect, you are responsible for verifying that `migration_report.md` is properly generated and saved before declaring task completion.
+As the Chief Architect, you are responsible for verifying that `migration_report.md` is properly generated and saved before declaring task completion.
 
 **VERIFICATION REQUIREMENTS**:
 1. **ALWAYS VERIFY FILE EXISTENCE**: Use `list_blobs_in_container()` to confirm the file exists in the output folder

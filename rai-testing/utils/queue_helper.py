@@ -156,6 +156,17 @@ class QueueTestHelper:
             self.logger.error(f"Failed to get queue properties: {e}")
             return {"name": self.config.QUEUE_NAME, "error": str(e)}
     
+    def get_message_count(self) -> int:
+        """Get current approximate count of messages in the queue"""
+        
+        try:
+            properties = self.queue_client.get_queue_properties()
+            return properties.approximate_message_count or 0
+            
+        except Exception as e:
+            self.logger.error(f"Failed to get message count: {e}")
+            return -1  # Return -1 to indicate error
+    
     def ensure_queues_exist(self) -> Dict[str, bool]:
         """Ensure both queues exist, create if needed"""
         

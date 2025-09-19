@@ -26,6 +26,7 @@ from rich.panel import Panel
 from config import RAITestConfig
 from utils.test_manager import TestManager, TestCase
 from utils.cosmos_helper import CosmosDBHelper
+from utils.queue_helper import QueueTestHelper
 from utils.logging_config import setup_logging
 from utils.test_formatter import extract_error_reason
 
@@ -38,6 +39,7 @@ class BatchResultsUpdater:
         self.console = Console()
         self.logger = logging.getLogger(__name__)
         self.cosmos_helper = CosmosDBHelper(self.config)
+        self.queue_helper = QueueTestHelper(self.config)
         
         # Test manager will be initialized when CSV file is provided
         self.test_manager: Optional[TestManager] = None
@@ -65,19 +67,26 @@ class BatchResultsUpdater:
             self.test_manager = TestManager(csv_file)
             test_cases = self.test_manager.load_test_cases()
             
-            # Filter for test cases that have process_ids (were queued)
-            queued_test_cases = [tc for tc in test_cases if tc.process_id and tc.process_id.strip()]
+            # Filter for test cases that have process_ids (were queued) and need updating
+            # Only process tests where result is empty, "unknown", or "queued"
+            updateable_results = {"", None, "unknown", "queued"}
+            queued_test_cases = [
+                tc for tc in test_cases 
+                if tc.process_id and tc.process_id.strip() and 
+                (tc.result is None or tc.result.strip().lower() in updateable_results)
+            ]
             
             if not queued_test_cases:
-                self.console.print("❌ No test cases with process_ids found in CSV file", style="red")
+                self.console.print("❌ No test cases requiring updates found in CSV file", style="red")
+                self.console.print("   (Looking for tests with process_ids and result status: empty, unknown, or queued)", style="dim")
                 return {
                     "success": False,
-                    "error": "No queued test cases found",
+                    "error": "No updateable test cases found",
                     "total_tests": len(test_cases),
                     "updated": 0
                 }
             
-            self.console.print(f"✅ CSV file loaded: {len(test_cases)} total test cases, {len(queued_test_cases)} with process_ids")
+            self.console.print(f"✅ CSV file loaded: {len(test_cases)} total test cases, {len(queued_test_cases)} requiring updates")
                 
             # Display update configuration
             config_table = Table()
@@ -185,6 +194,9 @@ class BatchResultsUpdater:
         pending = sum(1 for r in results if r.get("test_result") == "pending")
         errors = sum(1 for r in results if r.get("test_result") == "error")
         
+        # Get current queue message count
+        queue_message_count = self.queue_helper.get_message_count()
+        
         # Format total time
         total_minutes = int(total_time // 60)
         if total_minutes >= 60:
@@ -204,6 +216,7 @@ class BatchResultsUpdater:
             "pending": pending,
             "errors": errors,
             "completion_rate": f"{(found_in_cosmos / len(results) * 100):.1f}%" if results else "0%",
+            "queue_message_count": queue_message_count,
             "total_execution_time": total_time_formatted,
             "results": results,
             "csv_file": str(self.test_manager.csv_file_path),
@@ -224,6 +237,15 @@ class BatchResultsUpdater:
         results_table.add_row("Failed", f"[red]{summary['failed']}[/red]")
         results_table.add_row("Pending", f"[yellow]{summary['pending']}[/yellow]")
         results_table.add_row("Errors", f"[red]{summary['errors']}[/red]")
+        
+        # Display queue message count with appropriate styling
+        queue_count = summary["queue_message_count"]
+        if queue_count >= 0:
+            queue_display = f"[cyan]{queue_count}[/cyan]" if queue_count > 0 else f"[green]{queue_count}[/green]"
+        else:
+            queue_display = "[red]Error[/red]"
+        results_table.add_row("Current Queue Messages", queue_display)
+        
         results_table.add_row("Update Time", summary["total_execution_time"])
         
         self.console.print(Panel(results_table, title="📊 Update Results"))

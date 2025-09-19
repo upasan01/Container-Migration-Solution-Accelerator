@@ -61,8 +61,8 @@ class BatchResultsUpdater:
         if not validate_environment():
             exit(1)
         
-        today = datetime.now().strftime("%Y-%m-%d")
-        log_path = Path(__file__).parent / "logs" / f"run_batch_update_{today}_{str(uuid.uuid4())[:8]}.log"
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        log_path = Path(__file__).parent / "logs" / f"run_batch_update_{timestamp}.log"
         setup_logging(debug=debug, log_to_console=False, log_to_file=str(log_path))
             
         try:

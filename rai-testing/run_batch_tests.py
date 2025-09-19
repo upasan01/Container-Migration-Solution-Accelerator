@@ -28,6 +28,7 @@ from config import RAITestConfig
 from utils.test_manager import TestManager, TestCase
 from utils.core_testing import run_batch_tests, queue_batch_tests
 from utils.logging_config import setup_logging
+from utils.environment_validator import validate_environment
 
 
 class BatchTestOrchestrator:
@@ -54,6 +55,10 @@ class BatchTestOrchestrator:
         Returns:
             Dictionary containing test results and summary
         """
+        # Validate environment configuration before proceeding
+        if not validate_environment():
+            exit(1)
+        
         today = datetime.now().strftime("%Y-%m-%d")
         log_path = Path(__file__).parent / "logs" / f"rai_csv_test_{today}_{str(uuid.uuid4())[:8]}.log"
         setup_logging(debug=debug, log_to_console=False, log_to_file=str(log_path))

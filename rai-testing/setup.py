@@ -1,20 +1,3 @@
-#!/usr/bin/env python3
-"""
-Setup script for RAI Testing Framework
-
-This script helps set up the environment and validates the configuration.
-Run this before executing RAI tests for the first time.
-"""
-
-import os
-import sys
-import shutil
-from pathlib import Path
-
-import click
-from rich.console import Console
-from rich.panel import Panel
-
 
 #!/usr/bin/env python3
 """
@@ -32,42 +15,7 @@ from pathlib import Path
 import click
 from rich.console import Console
 from rich.panel import Panel
-
-
-def check_azure_storage_config(console):
-    """Check Azure Storage configuration and return status"""
-    storage_account = os.getenv("STORAGE_ACCOUNT_NAME")
-    connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-    
-    if not storage_account and not connection_string:
-        console.print("[yellow]⚠️  Azure Storage configuration not found[/yellow]")
-        return False
-    elif storage_account:
-        console.print(f"✅ Storage account configured: {storage_account}")
-        return True
-    else:
-        console.print("✅ Connection string configured")
-        return True
-
-
-def check_cosmos_db_config(console):
-    """Check Cosmos DB configuration and return status"""
-    cosmos_endpoint = os.getenv("COSMOS_DB_ENDPOINT")
-    cosmos_key = os.getenv("COSMOS_DB_KEY")
-    cosmos_db_name = os.getenv("RAI_COSMOS_DB_NAME", "migration_db")
-    cosmos_container_name = os.getenv("RAI_COSMOS_CONTAINER_NAME", "agent_telemetry")
-    
-    if not cosmos_endpoint or not cosmos_key:
-        console.print("[yellow]⚠️  Cosmos DB configuration not found[/yellow]")
-        console.print("Required environment variables:")
-        console.print("  • COSMOS_DB_ENDPOINT")
-        console.print("  • COSMOS_DB_KEY")
-        return False
-    else:
-        console.print(f"✅ Cosmos DB endpoint configured: {cosmos_endpoint}")
-        console.print(f"✅ Database: {cosmos_db_name}, Container: {cosmos_container_name}")
-        return True
-
+from utils.environment_validator import check_azure_storage_config, check_cosmos_db_config
 
 def setup_environment():
     """Set up the RAI testing environment"""
@@ -82,9 +30,9 @@ def setup_environment():
     console.print(f"✅ Python version: {sys.version_info.major}.{sys.version_info.minor}")
     
     # Check configurations
-    storage_configured = check_azure_storage_config(console)
-    cosmos_configured = check_cosmos_db_config(console)
-    
+    storage_configured = check_azure_storage_config(console=console, printSuccess=True)
+    cosmos_configured = check_cosmos_db_config(console=console, printSuccess=True)
+
     # Check required directories
     directories = ["temp_test_files"]
     for dir_name in directories:

@@ -36,6 +36,7 @@ sys.path.append(str(project_root))
 from config import RAITestConfig
 from utils.core_testing import run_single_test
 from utils.logging_config import setup_logging
+from utils.environment_validator import validate_environment
 
 
 async def main():
@@ -49,6 +50,10 @@ async def main():
     parser.add_argument('--debug', action='store_true', help='Enable debug logging.')
     
     args = parser.parse_args()
+    
+    # Validate environment configuration before proceeding
+    if not validate_environment():
+        sys.exit(1)
     
     today = datetime.now().strftime("%Y-%m-%d")
     log_path = Path(__file__).parent / "logs" / f"rai_single_tests_{today}.log"

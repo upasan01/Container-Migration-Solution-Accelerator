@@ -20,6 +20,7 @@ class TestCase:
     blob_path: Optional[str] = None
     result: Optional[str] = None
     reason: Optional[str] = None
+    full_response: Optional[str] = None
 
 
 class TestManager:
@@ -59,7 +60,8 @@ class TestManager:
                     process_id=row.get('process_id', '').strip() or None,
                     blob_path=row.get('blob_path', '').strip() or None,
                     result=row.get('result', '').strip() or None,
-                    reason=row.get('reason', '').strip() or None
+                    reason=row.get('reason', '').strip() or None,
+                    full_response=row.get('full_response', '').strip() or None
                 )
                 
                 # Skip empty test_content rows
@@ -76,7 +78,7 @@ class TestManager:
         blob_path: str,
         result: str,
         reason: str,
-        error_message: str
+        full_response: str
     ) -> None:
         """Update test result for a specific row"""
         
@@ -95,7 +97,7 @@ class TestManager:
         test_case.blob_path = blob_path
         test_case.result = result
         test_case.reason = reason
-        test_case.error_message = error_message
+        test_case.full_response = full_response
     
     def save_updated_csv(self, output_path: str, include_full_response: bool = False) -> str:
         """Save updated CSV file with test results"""
@@ -128,7 +130,7 @@ class TestManager:
                 }
                 
                 if include_full_response:
-                    row_data['full_response'] = getattr(test_case, 'error_message', '') or ''
+                    row_data['full_response'] = test_case.full_response or ''
                 
                 writer.writerow(row_data)
         

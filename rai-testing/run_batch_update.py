@@ -67,13 +67,10 @@ class BatchResultsUpdater:
             self.test_manager = TestManager(csv_file)
             test_cases = self.test_manager.load_test_cases()
             
-            # Filter for test cases that have process_ids (were queued) and need updating
-            # Only process tests where result is empty, "unknown", or "queued"
-            updateable_results = {"", None, "unknown", "queued"}
+            # Filter for test cases that have process_ids (were queued)
             queued_test_cases = [
                 tc for tc in test_cases 
-                if tc.process_id and tc.process_id.strip() and 
-                (tc.result is None or tc.result.strip().lower() in updateable_results)
+                if tc.process_id and tc.process_id.strip()
             ]
             
             if not queued_test_cases:
@@ -99,8 +96,7 @@ class BatchResultsUpdater:
             
             self.console.print(Panel(config_table, title="📊 Update Configuration"))
             
-            # Query Cosmos DB for final results
-            updated_results = []
+            results = []
             
             with Progress(
                 SpinnerColumn(),
@@ -113,46 +109,57 @@ class BatchResultsUpdater:
                 
                 for test_case in queued_test_cases:
                     try:
-                        # Query Cosmos DB once for final result
-                        process_final_outcome = await self.cosmos_helper.get_final_outcome(test_case.process_id)
-
-                        if process_final_outcome is not None:
-                            self.logger.info(f"Process completed for process_id: {test_case.process_id}, success: {process_final_outcome['success']}")
-
-                            # test succeed if final outcome of process was not successful
-                            test_result = "failed" if process_final_outcome["success"] else "passed"
-                            error_reason = extract_error_reason(process_final_outcome["error_message"] or "")
-
-                            # Update the test case
-                            self.test_manager.update_test_result(
-                                row_id=test_case.row_id,
-                                process_id=test_case.process_id,
-                                blob_path=test_case.blob_path or "",
-                                result=test_result,
-                                reason=error_reason,
-                                error_message=process_final_outcome["error_message"] or ""
-                            )
+                        # only query for test cases that do not have results
+                        if (test_case.result is None or test_case.result.strip().lower() in {"", None, "unknown", "queued"}):
                             
-                            updated_results.append({
-                                "row_id": test_case.row_id,
-                                "process_id": test_case.process_id,
-                                "test_result": test_result,
-                                "error_reason": error_reason,
-                                "found_in_cosmos": True
-                            })
+                            process_final_outcome = await self.cosmos_helper.get_final_outcome(test_case.process_id)
+
+                            if process_final_outcome is not None:
+                                self.logger.info(f"Process completed for process_id: {test_case.process_id}, success: {process_final_outcome['success']}")
+
+                                # test succeed if final outcome of process was not successful
+                                test_result = "failed" if process_final_outcome["success"] else "passed"
+                                error_reason = extract_error_reason(process_final_outcome["error_message"] or "")
+
+                                # Update the test case
+                                self.test_manager.update_test_result(
+                                    row_id=test_case.row_id,
+                                    process_id=test_case.process_id,
+                                    blob_path=test_case.blob_path or "",
+                                    result=test_result,
+                                    reason=error_reason,
+                                    full_response=process_final_outcome["error_message"] or ""
+                                )
+                                
+                                results.append({
+                                    "row_id": test_case.row_id,
+                                    "process_id": test_case.process_id,
+                                    "test_result": test_result,
+                                    "error_reason": error_reason,
+                                    "found_in_cosmos": True
+                                })
+                            else:
+                                # Process not found in Cosmos DB yet
+                                results.append({
+                                    "row_id": test_case.row_id,
+                                    "process_id": test_case.process_id,
+                                    "test_result": "pending",
+                                    "error_reason": "Not found in results / unfinished",
+                                    "found_in_cosmos": False
+                                })
                         else:
-                            # Process not found in Cosmos DB yet
-                            updated_results.append({
+                            # include the previously completed test in the results for summary
+                            results.append({
                                 "row_id": test_case.row_id,
                                 "process_id": test_case.process_id,
-                                "test_result": "pending",
-                                "error_reason": "Not found in results / unfinished",
-                                "found_in_cosmos": False
+                                "test_result": test_case.result,
+                                "error_reason": test_case.reason,
+                                "found_in_cosmos": True
                             })
                             
                     except Exception as e:
                         self.logger.error(f"Error querying process_id {test_case.process_id}: {e}")
-                        updated_results.append({
+                        results.append({
                             "row_id": test_case.row_id,
                             "process_id": test_case.process_id,
                             "test_result": "error",
@@ -168,7 +175,7 @@ class BatchResultsUpdater:
             elapsed_time = asyncio.get_event_loop().time() - start_time
 
             # Generate summary
-            summary = self._generate_summary(updated_results, test_cases, total_time=elapsed_time)
+            summary = self._generate_summary(results, test_cases, total_time=elapsed_time)
             
             # Display results
             self._display_results(summary)

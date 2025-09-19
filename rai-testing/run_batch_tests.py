@@ -68,7 +68,7 @@ class BatchTestOrchestrator:
             self.console.print(f"✅ CSV file loaded: {len(test_cases)} test cases found.")
                 
             # Display test configuration
-            estimated_minutes = len(test_cases) * (0.1 if no_wait else 1.2)
+            estimated_minutes = len(test_cases) * (0.01 if no_wait else 1.2)
             estimated_time = f"{int(estimated_minutes // 60)}h {int(estimated_minutes % 60)}m" if estimated_minutes >= 60 else f"{int(estimated_minutes)}m"
             
             config_table = Table()
@@ -146,7 +146,7 @@ class BatchTestOrchestrator:
                     blob_path=result.blob_path or "",
                     result=result.result or "queued",
                     reason=result.reason or "",
-                    error_message=""
+                    full_response=""
                 )
             else:
                 # This is a dict result from run_batch_tests
@@ -156,7 +156,7 @@ class BatchTestOrchestrator:
                     blob_path=result.get("blob_path"),
                     result=result.get("test_result", "unknown"),
                     reason=result.get("error_reason", ""),
-                    error_message=result.get("error_message", "")
+                    full_response=result.get("error_message", "")
                 )
         
         self.test_manager.save_updated_csv(output_path=file_path,include_full_response=include_full_response)

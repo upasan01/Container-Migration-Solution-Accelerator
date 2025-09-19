@@ -159,7 +159,7 @@ class BatchTestOrchestrator:
                     row_id=result["row_id"],
                     process_id=result.get("process_id"),
                     blob_path=result.get("blob_path"),
-                    result=result.get("test_result", "unknown"),
+                    result=result.get("test_result", "queued"),
                     reason=result.get("error_reason", ""),
                     full_response=result.get("error_message", "")
                 )

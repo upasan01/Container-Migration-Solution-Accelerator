@@ -23,22 +23,38 @@ The framework uses a **modular architecture** with a core testing library that b
 rai-testing/
 ├── README.md                    # This documentation
 ├── QUICKSTART.md               # Quick start guide  
+├── TRANSPARENCY.md             # Transparency documentation
+├── .gitignore                  # Git ignore rules
 ├── config.py                  # Configuration settings
 ├── requirements.txt           # Python dependencies
+├── setup.py                   # Environment setup and validation
 ├── run_single_test.py         # Single test execution script
 ├── run_batch_tests.py          # Batch CSV test execution script
-├── utils/                    # Utility modules
-│   ├── __init__.py
-│   ├── core_testing.py       # Core testing library (shared logic)
-│   ├── test_manager.py       # Test file management and processing
-│   ├── yaml_generator.py     # YAML file generation utilities
-│   ├── blob_helper.py        # Azure Blob Storage operations
-│   ├── queue_helper.py       # Azure Storage Queue operations
-│   ├── cosmos_helper.py      # Azure Cosmos DB operations
-│   ├── logging_config.py     # Centralized logging configuration
-│   └── monitoring.py         # Test execution monitoring
-└── results/                  # Test results and reports
-    └── (generated at runtime)
+├── run_batch_update.py        # Update batch results from Cosmos DB
+├── architecture/              # Architecture diagrams and documentation
+│   ├── batch_test.drawio      # Batch test flow diagram (source)
+│   ├── batch_test_architecture.png # Batch test architecture diagram
+│   ├── single_test.drawio     # Single test flow diagram (source)
+│   └── single_test_architecture.png # Single test architecture diagram
+├── samples/                   # Sample files and examples
+│   └── sample_tests.csv       # Example test cases CSV
+├── logs/                      # Log files directory
+│   └── (generated at runtime)
+├── temp_test_files/           # Temporary test file storage
+│   └── (generated at runtime)
+└── utils/                     # Utility modules
+    ├── __init__.py            # Package initialization and exports
+    ├── core_testing.py        # Core testing library (shared logic)
+    ├── test_manager.py        # Test file management and processing
+    ├── yaml_generator.py      # YAML file generation utilities
+    ├── blob_helper.py         # Azure Blob Storage operations
+    ├── queue_helper.py        # Azure Storage Queue operations
+    ├── cosmos_helper.py       # Azure Cosmos DB operations with async context manager
+    ├── repositories.py        # Data access layer for Cosmos DB
+    ├── environment_validator.py # Centralized environment validation
+    ├── test_formatter.py      # Test result formatting utilities
+    ├── logging_config.py      # Centralized logging configuration
+    └── monitoring.py          # Test execution monitoring
 ```
 
 ## Test Content Format
@@ -97,6 +113,8 @@ export RAI_COSMOS_POLLING_INTERVAL="10"     # Cosmos DB polling interval in seco
 
 See [QUICKSTART.md](./QUICKSTART.md) for complete start-up configuration reference.
 
+## Test Options
+
 ### 1. Single Test Mode
 
 ```bash
@@ -122,7 +140,10 @@ python run_single_test.py "Test content" --debug
 
 Create a CSV file with your test content using the required format shown above. You can include your own test cases targeting specific RAI concerns for your application.
 
-#### Run Tests
+#### Run Tests (wait)
+
+The "wait" option is the default approach when running batch tests. The batch will start the test, monitor the process, and record the test result for each test.
+
 ```bash
 # Run all tests from CSV file
 python run_batch_tests.py --csv-file my_test_cases.csv
@@ -132,6 +153,36 @@ python run_batch_tests.py --csv-file my_test_cases.csv --include-full-response
 
 # Enable debug logging  
 python run_batch_tests.py --csv-file my_test_cases.csv --debug
+```
+
+#### Run Tests (no wait)
+
+Including the `--no-wait` parameter will take the batch from the CSV and queue each test. It will not wait and monitor the result from each test. To find and update the test results, then execute `run_batch_update.py`.
+
+```bash
+# Run all tests from CSV file
+python run_batch_tests.py --csv-file my_test_cases.csv --no-wait
+
+# Include full response from AI in CSV results 
+python run_batch_tests.py --csv-file my_test_cases.csv --include-full-response --no-wait
+
+# Enable debug logging  
+python run_batch_tests.py --csv-file my_test_cases.csv --debug --no-wait
+```
+
+### 3. Batch Update Results
+
+This option provides a means to batch update tests in the CSV that have been queued (have a `process_id`). This is intended to check the status of a batch that were executed with `--no-wait`.
+
+```bash
+# Check for process and update all tests 
+python run_batch_update.py --csv-file my_test_cases.csv
+
+# Check for process and update all tests and include full response
+python run_batch_update.py --csv-file my_test_cases.csv --include-full-response
+
+# Enable debug logging  
+python run_batch_update.py --csv-file my_test_cases.csv --debug
 ```
 
 ## Test Workflow

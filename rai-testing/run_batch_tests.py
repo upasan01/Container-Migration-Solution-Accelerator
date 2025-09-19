@@ -71,9 +71,26 @@ class BatchTestOrchestrator:
             test_cases = self.test_manager.load_test_cases()
             
             self.console.print(f"✅ CSV file loaded: {len(test_cases)} test cases found.")
+
+            tests_ready_to_run = [
+                tc for tc in test_cases
+                if (not tc.process_id or tc.process_id.strip() == "")
+            ]
+
+            if len(tests_ready_to_run) == 0:
+                self.console.print(f"⚠️ No tests in CSV file are ready to run. All have been queud for testing or completed testing.")
+                return {
+                    "success": False,
+                    "total_tests": 0,
+                    "csv_file": str(self.test_manager.csv_file_path),
+                    "timestamp": datetime.now().isoformat()
+                }
                 
-            # Display test configuration
-            estimated_minutes = len(test_cases) * (0.01 if no_wait else 1.2)
+            completed_or_queued_tests = test_cases = [
+                tc for tc in test_cases
+                if tc.process_id and tc.process_id.strip()
+            ]
+            estimated_minutes = len(tests_ready_to_run) * (0.01 if no_wait else 1.2)
             estimated_time = f"{int(estimated_minutes // 60)}h {int(estimated_minutes % 60)}m" if estimated_minutes >= 60 else f"{int(estimated_minutes)}m"
             
             config_table = Table()
@@ -81,7 +98,8 @@ class BatchTestOrchestrator:
             config_table.add_column("Value", style="white")
             config_table.add_row("CSV File", str(csv_file))
             config_table.add_row("Wait for each result?", "No" if no_wait else "Yes")
-            config_table.add_row("Test Count", str(len(test_cases)))
+            config_table.add_row("Tests Ready-to-Run Count", str(len(tests_ready_to_run)))
+            config_table.add_row("Total Test Count", str(len(test_cases)))
             config_table.add_row("Estimated Time to Complete", estimated_time)
             config_table.add_row("Timeout per Test", str(self.config.TEST_TIMEOUT_MINUTES))
             
@@ -98,31 +116,44 @@ class BatchTestOrchestrator:
                 TaskProgressColumn(text_format="[progress.percentage]{task.percentage:>3.0f}%"),
                 console=self.console
             ) as progress:
-                task = progress.add_task("Queuing tests" if no_wait else "Running tests", total=len(test_cases))
+                task = progress.add_task("Queuing tests" if no_wait else "Running tests", total=len(tests_ready_to_run))
                 
                 if no_wait:
                     results = await queue_batch_tests(
-                        test_cases=test_cases,
+                        test_cases=tests_ready_to_run,
                         config=self.config,
                         progress_callback=lambda: progress.advance(task, 1)
                     )
                 else:
                     # Use the core testing library to run all tests
                     results = await run_batch_tests(
-                        test_cases=test_cases,
+                        test_cases=tests_ready_to_run,
                         config=self.config,
                         progress_callback=lambda: progress.advance(task, 1)
                     )
-            
-            # Update CSV with results
+
             await self._update_csv_with_results(results, file_path=csv_file, include_full_response=include_full_response)
             
             elapsed_time = asyncio.get_event_loop().time() - start_time
 
-            # Generate summary
-            summary = self._generate_summary(results, test_cases, total_time=elapsed_time)
-            
-            # Display results
+            # Update CSV with results
+            # Combine results with already completed/queued tests for summary
+            all_results = results + [
+                {
+                    "row_id": tc.row_id,
+                    "process_id": tc.process_id,
+                    "test_result": tc.result
+                }
+                for tc in completed_or_queued_tests
+            ]
+
+            execution_times = [int(r.get("execution_time", 0)) for r in results if r.get("execution_time")]
+
+            summary = self._generate_summary(all_results, 
+                                             execution_times, 
+                                             len(test_cases), 
+                                             total_time=elapsed_time)
+
             self._display_results(summary, no_wait=no_wait)
             
             return summary
@@ -166,14 +197,13 @@ class BatchTestOrchestrator:
         
         self.test_manager.save_updated_csv(output_path=file_path,include_full_response=include_full_response)
         
-    def _generate_summary(self, results: List[Dict[str, Any]], test_cases: List[TestCase], total_time: float) -> Dict[str, Any]:
+    def _generate_summary(self, results: List[Dict[str, Any]], execution_times: List[int], total_test_count: int, total_time: float) -> Dict[str, Any]:
         """Generate test results summary"""
         passed = sum(1 for r in results if r.get("test_result") == "passed")
         failed = sum(1 for r in results if r.get("test_result") == "failed")
         errors = sum(1 for r in results if r.get("test_result") in ["error", "timeout"])
         
         # Calculate average execution time
-        execution_times = [r.get("execution_time", 0) for r in results if r.get("execution_time")]
         avg_time = sum(execution_times) / len(execution_times) if execution_times else 0
         avg_time_formatted = f"{avg_time:.1f}s" if avg_time > 0 else "N/A"
         
@@ -188,11 +218,11 @@ class BatchTestOrchestrator:
         
         return {
             "success": True,
-            "total_tests": len(test_cases),
+            "total_tests": total_test_count,
             "passed": passed,
             "failed": failed,
             "errors": errors,
-            "pass_rate": f"{(passed / len(test_cases) * 100):.1f}%",
+            "pass_rate": f"{(passed / total_test_count * 100):.1f}%",
             "avg_time_per_test": avg_time_formatted,
             "total_execution_time": total_time_formatted,
             "results": results,

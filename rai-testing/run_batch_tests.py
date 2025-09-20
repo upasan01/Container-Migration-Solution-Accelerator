@@ -78,7 +78,7 @@ class BatchTestOrchestrator:
             ]
 
             if len(tests_ready_to_run) == 0:
-                self.console.print(f"⚠️ No tests in CSV file are ready to run. All have been queud for testing or completed testing.")
+                self.console.print(f"⚠️  No tests in CSV file are ready to run. All have been queud for testing or completed testing.")
                 return {
                     "success": False,
                     "total_tests": 0,
@@ -86,7 +86,7 @@ class BatchTestOrchestrator:
                     "timestamp": datetime.now().isoformat()
                 }
                 
-            completed_or_queued_tests = test_cases = [
+            completed_or_queued_tests = [
                 tc for tc in test_cases
                 if tc.process_id and tc.process_id.strip()
             ]

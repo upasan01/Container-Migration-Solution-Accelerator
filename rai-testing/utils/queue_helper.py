@@ -80,7 +80,7 @@ class QueueTestHelper:
     def send_test_message(
         self,
         process_id: str,
-        user_id: str = "rai-test-user",
+        user_id: str,
         additional_data: Dict[str, Any] = None,
         visibility_timeout: int = None,
         time_to_live: int = None

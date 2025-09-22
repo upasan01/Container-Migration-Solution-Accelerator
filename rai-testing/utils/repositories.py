@@ -1,7 +1,7 @@
 from pydantic import Field
 from sas.cosmosdb.sql import EntityBase, RepositoryBase, RootEntityBase
 from config import RAITestConfig
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timezone
 
 def _get_utc_timestamp() -> str:
     """Get current UTC timestamp in human-readable format"""
@@ -76,6 +76,25 @@ class ProcessStatus(RootEntityBase["ProcessStatus", str]):
    
 
 class AgentActivityRepository(RepositoryBase[ProcessStatus, str]):
+    def __init__(self, config: RAITestConfig):
+        if not config:
+            raise ValueError("RAITestConfig is required")
+
+        super().__init__(
+            connection_string=f"AccountEndpoint={config.COSMOS_DB_ENDPOINT};AccountKey={config.COSMOS_DB_KEY};",
+            database_name=config.COSMOS_DB_NAME,
+            container_name=config.COSMOS_DB_CONTAINER,
+        )
+
+class Process(RootEntityBase["Process", str]):
+    user_id: str
+    source_file_count: int = 0
+    result_file_count: int = 0
+    status: str = "initialized"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ProcessRepository(RepositoryBase[Process, str]):
     def __init__(self, config: RAITestConfig):
         if not config:
             raise ValueError("RAITestConfig is required")

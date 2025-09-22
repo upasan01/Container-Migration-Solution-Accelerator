@@ -19,6 +19,7 @@ from utils.yaml_generator import YamlFileGenerator
 from utils.blob_helper import BlobStorageTestHelper
 from utils.queue_helper import QueueTestHelper
 from utils.monitoring import TestMonitor
+from repositories import Process, ProcessRepository
 
 
 class CoreTestRunner:
@@ -216,10 +217,20 @@ class CoreTestRunner:
             
             self.logger.debug(f"Uploaded to blob: {blob_path}")
             
-            test_case.blob_path = blob_path         
+            test_case.blob_path = blob_path    
+                 
+            # Step 3: create Process record in Cosmos
+            #         Note: this is only used on the final results page and should be refactored with the activity container
+            process = Process(
+                id=test_case.process_id,
+                user_id="rai-test-user"
+            )
 
-            # Step 3: Send queue message to trigger processing
-            self.queue_helper.send_test_message(test_case.process_id, time_to_live=time_to_live)
+            async with ProcessRepository(self.config) as processRepository:
+                await processRepository.add_async(process)
+
+            # Step 4: Send queue message to trigger processing
+            self.queue_helper.send_test_message(process_id=process.id, user_id=process.user_id, time_to_live=time_to_live)
             self.logger.debug(f"Sent queue message for process_id: {test_case.process_id}")
                   
             return test_case

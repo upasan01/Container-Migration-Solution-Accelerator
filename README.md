@@ -24,7 +24,7 @@ The solution uses a sophisticated multi-agent orchestration pattern where specia
 4. **YAML Conversion**: Expert YAML transformation with security, networking, and storage optimizations
 5. **Documentation Generation**: Comprehensive migration reports with expert insights
 
-### Key features
+## Features
 
 This solution enables enterprise-grade Kubernetes migration with the following capabilities:
 
@@ -66,6 +66,8 @@ If you want to get know more detail about Agentic Architecture, please take a lo
 - **Microsoft MCP Server**: Document search and knowledge retrieval
 - **Intelligent Tool Selection**: Agents autonomously choose appropriate tools based on context
 
+## Resources
+
 ### How to customize
 
 If you'd like to customize the solution accelerator, here are some common areas to start:
@@ -87,6 +89,8 @@ If you'd like to customize the solution accelerator, here are some common areas 
 [Process Framework Implementation](docs/ProcessFrameworkGuide.md)
 
 [MCP Server Integration Guide](docs/MCPServerGuide.md)
+
+## Getting Started
 
 ## <img src="docs/images/readme/quick-deploy.png" width="48" alt="Quick deploy" />[Quick deploy](#quick-deploy)
 
@@ -129,6 +133,8 @@ Use the [Azure pricing calculator](https://azure.microsoft.com/pricing/calculato
 - **o3 Model**: Available across **20+ Azure regions** including Australia East, Brazil South, Canada East, East US, East US2, France Central, Germany West Central, Italy North, Japan East, Korea Central, North Central US, Norway East, Poland Central, South Africa North, South Central US, South India, Spain Central, Sweden Central, Switzerland North, UAE North, UK South, West Europe, West US, and West US3
 - **Registration Requirements**: Some models may require registration for access
 - **Quota Management**: Ensure sufficient TPM (tokens per minute) quota for batch processing
+
+## Guidance
 
 ## <img src="docs/images/readme/business_scenario.png" width="48">[Migration Scenario](#migration-scenario)
 

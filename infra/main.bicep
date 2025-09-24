@@ -207,7 +207,7 @@ module cosmosDb 'modules/cosmosDb.bicep' = {
 
 var aiModelDeploymentName = aiModelName
 
-module aiFoundry 'br/public:avm/ptn/ai-ml/ai-foundry:0.3.0' = {
+module aiFoundry 'br/public:avm/ptn/ai-ml/ai-foundry:0.4.0' = {
   name: take('avm.ptn.ai-ml.ai-foundry.${resourcesName}', 64)
   params: {
     #disable-next-line BCP334
@@ -266,8 +266,8 @@ module appConfiguration 'br/public:avm/res/app-configuration/configuration-store
   params: {
     location: location
     name: 'appcs-${resourcesName}'
-    disableLocalAuth: false // TODO - private networking?
-    //enablePurgeProtection: false // TODO - turn off purge protection after dev env not used or is recreated
+    disableLocalAuth: false // needed to allow setting app config key values from this module
+    enablePurgeProtection: false
     // TODO - private networking
     //privateEndpoints:
     tags: allTags
